@@ -1,7 +1,7 @@
-import Signup from "./authentication/signup";
-import Login from "./authentication/login";
+import Signup from "./pages/authentication/signup";
+import Login from "./pages/authentication/login";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./home";
+import Home from "./pages/home";
 
 function App() {
   return (
