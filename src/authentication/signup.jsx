@@ -122,9 +122,12 @@ function Signup() {
               </button>
             </form>
             <div className="text-center mt-4 mb-4">
-              <a href="#" className="text-gray-600 hover:underline">
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full text-gray-600 hover:underline"
+              >
                 Login
-              </a>
+              </button>
             </div>
           </div>
         </div>

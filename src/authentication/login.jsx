@@ -8,8 +8,8 @@ function Login() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState(" ");
-  const [password, setPassword] = useState(" ");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
 
   const onSubmit = async (e) => {
@@ -24,7 +24,7 @@ function Login() {
 
   return (
     <>
-      {/* {userLoggedIn && <Navigate to={"home"} replace={true} />} */}
+      {userLoggedIn && <Navigate to={"/home"} replace={true} />}
       <h1 className="italic text-green-600 text-4xl bg-gray-100">
         @WildRoutes
       </h1>
@@ -44,6 +44,10 @@ function Login() {
                   id="email"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
                 />
               </div>
               <div className="mb-4">
@@ -56,6 +60,10 @@ function Login() {
                     id="password"
                     className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
                     placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
                   />
                   <button
                     type="button"
