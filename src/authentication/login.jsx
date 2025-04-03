@@ -1,11 +1,30 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { doSignINWithEmailAndPassword } from "../firebase/auth";
+import { useAuth } from "../contexts/authContext";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Login() {
+  const { userLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState(" ");
+  const [password, setPassword] = useState(" ");
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (!isSigningIn) {
+      setIsSigningIn(true);
+      await doSignINWithEmailAndPassword(email, password);
+    }
+  };
+
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <>
+      {/* {userLoggedIn && <Navigate to={"home"} replace={true} />} */}
       <h1 className="italic text-green-600 text-4xl bg-gray-100">
         @WildRoutes
       </h1>
@@ -15,7 +34,7 @@ function Login() {
             <h1 className="text-4xl font-bold text-center mb-6">
               Welcome Back!
             </h1>
-            <form>
+            <form onSubmit={onSubmit}>
               <div className="mb-4">
                 <label className="block text-gray-700" htmlFor="email">
                   Email
@@ -53,18 +72,19 @@ function Login() {
               >
                 Sign In
               </button>
-              <div className="text-center mt-4 mb-4">
-                <a href="#" className="text-gray-600 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-800 transition"
-              >
-                Sign Up
-              </button>
             </form>
+
+            <div className="text-center mt-4 mb-4">
+              <a href="#" className="text-gray-600 hover:underline">
+                Forgot password?
+              </a>
+            </div>
+            <button
+              onClick={() => navigate("/signup")}
+              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-800 transition"
+            >
+              Sign Up
+            </button>
           </div>
         </div>
       </>
