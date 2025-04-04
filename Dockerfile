@@ -5,10 +5,11 @@ FROM node:20
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY package*.json package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm install --omit=dev
+RUN npm install
+RUN ls node_modules/.bin && npm list vite
 
 # Copy the rest of your application files
 COPY . .
