@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { doSignINWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
+import "../../index.css";
 
 
 function Login() {
@@ -74,7 +75,7 @@ function Login() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition"
+                className="generic-button"
               >
                 Sign In
               </button>
@@ -87,7 +88,7 @@ function Login() {
             </div>
             <button
               onClick={() => navigate("/signup")}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-800 transition"
+              className="generic-button"
             >
               Sign Up
             </button>

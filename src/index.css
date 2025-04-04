@@ -1,19 +1,27 @@
 @import "tailwindcss";
 
-nav {
+.generic-button {
+  @apply w-full bg-black text-white py-2 rounded-lg transition;
+}
+.generic-button:hover {
+  @apply hover:bg-gray-600 underline outline-1;
+}
+
+.nav-bar {
   @apply text-black mx-auto px-2;
 }
-.nav-link {
+.nav-bar .nav-link {
   @apply text-xl bg-white rounded-lg transition-all duration-300 px-5 py-2;
 }
 
-.nav-link:hover {
+.nav-bar .nav-link:hover {
   @apply bg-black text-white;
 }
 .search-bar {
   @apply flex items-center py-1 pl-3 pr-3 text-gray-500 border-2 rounded-2xl bg-gray-50 border-gray-300 w-full;
 }
-/* Responsive behavior for the search bar */
+
+/*===================================== Responsive behavior for the search bar */
 @media (max-width: 768px) {
   .search-bar {
     @apply max-w-1/4;

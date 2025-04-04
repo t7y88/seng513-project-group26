@@ -113,7 +113,7 @@ function Signup() {
               <button
                 disabled={isRegistering}
                 type="submit"
-                className="w-full bg-white-600 text-gray-700 py-2 rounded-lg hover:bg-black hover:text-white transition"
+                className="generic-button"
               >
                 {isRegistering ? "Signing Up..." : "Sign Up"}
               </button>
@@ -121,7 +121,7 @@ function Signup() {
             <div className="text-center mt-4 mb-4">
               <button
                 onClick={() => navigate("/login")}
-                className="w-full bg-white-600 text-gray-700 py-2 rounded-lg hover:bg-black hover:text-white transition"
+                className="generic-button"
               >
                 Login
               </button>

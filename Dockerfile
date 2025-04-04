@@ -9,8 +9,6 @@ COPY package.json package-lock.json ./
 
 # Install dependencies
 RUN npm install
-RUN ls node_modules/.bin && npm list vite
-
 # Copy the rest of your application files
 COPY . .
 

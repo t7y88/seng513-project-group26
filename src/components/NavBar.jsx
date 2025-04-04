@@ -10,7 +10,7 @@ function NavBar() {
   const { userLoggedIn } = useAuth();
 
   return (
-    <nav className="nav">
+    <nav className="nav-bar">
       <div className="flex items-center justify-between h-16 ">
         <div className="flex items-center mr-2">
           <h1 className="italic text-black-600 text-4xl">
