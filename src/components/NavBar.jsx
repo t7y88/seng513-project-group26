@@ -14,13 +14,13 @@ function NavBar() {
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="flex items-center justify-between h-16 ">
-          <div className="flex items-center ">
+          <div className="flex items-center mr-2">
             <h1 className="italic text-black-600 text-4xl">
               WildRoutes
             </h1>
           </div>
           <SearchBar/>
-          <div className="flex space-x-4">
+          <div className="flex space-x-1 ml-1">
             <Link to="/home" className="nav-link">
               Home
             </Link>
