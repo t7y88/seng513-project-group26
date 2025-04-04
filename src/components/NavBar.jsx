@@ -11,46 +11,43 @@ function NavBar() {
 
   return (
     <nav className="nav">
-      <div className="mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="flex items-center justify-between h-16 ">
-          <div className="flex items-center mr-2">
-            <h1 className="italic text-black-600 text-4xl">
-              WildRoutes
-            </h1>
-          </div>
-          <SearchBar/>
-          <div className="flex space-x-1 ml-1">
-            <Link to="/home" className="nav-link">
-              Home
+      <div className="flex items-center justify-between h-16 ">
+        <div className="flex items-center mr-2">
+          <h1 className="italic text-black-600 text-4xl">
+            WildRoutes
+          </h1>
+        </div>
+        <SearchBar/>
+        <div className="flex space-x-1 ml-1">
+          <Link to="/home" className="nav-link">
+            Home
+          </Link>
+          {/* Only Show the profile option if a user is logged in */}
+          {userLoggedIn && (
+            <Link to="/profile" className="nav-link">
+              Profile
             </Link>
-            {/* Only Show the profile option if a user is logged in */}
-            {userLoggedIn && (
-              <Link to="/profile" className="nav-link">
-                Profile
-              </Link>
-            )}
+          )}
 
-            {/* Users only have the sign out option if they are logged in. */}
-            {userLoggedIn ? (
-              <Link
-                to="/login"
-                className="nav-link"
-                onClick={() => {
-                  doSignOut().then(() => {
-                    navigate("/login");
-                  });
-                }}
-              >
-                Logout
-              </Link>
-            ) : (
+          {/* Users only have the sign out option if they are logged in. */}
+          {userLoggedIn ? (
+            <Link
+              to="/login"
+              className="nav-link"
+              onClick={() => {
+                doSignOut().then(() => {
+                  navigate("/login");
+                });
+              }}
+            >
+              Logout
+            </Link>
+          ) : (
 
-              <Link to="/signup" className="nav-link">
-                Signup
-              </Link>
-            )}
-          </div>
+            <Link to="/signup" className="nav-link">
+              Signup
+            </Link>
+          )}
         </div>
       </div>
     </nav>
