@@ -27,9 +27,6 @@ function Signup() {
   return (
     <>
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
-      <h1 className="italic text-green-600 text-4xl bg-gray-100">
-        @WildRoutes
-      </h1>
       <>
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
           <div className="bg-white p-8 rounded-xl shadow-lg w-96">
@@ -116,7 +113,7 @@ function Signup() {
               <button
                 disabled={isRegistering}
                 type="submit"
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-800 transition"
+                className="w-full bg-white-600 text-gray-700 py-2 rounded-lg hover:bg-black hover:text-white transition"
               >
                 {isRegistering ? "Signing Up..." : "Sign Up"}
               </button>
@@ -124,7 +121,7 @@ function Signup() {
             <div className="text-center mt-4 mb-4">
               <button
                 onClick={() => navigate("/login")}
-                className="w-full text-gray-600 hover:underline"
+                className="w-full bg-white-600 text-gray-700 py-2 rounded-lg hover:bg-black hover:text-white transition"
               >
                 Login
               </button>

@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+nav {
+  @apply text-black;
+}
+.nav-link {
+  @apply text-xl bg-white rounded-lg transition-all duration-300 px-8 py-2;
+}
+
+.nav-link:hover {
+  @apply bg-black text-white;
+}
+/* 
+nav.searchBar {
+  @apply flex items-center justify-between;
+}
+.searchBar input {
+  @apply border-2 border-gray-300 rounded-lg px-4 py-2;
+}
+.searchBar input:focus {
+  @apply border-blue-500 outline-none;
+}
+.searchBar button {
+  @apply bg-blue-500 text-white rounded-lg px-4 py-2 ml-2;
+}
+.searchBar button:hover {
+  @apply bg-blue-700;
+} */

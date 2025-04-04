@@ -4,6 +4,7 @@ import { doSignINWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
 
+
 function Login() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
@@ -25,9 +26,6 @@ function Login() {
   return (
     <>
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
-      <h1 className="italic text-green-600 text-4xl bg-gray-100">
-        @WildRoutes
-      </h1>
       <>
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
           <div className="bg-white p-8 rounded-xl shadow-lg w-96">
