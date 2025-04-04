@@ -4,16 +4,16 @@ nav {
   @apply text-black;
 }
 .nav-link {
-  @apply text-xl bg-white rounded-lg transition-all duration-300 px-8 py-2;
+  @apply text-xl bg-white rounded-lg transition-all duration-300 px-6 py-2;
 }
 
 .nav-link:hover {
   @apply bg-black text-white;
 }
-/* 
-nav.searchBar {
-  @apply flex items-center justify-between;
+nav.search-bar {
+  @apply max-w-sm px-4;
 }
+/*
 .searchBar input {
   @apply border-2 border-gray-300 rounded-lg px-4 py-2;
 }
