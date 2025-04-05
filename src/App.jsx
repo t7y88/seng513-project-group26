@@ -9,6 +9,7 @@ import Signup from "./pages/authentication/signup";
 import PageSizeWidget from "./components/PageSizeWidget";
 import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
+import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
 function App() {
@@ -23,9 +24,30 @@ function App() {
           <Route path="signup" element={<Signup />} />
           <Route path="home" element={<Home />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="profile/edit" element={<EditProfilePage />} />
-          <Route path="friends" element={<div>Friends Page Coming Soon</div>} />
+          <Route 
+            path="profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="profile/edit" 
+            element={
+              <ProtectedRoute>
+                <EditProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="friends" 
+            element={
+              <ProtectedRoute>
+                <div>Friends Page Coming Soon</div>
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
         <BottomNavBar />
         {/* Widget for debug only. Helps us find the break points we want to set. */}
