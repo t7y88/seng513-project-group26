@@ -113,7 +113,7 @@ function Signup() {
               <button
                 disabled={isRegistering}
                 type="submit"
-                className="generic-button"
+                className="generic-button-active"
               >
                 {isRegistering ? "Signing Up..." : "Sign Up"}
               </button>
@@ -121,7 +121,7 @@ function Signup() {
             <div className="text-center mt-4 mb-4">
               <button
                 onClick={() => navigate("/login")}
-                className="generic-button"
+                className="generic-button-inactive"
               >
                 Login
               </button>

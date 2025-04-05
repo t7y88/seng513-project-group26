@@ -6,6 +6,7 @@ import Home from "./pages/home";
 import Login from "./pages/authentication/login";
 import Signup from "./pages/authentication/signup";
 import PageSizeWidget from "./components/PageSizeWidget";
+import Profile from "./pages/profile";
 import "./index.css";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="login" element={<Login />}></Route>
         <Route path="signup" element={<Signup />}></Route>
         <Route path="home" element={<Home />}></Route>
+        <Route path="profile" element={<Profile />}></Route>
       </Routes>
       {/* Widget for debug only. Helps us find the break points we want to set. */}
       <PageSizeWidget />
