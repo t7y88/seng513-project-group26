@@ -1,4 +1,5 @@
 import React from "react";
+import HikeCard from "../components/home/HikeCard";
 
 
 function Home() {
@@ -9,7 +10,7 @@ function Home() {
     // Please insert your own values and don't trust these.
     <div className="bg-red-500 h-screen flex items-center justify-center">
 
-
+      <HikeCard />
     </div>
   );
 }
