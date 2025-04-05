@@ -7,6 +7,7 @@ import Login from "./pages/authentication/login";
 import Signup from "./pages/authentication/signup";
 import PageSizeWidget from "./components/PageSizeWidget";
 import Profile from "./pages/profile";
+import EditProfilePage from "./pages/editProfile";
 import "./index.css";
 
 function App() {
@@ -16,10 +17,11 @@ function App() {
       <NavBar/>
       <Routes>
         <Route path="/" element={userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
-        <Route path="login" element={<Login />}></Route>
-        <Route path="signup" element={<Signup />}></Route>
-        <Route path="home" element={<Home />}></Route>
-        <Route path="profile" element={<Profile />}></Route>
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+        <Route path="home" element={<Home />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="profile/edit" element={<EditProfilePage />} />
       </Routes>
       {/* Widget for debug only. Helps us find the break points we want to set. */}
       <PageSizeWidget />

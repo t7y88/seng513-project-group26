@@ -1,7 +1,14 @@
 import React from "react";
 import { FaPencil } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 function ProfileData({ userData }) {
+  const navigate = useNavigate();
+
+  const handleEditProfile = () => {
+    navigate('/profile/edit', { state: { userData } });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow p-6 space-y-6 md:space-y-0 md:grid md:grid-cols-3 md:gap-6">
       {/* Profile Image Section */}
@@ -37,7 +44,10 @@ function ProfileData({ userData }) {
         <p className="mt-2 text-gray-600">{userData.about}</p>
         <p className="mt-2 text-sm text-gray-500">{userData.description}</p>
         <div className="flex justify-end">
-          <button className="generic-button-active mt-2">
+          <button 
+            onClick={handleEditProfile}
+            className="generic-button-active mt-2"
+          >
             <FaPencil className="inline-block mr-1" />
             Edit Profile
           </button>
