@@ -1,6 +1,6 @@
 import React from "react";
 import { SlMagnifier } from "react-icons/sl";
-import "../index.css";
+import "../../index.css";
 
 // TODO: Add search functionality to the search bar
 

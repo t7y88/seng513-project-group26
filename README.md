@@ -13,6 +13,15 @@
 - Copy the .env details we shared in the discord.
   - We need the .env files for our firebase DB to work.
 
+# Make sure you have node 20 running locally.
+
+```bash
+nvm install 20
+npm install
+```
+
+Now you should have all the local dependencies built you can proceed with the below commands.
+
 # Starting and stopping the docker containers
 
 - First make sure docker is running.

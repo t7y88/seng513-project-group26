@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/navbar/NavBar";
 import BottomNavBar from "./components/BottomNavBar";
 import Home from "./pages/home";
 import Login from "./pages/authentication/login";
@@ -16,6 +16,9 @@ function App() {
   const { userLoggedIn } = useAuth();
   return (
     <Router>
+      {/* Shouldn't the bottom navbar just be the same component as the navbar 
+          but it changes depending on the screen size?
+          */}
       <div className="pb-16 md:pb-0"> {/* Add padding for bottom nav */}
         <NavBar/>
         <Routes>

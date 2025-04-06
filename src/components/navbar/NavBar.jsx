@@ -1,8 +1,8 @@
 import React from "react";
-import { doSignOut } from "../firebase/auth";
+import { doSignOut } from "../../firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/authContext";
-import "../index.css";
+import { useAuth } from "../../contexts/authContext";
+import "../../index.css";
 import SearchBar from "./SearchBar";
 
 function NavBar() {
