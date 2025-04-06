@@ -5,12 +5,11 @@ import { useAuth } from "../../contexts/authContext";
 import "../../index.css";
 import SearchBar from "./SearchBar";
 
-function NavBar() {
-  // const navigate = useNavigate();
+function NavBar() { 
+  const navigate = useNavigate();
   const { userLoggedIn } = useAuth();
   return (
-    // The nav bar is hidden on mobile devices and only shows on larger screens.
-    <nav className="hidden md:flex sticky top-0 bg-white shadow-md z-50">
+    <nav className="hidden md:flex sticky top-0 bg-white z-50">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 ">
           {/* Logo */}
