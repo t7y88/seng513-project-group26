@@ -19,8 +19,9 @@ function App() {
       {/* Shouldn't the bottom navbar just be the same component as the navbar 
           but it changes depending on the screen size?
           */}
-      <div className="pb-16 md:pb-0"> {/* Add padding for bottom nav */}
+      {/* Add padding for bottom nav */}
         <NavBar/>
+        <div className="pb-16 md:pb-0"> 
         <Routes>
           <Route path="/" element={userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
           <Route path="login" element={<Login />} />
