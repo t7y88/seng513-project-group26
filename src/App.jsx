@@ -10,6 +10,7 @@ import PageSizeWidget from "./components/PageSizeWidget";
 import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Friends from "./pages/friends";
 import "./index.css";
 
 function App() {
@@ -48,7 +49,7 @@ function App() {
             path="friends" 
             element={
               <ProtectedRoute>
-                <div>Friends Page Coming Soon</div>
+                <Friends />
               </ProtectedRoute>
             } 
           />

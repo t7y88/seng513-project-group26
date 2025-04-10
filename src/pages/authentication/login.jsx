@@ -80,6 +80,19 @@ function Login() {
                 Log In
               </button>
             </form>
+            {process.env.NODE_ENV === "development" && (
+                <div className="text-center mt-4">
+                  <button
+                    onClick={() =>
+                      doSignINWithEmailAndPassword("devuser@example.com", "devpassword123")
+                    }
+                    className="generic-button-inactive w-full"
+                  >
+                    Dev Login
+                  </button>
+                </div>
+              )}
+  
 
             <div className="text-center mt-4 mb-4">
               <a href="#" className="text-gray-600 hover:underline">
