@@ -1,53 +1,116 @@
+/* ------------------------------------------
+   Tailwind Base + Utilities (v4-compatible)
+------------------------------------------- */
+
+/* Imports Tailwind’s core styles */
 @import "tailwindcss";
 
-/* Base button styles */
+/* Includes only Tailwind utilities layer (v4 removes @tailwind components) */
+@tailwind utilities;
+
+
+/* ------------------------------------------
+   Custom Utility Classes (defined via @layer)
+------------------------------------------- */
+@layer utilities {
+  /* Used for small hike cards in Friend preview carousels */
+  .hike-preview-card {
+    @apply p-1 border-2 border-gray-300 rounded hover:shadow-md hover:shadow-gray-400 transition-shadow;
+  }
+
+  /* Compact hike title inside previews */
+  .hike-preview-text {
+    @apply text-xs font-semibold truncate;
+  }
+
+  /* Very small, light gray date text */
+  .hike-preview-date {
+    @apply text-[10px] text-gray-500;
+  }
+}
+
+
+/* ------------------------------------------
+   Button Styles (Reusable Across Site)
+------------------------------------------- */
+
+/* Base button style used as a starting point */
 .generic-button {
   @apply px-4 py-2 w-full rounded-lg font-medium transition-colors duration-200;
 }
 
-/* Button variants */
+/* Primary button style: black background, white text */
 .generic-button-active {
   @apply px-4 py-2 rounded-lg cursor-pointer bg-black text-white hover:bg-gray-800;
 }
 
+/* Secondary button style: gray background, gray text */
 .generic-button-inactive {
   @apply px-4 py-2 rounded-lg cursor-pointer bg-gray-100 text-gray-600 hover:bg-gray-200;
 }
 
+
+/* ------------------------------------------
+   Input Field Styling (Used in Forms)
+------------------------------------------- */
 .input-field {
-  @apply mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-black focus:outline-none focus:ring-1 focus:ring-black;
+  @apply mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 
+         focus:border-black focus:outline-none focus:ring-1 focus:ring-black;
 }
 
-/* Navigation styles */
+
+/* ------------------------------------------
+   Navigation Links & Layout Helpers
+------------------------------------------- */
+
+/* Navbar link style with hover animation */
 .nav-link {
-  @apply text-base md:text-lg bg-white rounded-lg transition-all duration-300 px-3 py-1.5 md:px-4 md:py-2 hover:bg-black hover:text-white;
+  @apply text-base md:text-lg bg-white rounded-lg transition-all duration-300 
+         px-3 py-1.5 md:px-4 md:py-2 hover:bg-black hover:text-white;
 }
 
-/* Bottom Navigation styles */
+/* Safe padding for bottom navbar on mobile devices with notches */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* Search bar styles */
+
+/* ------------------------------------------
+   Search Bar Styling
+------------------------------------------- */
+
+/* Full-width search bar with subtle border and hover behavior */
 .search-bar {
-  @apply flex items-center py-1.5 px-3 text-gray-500 border rounded-2xl bg-gray-50 border-gray-300 w-full transition-all duration-200 focus-within:border-black focus-within:ring-1 focus-within:ring-black;
+  @apply flex items-center py-1.5 px-3 text-gray-500 border rounded-2xl 
+         bg-gray-50 border-gray-300 w-full transition-all duration-200 
+         focus-within:border-black focus-within:ring-1 focus-within:ring-black;
 }
 
+
+/* ------------------------------------------
+   Utility Classes for Overflow/Scrollbars
+------------------------------------------- */
+
+/* Hides scrollbars for horizontal scrolling containers */
 .no-scrollbar {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE 10+ */
 }
 .no-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none;                  /* Chrome, Safari */
 }
 
-/* Responsive search bar behavior */
+
+/* ------------------------------------------
+   Mobile-Only Adjustments (Responsive Hacks)
+------------------------------------------- */
 @media (max-width: 768px) {
+  /* Make search bar more compact on mobile */
   .search-bar {
     @apply py-1 px-2 text-sm;
   }
 
-  /* Adjust main content padding for bottom nav */
+  /* Add bottom padding to main content to prevent overlap with fixed bottom nav */
   main {
     @apply pb-16;
   }

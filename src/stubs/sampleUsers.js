@@ -24,7 +24,50 @@ export const sampleUsers = [
                 dateCompleted: "2025-04-06",
                 rating: 4.5,
                 notes: "Crystal-clear lakes and stunning reflections!"
+            },
+            {
+                hikeId: "ha-ling-peak",
+                dateCompleted: "2025-05-10",
+                rating: 5,
+                notes: "I almost got struck by lightning - but what a view!"
+            },
+            {
+                hikeId: "valley-of-five-lakes",
+                dateCompleted: "2022-04-16",
+                rating: 3,
+                notes: "Cold and Rainy - but the views were worth it!"
+            },
+            {
+                hikeId: "ha-ling-peak",
+                dateCompleted: "2022-06-10",
+                rating: 4,
+                notes: "A bit windy, but that meant the sky was blue and the sun was out."
+            },
+            {
+                hikeId: "valley-of-five-lakes",
+                dateCompleted: "2021-08-06",
+                rating: 4,
+                notes: "I saw a squirrel. It was brown."
+            },
+            {
+                hikeId: "ha-ling-peak",
+                dateCompleted: "2020-12-24",
+                rating: 1,
+                notes: "Why did I think this was a good idea? It was freezing!"
+            },
+            {
+                hikeId: "valley-of-five-lakes",
+                dateCompleted: "2019-06-06",
+                rating: 5,
+                notes: "The best hike ever! I saw a moose!"
+            },
+            {
+                hikeId: "ha-ling-peak",
+                dateCompleted: "2019-03-10",
+                rating: 3.5,
+                notes: "It snowed the whole time, and I almost slipped and died, but the view was worth it!"
             }
+        
         ]
     },
     {

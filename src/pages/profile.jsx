@@ -6,7 +6,7 @@ import HikesList from "../components/profile/HikesList";
 import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 
-function Profile() {
+function Profile( ) {
   // Mock data
   const userData = sampleUsers[0];
 

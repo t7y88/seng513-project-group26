@@ -26,7 +26,7 @@ export const hikeEntities = {
     "throat-of-the-world": {
       id: "throat-of-the-world",
       title: "Throat of the World",
-      image: "https://static.wikia.nocookie.net/elderscrolls/images/b/bf/Paarthurnax-crushed.png/revision/latest/scale-to-width-down/1000?cb=20120513053037.png",
+      image: "https://i0.wp.com/girlsincapes.com/wp-content/uploads/2014/11/Throat-of-the-World.jpg",
       location: "Skyrim",
       difficulty: "Hard",
       distance: "666 km",
