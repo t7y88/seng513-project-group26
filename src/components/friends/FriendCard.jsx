@@ -1,6 +1,15 @@
 // Import React (not always required in newer versions, but still common)
 import React from "react";
 
+import FriendHikePreviewList from "./FriendHikePreviewList";
+// Mock data from stubs
+import { hikeEntities } from "../../stubs/hikeEntities";
+import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
+
+
+
+
+
 /*
   FriendCard Component
 
@@ -24,6 +33,9 @@ import React from "react";
 */
 
 function FriendCard({ friend, onViewProfile }) {
+  // Merge the user's completedHikes with the full hike data (to get title, image, etc.)
+  const mergedHikes = getMergedRecentHikes(friend.completedHikes, hikeEntities);
+
   return (
     // Card container: white background, padding, rounded corners, shadow
     // Uses flexbox to space out content horizontally with center alignment
@@ -50,10 +62,21 @@ function FriendCard({ friend, onViewProfile }) {
       {/* Right section: view profile button */}
       <button
         className="generic-button-active" // Styled button class 
+        // TODO - Need to define the onViewProfile function in the friends component module
         onClick={() => onViewProfile(friend)} // Calls the function passed via props
       >
         View Profile
       </button>
+
+      
+      {/* Bottom: Recent Hikes list (now in its own row below the flex) */}
+      {friend.completedHikes?.length > 0 && (
+        <div>
+          <p className="text-sm text-gray-700 font-medium mb-1">Recent Hikes</p>
+          <FriendHikePreviewList hikes={mergedHikes} />
+        </div>
+      )}
+
     </div>
   );
 }

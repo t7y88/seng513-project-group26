@@ -45,7 +45,7 @@ function FriendHikePreviewList({ hikes }) {
 
           {/* Hike name and date */}
           <div className="p-1 bg-white">
-            {/* Hike title — truncated so long names don't overflow */}
+            {/* Hike title — truncated so long names don't overflow - e.g. Valley of Five Lakes */}
             <p className="text-xs font-semibold truncate">{hike.title}</p>
 
             {/* Completion date formatted as MM/DD/YYYY */}

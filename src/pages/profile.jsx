@@ -2,18 +2,13 @@ import React from "react";
 import ProfileData from "../components/profile/ProfileData";
 import HikesList from "../components/profile/HikesList";
 
+// Mock data from stu
+import { sampleUsers } from "../stubs/sampleUsers";
+import { hikeEntities } from "../stubs/hikeEntities";
+
 function Profile() {
   // Mock data
-  const userData = {
-    username: "usharabkhan",
-    age: 28,
-    location: "Calgary, AB",
-    friends: 142,
-    memberSince: "January 2024",
-    about: "Passionate hiker and nature enthusiast",
-    description: "Always seeking new adventures in the Canadian Rockies. Love photographing wildlife and mountain landscapes.",
-    profileImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9UdkG68P9AHESMfKJ-2Ybi9pfnqX1tqx3wQ&s",
-  };
+  const userData = sampleUsers[0];
 
   const completedHikes = [
     {

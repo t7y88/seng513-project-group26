@@ -5,6 +5,7 @@ import FriendCard from "./FriendCard";
 import "../../index.css";
 
 
+
 /*
   FriendsList Component
 
