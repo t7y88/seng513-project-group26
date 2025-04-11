@@ -1,5 +1,14 @@
 import { db } from "./firebase";
-import { collection, doc, setDoc, addDoc, getDoc, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
+  query,
+  where
+} from "firebase/firestore";
 
 // 1. Create a new user
 export const createUserInFirestore = async (uid, userData) => {
@@ -36,4 +45,17 @@ export const addFriendship = async (user1, user2) => {
     user2,
     since: new Date()
   });
+};
+
+// 6. Get all users
+export const getAllUsers = async () => {
+  const usersRef = collection(db, "users");
+  const snapshot = await getDocs(usersRef);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+// 7. Update a user's completed hikes
+export const updateCompletedHikes = async (uid, completedHikes) => {
+  const userRef = doc(db, "users", uid);
+  await setDoc(userRef, { completedHikes }, { merge: true });
 };
