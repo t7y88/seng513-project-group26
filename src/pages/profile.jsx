@@ -40,7 +40,7 @@ function Profile() {
           >
             Logout
           </Link>
-      </div>
+        </div>
       </div>
     </div>
   );
