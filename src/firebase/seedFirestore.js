@@ -1,6 +1,7 @@
-import { createUserInFirestore, addHike } from "./firestore";
+import { createUserInFirestore, addHike, addReview } from "./firestore";
 import { sampleUsers } from "./stubs/sampleUsers";
 import { hikeEntities } from "./stubs/hikeEntities";
+import { reviewEntities } from "./stubs/reviewEntities"; 
 
 // Utility function to delay for Firestore write limits (optional but safe)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -12,7 +13,7 @@ const seedFirestore = async () => {
       const hikeData = hikeEntities[hikeId];
       await addHike(hikeData);
       console.log(`Added hike: ${hikeData.title}`);
-      await delay(100); // Small delay to avoid too many writes at once
+      await delay(100);
     }
 
     console.log("Seeding users...");
@@ -20,6 +21,13 @@ const seedFirestore = async () => {
       const { username, ...userData } = user;
       await createUserInFirestore(username, userData);
       console.log(`Added user: ${username}`);
+      await delay(100);
+    }
+
+    console.log("Seeding reviews...");
+    for (const review of reviewEntities) {
+      await addReview(review);
+      console.log(`Added review for hike ${review.hikeId} by ${review.userId}`);
       await delay(100);
     }
 
