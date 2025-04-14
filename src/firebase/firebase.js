@@ -22,7 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-export { app, auth };
+// export { app, auth };
 
 // Initialize Firestore
 const db = getFirestore(app);  // Import Firestore from Firebase SDK
