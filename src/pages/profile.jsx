@@ -1,13 +1,16 @@
 import React from "react";
 import ProfileData from "../components/profile/ProfileData";
 import HikesList from "../components/profile/HikesList";
+import { Link, useNavigate } from "react-router-dom";
+import { doSignOut } from "../firebase/auth";
 
 // Mock data from stu
 import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 
-function Profile( ) {
-  // Mock data
+function Profile() {
+  const navigate = useNavigate();
+  // Mock 
   const userData = sampleUsers[0];
 
   const completedHikes = [
@@ -25,6 +28,19 @@ function Profile( ) {
       <div className="max-w-4xl mx-auto space-y-8">
         <ProfileData userData={userData} />
         <HikesList completedHikes={completedHikes} />
+        <div className="flex justify-center">
+          <Link
+            to="/login"
+            className="md:hidden w-full text-center bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
+            onClick={() => {
+              doSignOut().then(() => {
+                navigate("/login");
+              });
+            }}
+          >
+            Logout
+          </Link>
+        </div>
       </div>
     </div>
   );
