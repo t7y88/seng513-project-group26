@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
 import NavBar from "./components/navbar/NavBar";
 import BottomNavBar from "./components/BottomNavBar";
@@ -10,6 +15,7 @@ import PageSizeWidget from "./components/PageSizeWidget";
 import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Map from "./components/Map";
 import "./index.css";
 
 function App() {
@@ -20,37 +26,43 @@ function App() {
           but it changes depending on the screen size?
           */}
       {/* Add padding for bottom nav */}
-        <NavBar/>
-        <div className="pb-16 md:pb-0"> 
+      <NavBar />
+      <div className="pb-16 md:pb-0">
         <Routes>
-          <Route path="/" element={userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
+          <Route
+            path="/"
+            element={
+              userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
+            }
+          />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="home" element={<Home />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
-          <Route 
-            path="profile" 
+          <Route path="map" element={<Map />} />
+          <Route
+            path="profile"
             element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="profile/edit" 
+          <Route
+            path="profile/edit"
             element={
               <ProtectedRoute>
                 <EditProfilePage />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="friends" 
+          <Route
+            path="friends"
             element={
               <ProtectedRoute>
                 <div>Friends Page Coming Soon</div>
               </ProtectedRoute>
-            } 
+            }
           />
         </Routes>
         <BottomNavBar />
