@@ -6,10 +6,10 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+    env_file:
+      - .env
     
     environment:
       NODE_ENV: development
       CHOKIDAR_USEPOLLING: true
-    # stdin_open: true
-    # tty: true
-    # command: npm run dev
+
