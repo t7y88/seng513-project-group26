@@ -3,63 +3,39 @@ import HikeCard from './HikeCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function SuggestedHikes() {
-  // Keep your existing state variables
   const [hikes, setHikes] = useState([]);
-  const [lastVisible, setLastVisible] = useState(null);
   const [loading, setLoading] = useState(false);
   const [allLoaded, setAllLoaded] = useState(false);
   const scrollContainerRef = useRef(null);
-  
-  // Always show both arrows by default
-  const [canScrollLeft, setCanScrollLeft] = useState(true);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  
+    
   // Flag to track initial scroll has been set
   const [initialScrollSet, setInitialScrollSet] = useState(false);
   
   const HIKES_PER_PAGE = 5;
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchHikes();
+
+
+  const checkScrollability = React.useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
   }, []);
 
-  // Scroll to middle after data loads
-  useEffect(() => {
-    if (hikes.length > 0 && !initialScrollSet) {
-      scrollToMiddle();
-      setInitialScrollSet(true);
-    }
-  }, [hikes]);
-
-  const checkScrollability = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    
-    // For visual continuity, we never hide the arrows, but we still track real scroll position
-    const realCanScrollLeft = container.scrollLeft > 0;
-    const realCanScrollRight = 
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 10;
-    
-    setCanScrollLeft(true);
-    setCanScrollRight(true);
-  };
-
   // Function to scroll to the middle of the list on initial load
-  const scrollToMiddle = () => {
+  const scrollToMiddle = React.useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    
+  
     // Calculate a position that's about 1-2 items in
     const itemWidth = 352; // Your card width + margin
     const scrollPosition = itemWidth * 1.5; // Scroll about 1.5 items in
-    
+  
     // Set the scroll position without animation
     container.scrollLeft = scrollPosition;
-    
+  
     // Update scroll indicators
     checkScrollability();
-  };
+  }, [checkScrollability]);
   // TODO:
   // - Add a link to the hike details page when the card is clicked
   // - Add a button to save the hike to the user's profile (if logged in)
@@ -226,7 +202,7 @@ export default function SuggestedHikes() {
 
 
 
-  const fetchHikes = async (nextBatch = false) => {
+  const fetchHikes = React.useCallback(async (nextBatch = false) => {
     setLoading(true);
         
     if (hikes.length >= 20 && nextBatch) {
@@ -235,7 +211,7 @@ export default function SuggestedHikes() {
       return;
     }
     
-    const newHikes = getHikes().slice(0, HIKES_PER_PAGE); // Use your existing getHikes function
+    const newHikes = getHikes().slice(0, HIKES_PER_PAGE);
     
     // Modify each hike to ensure uniqueness between batches
     const batchedHikes = newHikes.map((hike, index) => ({
@@ -246,7 +222,20 @@ export default function SuggestedHikes() {
     
     setHikes(prev => nextBatch ? [...prev, ...batchedHikes] : batchedHikes);
     setLoading(false);
-  };
+  }, [hikes.length, HIKES_PER_PAGE]);
+
+    // Initial data fetch
+    useEffect(() => {
+      fetchHikes();
+    }, [fetchHikes]);
+  
+    useEffect(() => {
+      if (hikes.length > 0 && !initialScrollSet) {
+        scrollToMiddle();
+        setInitialScrollSet(true);
+      }
+    }, [hikes, initialScrollSet, scrollToMiddle]);
+
 
   // Handle scroll to load more when approaching the end
   const handleScroll = () => {
@@ -321,13 +310,12 @@ export default function SuggestedHikes() {
   };
 
   return (
-    <div className="w-full h-fit py-2 px-16 relative bg-gray-100">
-      <h1 className="px-2 text-2xl font-stretch-ultra-expanded text-left">Suggested Hikes</h1>
-  
-      {/* Navigation buttons remain unchanged */}
+    <div className="w-full h-fit py-2 relative bg-gray-red-100">
+      <h1 className="px-16 text-2xl font-stretch-ultra-expanded text-left">Suggested Hikes</h1>
+
       <button 
         onClick={scrollPrevious}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
+        className="absolute float-left left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
         aria-label="Previous item"
       >
         <ChevronLeft size={24} />
@@ -335,43 +323,28 @@ export default function SuggestedHikes() {
   
       <button 
         onClick={scrollNext}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
+        className="absolute float-right right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
         aria-label="Next item"
       >
         <ChevronRight size={24} />
       </button>
   
-      {/* Add a relative wrapper to contain both the scrollable content and the fading edges */}
-      <div className="relative">
-        {/* Left edge gradient mask */}
-        <div 
-          className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none" 
-          style={{
-            background: 'linear-gradient(to right, rgb(243, 244, 246), rgba(243, 244, 246, 0))'
-          }}
-        ></div>
-        
-        {/* Right edge gradient mask */}
-        <div 
-          className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none" 
-          style={{
-            background: 'linear-gradient(to left, rgb(243, 244, 246), rgba(243, 244, 246, 0))'
-          }}
-        ></div>
+      <div className="w-full mask-l-from-80% mask-r-from-80% sm:mask-l-from-80% sm:mask-r-from-80% lg:mask-l-from-80% lg:mask-r-from-80%">
+
   
         {/* Scrollable content */}
         <div 
           ref={scrollContainerRef}
-          className="flex flex-nowrap overflow-x-auto overscroll-y-none snap-x space-x-8 h-full no-scrollbar relative"
+          className="flex flex-nowrap overflow-x-auto overscroll-y-none snap-x space-x-8 h-full no-scrollbar relative w-full"
           onScroll={handleScroll}
         >
 
           
-          {/* Add 20px padding to the first and last items to give space for the gradient mask */}
-          <div className="w-8 shrink-0"></div>
+
+          <div className="shrink-0"></div>
           
           {hikes.map((hike, index) => (
-            <div key={hike.id || index} className="snap-center w-sm shrink-0">
+            <div key={hike.id || index} className="snap-center max-sm:w-xs min-sm:w-sm shrink-0">
               <HikeCard
                 title={hike.title}
                 image={hike.image}
@@ -390,7 +363,7 @@ export default function SuggestedHikes() {
             </div>
           )}
           
-          {/* Add padding to the end as well */}
+
           <div className="w-8 shrink-0"></div>
         </div>
       </div>

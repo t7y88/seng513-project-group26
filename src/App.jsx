@@ -56,7 +56,7 @@ function App() {
         </Routes>
         <BottomNavBar />
         {/* Widget for debug only. Helps us find the break points we want to set. */}
-        {/* <PageSizeWidget /> */}
+        <PageSizeWidget />
       </div>
     </Router>
   );
