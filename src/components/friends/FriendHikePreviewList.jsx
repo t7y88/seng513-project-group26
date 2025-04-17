@@ -1,4 +1,3 @@
-// Import React so we can define and use a component
 import React from "react";
 
 // Import the navigate hook from React Router so we can programmatically go to a hike detail page
@@ -27,31 +26,33 @@ function FriendHikePreviewList({ hikes }) {
 
   return (
     // Container for hike previews: horizontal scroll, spacing between items, padding at the top
-    <div className="flex gap-2 overflow-x-auto pt-2">
+    <div className="flex gap-2 overflow-x-auto pt-2 no-scrollbar snap-x snap-mandatory">
       {/* Only show the first 5 hikes using slice */}
-      {hikes.slice(0, 5).map((hike, index) => (
+      {hikes.map((hike, index) => (
         // Each mini hike card
         <div
           key={index} // React needs a unique key for list rendering
           onClick={() => navigate(`/hikes/${hike.id}`)} // Clicking the card navigates to the hike details page
-          className="w-24 min-w-[96px] cursor-pointer rounded overflow-hidden shadow hover:shadow-lg transition"
+          className="w-24 min-w-[96px] cursor-pointer snap-start"  // <- snap target
         >
-          {/* Hike image */}
-          <img
-            src={hike.image} // Image URL
-            alt={hike.title} // Alt text for accessibility
-            className="h-16 w-full object-cover" // Image fits container, cropped if needed
-          />
+          <div className="hike-preview-card">
+            {/* Hike image */}
+            <img
+              src={hike.image} // Image URL
+              alt={hike.title} // Alt text for accessibility
+              className="h-16 w-full object-cover" // Image fits container, cropped if needed
+            />
 
-          {/* Hike name and date */}
-          <div className="p-1 bg-white">
-            {/* Hike title — truncated so long names don't overflow - e.g. Valley of Five Lakes */}
-            <p className="text-xs font-semibold truncate">{hike.title}</p>
+            {/* Hike name and date */}
+            <div className="p-1 bg-white">
+              {/* Hike title — truncated so long names don't overflow - e.g. Valley of Five Lakes */}
+              <p className="hike-preview-text">{hike.title}</p>
 
-            {/* Completion date formatted as MM/DD/YYYY */}
-            <p className="text-[10px] text-gray-500">
-              {new Date(hike.dateCompleted).toLocaleDateString("en-US")}
-            </p>
+              {/* Completion date formatted as MM/DD/YYYY */}
+              <p className="hike-preview-date">
+                {new Date(hike.dateCompleted).toLocaleDateString("en-US")}
+              </p>
+            </div>
           </div>
         </div>
       ))}
