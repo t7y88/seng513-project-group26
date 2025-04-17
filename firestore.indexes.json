@@ -1,0 +1,24 @@
+{
+  "_meta": "Safe to edit add indexes for queries. Comments are ignored by Firebase CLI. We can use these to denote what they do.",
+  "indexes": [
+    { 
+      "_comment": "This index is for user-specific hikes sorted by date",
+      "collectionGroup": "completedHikes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "dateCompleted", "order": "DESCENDING" }
+      ]
+    },
+    { 
+      "_comment": "This index is for retrieving all reviews for a hike sorted by their creation time.",
+      "collectionGroup": "reviews",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hikeId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
