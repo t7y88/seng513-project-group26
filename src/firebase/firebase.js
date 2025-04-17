@@ -2,9 +2,7 @@
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -22,8 +20,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// export { app, auth };
-
 // Initialize Firestore
-const db = getFirestore(app);  // Import Firestore from Firebase SDK
-export { app, auth, db };  // Export the Firestore instance
+const db = getFirestore(app);
+
+// Connect to the local Firestore emulator (only in dev mode)
+if (import.meta.env.MODE === "development") {
+  connectFirestoreEmulator(db, "localhost", 8080);
+}
+
+export { app, auth, db };

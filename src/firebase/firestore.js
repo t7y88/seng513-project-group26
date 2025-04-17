@@ -168,7 +168,7 @@ export const removeCompletedHike = async (completedHike) => {
 
 
 // Get all completed hikes for a specific user
-export const getCompletedHikesByUser = async ()
+//export const getCompletedHikesByUser = async ()
 
 
 // ---------- FRIENDSHIPS ----------
