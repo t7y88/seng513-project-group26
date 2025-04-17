@@ -1,3 +1,6 @@
+// @ts-check
+
+
 import { db } from "./firebase";
 import {
   collection,
@@ -56,7 +59,7 @@ export const updateCompletedHikes = async (uid, completedHikes) => {
 
 // 1. Add a hike
 export const addHike = async (hikeData) => {
-  const hikesRef = collection(db, "hikes");
+  const hikesRef = collection(db, "hikes");  // 'hikes' is the collection name in Firestore
   const hikeDoc = await addDoc(hikesRef, hikeData);
   return hikeDoc.id;
 };
@@ -79,6 +82,94 @@ export const deleteHike = async (hikeId) => {
   const hikeRef = doc(db, "hikes", hikeId);
   await deleteDoc(hikeRef);
 };
+
+
+// ---------- HIKES BY USER ----------
+/**
+ * Logs a completed hike to Firestore.
+ *
+ * Throws:
+ * - Error if required fields are missing
+ * - Error if Firestore fails to write the document
+ *
+ * Notes:
+ * - Uses composite ID (userId + hikeId + date)
+ *
+ * @param {CompletedHike} data
+ * @throws {Error} If required fields are missing or if the document (tuple) was not inserted into the Collection (database)
+ * 
+ * @author aidan
+ */
+export const createCompletedHike = async ({ userId, hikeId, rating, notes, dateCompleted }) => {
+
+  if (!userId || !hikeId || typeof rating !== "number") {
+    throw new Error("Missing required hike data (userId, hikeId, or rating)");
+  }
+
+  const date = dateCompleted || new Date().toISOString().split("T")[0];
+  // The document ID aka Primary key is a combination of - userID, hikeId, and date - (aka a composite primary key)
+  const docID = `${userId}_${hikeId}_${date}`;
+  // We insert the completed hike data into the completedHikes collection
+  const ref = doc(db, "completedHikes", docID);
+
+  try {
+    await setDoc(ref, {
+      userId,
+      hikeId,
+      rating,
+      notes,
+      dateCompleted: date,
+      createdAt: new Date()
+    });
+  }catch (error) {
+    console.error("Failed to log completed hike:", error);
+    throw new Error("Failed to save hike. Please try again.");
+  }
+
+};
+
+/**
+ * Removes a completed hike from the `completedHikes` collection in Firestore.
+ *
+ *This function constructs the document ID using the user's ID, hike ID, and date the hike was completed,
+ * and attempts to delete the corresponding document from Firestore. 
+ * 
+ * Throws: 
+ * - Error if required fields are missing 
+ * - Error if Firestore encounters an error during deletion.
+ *
+ * @param {CompletedHike} completedHike - The completed hike object to be removed. Must include `userId`, `hikeId`, and either `dateCompleted` or `dateHikeOccured`.
+ * @returns {Promise<void>} A promise that resolves if the document is successfully deleted.
+ * @throws {Error} If required fields are missing or if deletion fails.
+ * 
+ * @autho aidan
+ */
+export const removeCompletedHike = async (completedHike) => {
+  const {
+    userId,
+    hikeId,
+    dateCompleted
+  } = completedHike;
+
+  if (!userId || !hikeId || !dateCompleted) {
+    throw new Error("Missing required fields: userId, hikeId, or date (dateCompleted).");
+  }
+
+  const docID = `${userId}_${hikeId}_${dateCompleted}`;
+  const ref = doc(db, "completedHikes", docID);
+
+  try {
+    await deleteDoc(ref);
+  } catch (error) {
+    console.error("Failed to delete completed hike:", error);
+    throw new Error("An error occurred while trying to remove the hike from Firestore.");
+  }
+};
+
+
+// Get all completed hikes for a specific user
+export const getCompletedHikesByUser = async ()
+
 
 // ---------- FRIENDSHIPS ----------
 
