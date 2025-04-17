@@ -37,7 +37,7 @@ function FriendsList({ friends }) {
   // When a user clicks "View Profile", this function is called
   // It navigates to "/friend-profile" and passes the selected friend object as state
   const handleViewProfile = (friend) => {
-    navigate("/friend-profile", { state: { userData: friend } });
+    navigate("/profile", { state: { userData: friend } });
   };
 
   return (
