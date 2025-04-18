@@ -3,6 +3,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { doSignINWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
+import { seedFirestore } from "../../firebase/seedFirestore";
 import "../../index.css";
 
 
@@ -80,12 +81,15 @@ function Login() {
                 Log In
               </button>
             </form>
+            {/* TODO [Aidan 4-16]: This is for development purposes only - must be removed before the final submission */}
             {process.env.NODE_ENV === "development" && (
                 <div className="text-center mt-4">
                   <button
-                    onClick={() =>
-                      doSignINWithEmailAndPassword("devuser@example.com", "devpassword123")
+                    onClick={async () => {
+                      //await doSignINWithEmailAndPassword("devuser@example.com", "devpassword123");
+                      //await seedFirestore();
                     }
+                  }
                     className="generic-button-inactive w-full"
                   >
                     Dev Login
