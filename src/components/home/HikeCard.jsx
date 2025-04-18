@@ -9,16 +9,20 @@ export default function HikeCard(hikeData) {
 //   const hikeData = {
 //     title: "Valley of Five Lakes",
 //     image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-//     location: "Jasper National Park, Alberta",
+//     location: "Jasper National Park",
+//     province: "Alberta"
 //     difficulty: "Moderate",
-//     distance: "4.5 km",
-//     time: "~ 2-3 hours",
-//     elevation: "66 m"
+//     distance: "4.5",
+//     distanceUnit: "km"
+//     time: "250",
+//     timeUnit: "min"
+//     elevation: "66"
+//     elevationUnit: "m"
 //   };
 
   return (
     <div className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 shrink-0 max-sm:w-sm max-md:w-1/4 min-md:w-1/3">
-        <h2 className="font-bold text-l px-2 text-gray-800">{hikeData.title}</h2>
+        <h2 className="font-bold text-l px-2 text-gray-800">{hikeData.title}, {hikeData.province}</h2>
         <div className="aspect-[16/9] w-full rounded-2xl">
             <img 
             className="w-full h-full object-cover rounded-2xl"
