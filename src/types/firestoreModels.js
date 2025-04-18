@@ -1,5 +1,6 @@
 /**
  * @typedef {Object} CompletedHike
+ * @property {string} [id] - Firestore document ID (added during retrieval).
  * @property {string} userId - The ID of the user who completed the hike.
  * @property {string} hikeId - The ID of the hike.
  * @property {number} rating - The rating given by the user (0–5).
@@ -9,6 +10,8 @@
 
 /**
  * @typedef {Object} UserProfile
+ * @property {string} [id] - Firestore document ID (added during retrieval).
+ * @property {string} email - The user's email address (copied from Firebase Auth at account creation).
  * @property {string} username - The unique username of the user.
  * @property {string} name - The full name of the user.
  * @property {number} age - Age of the user.
@@ -22,7 +25,7 @@
 
 /**
  * @typedef {Object} HikeEntity
- * @property {string} id - Unique ID for the hike.
+ * @property {string} hikeId - Unique ID for the hike.
  * @property {string} title - Name of the hike.
  * @property {string} image - Image URL.
  * @property {string} location - Geographic location.
@@ -34,6 +37,7 @@
 
 /**
  * @typedef {Object} ReviewEntity
+ * @property {string} [id] - Firestore document ID (added during retrieval).
  * @property {string} userId - The ID of the user who wrote the review.
  * @property {string} hikeId - The ID of the hike being reviewed.
  * @property {number} rating - The user's rating for the hike.

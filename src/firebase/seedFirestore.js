@@ -1,4 +1,4 @@
-import { createUserInFirestore, addHike, addReview } from "./firestore";
+import { createCompletedHike, createUserInFirestore, addHike, addReview } from "./firestore";
 import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 import { reviewEntities } from "../stubs/reviewEntities"; 
@@ -17,24 +17,27 @@ const seedFirestore = async () => {
       await delay(100);
     }
 
-    console.log("Seeding users...");
-    for (const user of sampleUsers) {
-      const { username, ...userData } = user;
-      await createUserInFirestore(username, userData);
-      console.log(`Added user: ${username}`);
-      await delay(100);
-    }
+    // console.log("Seeding users...");
+    // for (const user of sampleUsers) {
+    //   const { username, ...userData } = user;
+    //   await createUserInFirestore(username, userData);
+    //   console.log(`Added user: ${username}`);
+    //   await delay(100);
+    // }
 
-    console.log("Seeding reviews...");
-    for (const review of reviewEntities) {
-      await addReview(review);
-      console.log(`Added review for hike ${review.hikeId} by ${review.userId}`);
-      await delay(100);
-    }
+    // console.log("Seeding reviews...");
+    // for (const review of reviewEntities) {
+    //   await addReview(review);
+    //   console.log(`Added review for hike ${review.hikeId} by ${review.userId}`);
+    //   await delay(100);
+    // }
 
-    for (const completedHike of completedHikes) {
-      
-    }
+    // console.log("Seeding completed hikes...");
+    // for (const hike of completedHikes) {
+    //   await createCompletedHike(hike);
+    //   console.log(`Added completed hike: ${hike.docId}`);
+    //   await delay(100);
+    // }
 
 
     console.log("Firestore seeded successfully!");

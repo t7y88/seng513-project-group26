@@ -1,0 +1,14 @@
+ 
+{
+    "compilerOptions": {
+      "checkJs": true,             // Optional: enables error checking in .js files
+      "jsx": "react-jsx",          // Enables JSX support (React 17+)
+      "baseUrl": "./src",           // Lets you use imports like 'components/Button'
+      "module": "esnext",
+      "target": "es2020",
+      "moduleResolution": "node",
+      "allowJs": true
+    },
+    "include": ["src/**/*", "types/**/*", "vite-env.d.ts"]
+}
+  
