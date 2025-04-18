@@ -36,3 +36,23 @@ Now you should have all the local dependencies built you can proceed with the be
   - ```bash
     docker compose down
     ```
+
+
+# TODO List:
+- [X] Set up front-end and back-end Firestore
+
+- [ ] Add dropdown menu with contextual actions to the Hike page for Administrators that sets a STATUS: field in the hike entity (closed for winter, open, bear in area, under repair, etc.)
+- [ ] Think of any admin only actions we can add
+
+## Friends Page
+- [ ] Add friend removal to User Profile page
+- [ ] Add search bar to 'friends' page
+- [ ] Add 'wishlist' and 'you've hiked it' notes/icons to friends hikes
+
+## Login Page
+- [ ] Add administrator priveledged login
+- [ ] Complete 'forgot password' logic
+- [ ] Include "No such email exists with our registered accounts" for any emails that aren't linked to an account
+- [ ] Complete 'login with google' logic
+- [ ] Add user detail entry form for new users (username check and handling to ensure it is unique, DOB, age, location, etc)
+- [ ] Ensure error handling for each case
