@@ -1,42 +1,172 @@
-// NOTE: This structure is intended to match the backend hike entity schema in Firebase.
-
 export const hikeEntities = {
   "valley-of-five-lakes": {
     id: "valley-of-five-lakes",
     title: "Valley of Five Lakes",
-    image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+    image:
+      "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
     location: "Jasper National Park, Alberta",
     difficulty: "Moderate",
     distance: 4.5,
     distanceUnit: "km",
-    timeEstimateMinutes: 150, // ~2.5 hours
+    timeEstimateMinutes: 150,
     elevation: 66,
-    elevationUnit: "m"
+    elevationUnit: "m",
   },
-
+  "valley-of-five-lakes-2": {
+    id: "valley-of-five-lakes-2",
+    title: "Valley of Five Lakes - Extended Loop",
+    image:
+      "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+    location: "Jasper National Park, Alberta",
+    difficulty: "Hard",
+    distance: 8.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 240,
+    elevation: 120,
+    elevationUnit: "m",
+  },
   "ha-ling-peak": {
     id: "ha-ling-peak",
     title: "Ha Ling Peak",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
     location: "Bow Valley Wildland Provincial Park, Alberta",
     difficulty: "Hard",
     distance: 7.4,
     distanceUnit: "km",
-    timeEstimateMinutes: 210, // ~3.5 hours
+    timeEstimateMinutes: 210,
     elevation: 763,
-    elevationUnit: "m"
+    elevationUnit: "m",
+  },
+  "ha-ling-peak-2": {
+    id: "ha-ling-peak-2",
+    title: "Ha Ling Peak - Ridge Trail",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
+    location: "Bow Valley Wildland Provincial Park, Alberta",
+    difficulty: "Moderate",
+    distance: 5.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 150,
+    elevation: 500,
+    elevationUnit: "m",
+  },
+  "johnston-canyon": {
+    id: "johnston-canyon",
+    title: "Johnston Canyon",
+    image:
+      "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
+    location: "Banff National Park, Alberta",
+    difficulty: "Easy",
+    distance: 5.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 120,
+    elevation: 120,
+    elevationUnit: "m",
+  },
+  "johnston-canyon-2": {
+    id: "johnston-canyon-2",
+    title: "Johnston Canyon - Upper Falls",
+    image:
+      "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
+    location: "Banff National Park, Alberta",
+    difficulty: "Moderate",
+    distance: 7.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 180,
+    elevation: 200,
+    elevationUnit: "m",
+  },
+  "lake-louise-teahouse": {
+    id: "lake-louise-teahouse",
+    title: "Lake Louise Teahouse",
+    image:
+      "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
+    location: "Banff National Park, Alberta",
+    difficulty: "Moderate",
+    distance: 10.6,
+    distanceUnit: "km",
+    timeEstimateMinutes: 240,
+    elevation: 400,
+    elevationUnit: "m",
+  },
+  "lake-louise-teahouse-2": {
+    id: "lake-louise-teahouse-2",
+    title: "Lake Louise Teahouse - Scenic Route",
+    image:
+      "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
+    location: "Banff National Park, Alberta",
+    difficulty: "Hard",
+    distance: 12.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 300,
+    elevation: 500,
+    elevationUnit: "m",
+  },
+  "plain-of-six-glaciers": {
+    id: "plain-of-six-glaciers",
+    title: "Plain of Six Glaciers",
+    image:
+      "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
+    location: "Lake Louise, Alberta",
+    difficulty: "Hard",
+    distance: 14.6,
+    distanceUnit: "km",
+    timeEstimateMinutes: 300,
+    elevation: 587,
+    elevationUnit: "m",
+  },
+  "plain-of-six-glaciers-2": {
+    id: "plain-of-six-glaciers-2",
+    title: "Plain of Six Glaciers - Extended Trail",
+    image:
+      "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
+    location: "Lake Louise, Alberta",
+    difficulty: "Hard",
+    distance: 18.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 400,
+    elevation: 700,
+    elevationUnit: "m",
   },
 
-  "throat-of-the-world": {
-    id: "throat-of-the-world",
-    title: "Throat of the World",
-    image: "https://i0.wp.com/girlsincapes.com/wp-content/uploads/2014/11/Throat-of-the-World.jpg",
-    location: "Skyrim",
-    difficulty: "Hard",
-    distance: 666,
+  "plain-of-six-glaciers-3": {
+    id: "plain-of-six-glaciers-3",
+    title: "Plain of Six Glaciers - Scenic Route",
+    image:
+      "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
+    location: "Lake Louise, Alberta",
+    difficulty: "Moderate",
+    distance: 12.0,
     distanceUnit: "km",
-    timeEstimateMinutes: 420, // ~7 hours
-    elevation: 8848,
-    elevationUnit: "m"
-  }
+    timeEstimateMinutes: 240,
+    elevation: 400,
+    elevationUnit: "m",
+  },
+  "plain-of-six-glaciers-4": {
+    id: "plain-of-six-glaciers-4",
+    title: "Plain of Six Glaciers - Easy Route",
+    image:
+      "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
+    location: "Lake Louise, Alberta",
+    difficulty: "Easy",
+    distance: 8.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 180,
+    elevation: 200,
+    elevationUnit: "m",
+  },
+  "plain-of-six-glaciers-5": {
+    id: "plain-of-six-glaciers-5",
+    title: "Plain of Six Glaciers - Family Friendly Route",
+    image:
+      "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
+    location: "Lake Louise, Alberta",
+    difficulty: "Easy",
+    distance: 6.0,
+    distanceUnit: "km",
+    timeEstimateMinutes: 120,
+    elevation: 100,
+    elevationUnit: "m",
+  },
 };

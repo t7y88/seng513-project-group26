@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HikeCard from './HikeCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { db } from '../../firebase';
+import { collection, query, orderBy, limit, startAfter, getDocs } from 'firebase/firestore';
 
 export default function FriendLog() {
 
@@ -23,183 +25,184 @@ export default function FriendLog() {
   // - Add a button to save the hike to the user's profile (if logged in)
   // - Change color of difficulty based on level (easy, moderate, hard)
 
-  function getHikes(){
-    const hikes = [
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-      {
-        title: "Valley of Five Lakes",
-        image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
-        location: "Jasper National Park, Alberta",
-        difficulty: "Moderate",
-        distance: "4.5 km",
-        time: "~ 2-3 hours",
-        elevation: "66 m"
-      },
-    ];
+  // function getHikes(){
+  //   const hikes = [
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //     {
+  //       title: "Valley of Five Lakes",
+  //       image: "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
+  //       location: "Jasper National Park, Alberta",
+  //       difficulty: "Moderate",
+  //       distance: "4.5 km",
+  //       time: "~ 2-3 hours",
+  //       elevation: "66 m"
+  //     },
+  //   ];
 
-    return hikes;
-  }
+  //   return hikes;
+  // }
 
 
-  // // Fetch initial or next set of hikes. via pagination
-  // const fetchHikes = async (nextBatch = false) => {
-  //   if (allLoaded) return;
-    
-  //   setLoading(true);
-  //   try {
-  //     let hikesQuery;
-      
-  //     if (nextBatch && lastVisible) {
-  //       hikesQuery = query(
-  //         collection(db, 'hikes'),
-  //         orderBy('title'),
-  //         startAfter(lastVisible),
-  //         limit(HIKES_PER_PAGE)
-  //       );
-  //     } else {
-  //       hikesQuery = query(
-  //         collection(db, 'hikes'),
-  //         orderBy('title'),
-  //         limit(HIKES_PER_PAGE)
-  //       );
-  //     }
-  //     const querySnapshot = await getDocs(hikesQuery);
-  //     if (querySnapshot.empty) {
-  //       setAllLoaded(true);
-  //       setLoading(false);
-  //       return;
-  //     }
-      
-  //     const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
-  //     setLastVisible(lastDoc);
-      
-  //     const newHikes = querySnapshot.docs.map(doc => ({
-  //       id: doc.id,
-  //       ...doc.data()
-  //     }));
-      
-  //     setHikes(prev => nextBatch ? [...prev, ...newHikes] : newHikes);
-  //   } catch (error) {
-  //     console.error("Error fetching hikes:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  // Fetch initial or next set of hikes. via pagination
+  const fetchHikes = async (nextBatch = false) => {
+    if (allLoaded) return;
+  
+    setLoading(true);
+    try {
+      let hikesQuery;
+  
+      if (nextBatch && lastVisible) {
+        hikesQuery = query(
+          collection(db, "hikes"),
+          orderBy("title"),
+          startAfter(lastVisible),
+          limit(HIKES_PER_PAGE)
+        );
+      } else {
+        hikesQuery = query(
+          collection(db, "hikes"),
+          orderBy("title"),
+          limit(HIKES_PER_PAGE)
+        );
+      }
+  
+      const querySnapshot = await getDocs(hikesQuery);
+      if (querySnapshot.empty) {
+        setAllLoaded(true);
+        setLoading(false);
+        return;
+      }
+  
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      setLastVisible(lastDoc);
+  
+      const newHikes = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      setHikes((prev) => (nextBatch ? [...prev, ...newHikes] : newHikes));
+    } catch (error) {
+      console.error("Error fetching hikes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
 
   // dummy function to simulate fetching hikes TODO: Replace with actual api call
-  const fetchHikes = async (nextBatch = false) => {
-    setLoading(true);
+  // const fetchHikes = async (nextBatch = false) => {
+  //   setLoading(true);
     
     
-    if (hikes.length >= 20 && nextBatch) {
-      setAllLoaded(true);
-      setLoading(false);
-      return;
-    }
+  //   if (hikes.length >= 20 && nextBatch) {
+  //     setAllLoaded(true);
+  //     setLoading(false);
+  //     return;
+  //   }
     
-    const newHikes = getHikes().slice(0, HIKES_PER_PAGE); 
+  //   const newHikes = getHikes().slice(0, HIKES_PER_PAGE); 
     
-    // Modify each hike to ensure uniqueness between batches
-    const batchedHikes = newHikes.map((hike, index) => ({
-      ...hike,
-      id: `hike-${nextBatch ? hikes.length + index : index}`,
-      title: `${hike.title} ${nextBatch ? hikes.length + index : index}`
-    }));
+  //   // Modify each hike to ensure uniqueness between batches
+  //   const batchedHikes = newHikes.map((hike, index) => ({
+  //     ...hike,
+  //     id: `hike-${nextBatch ? hikes.length + index : index}`,
+  //     title: `${hike.title} ${nextBatch ? hikes.length + index : index}`
+  //   }));
     
-    setHikes(prev => nextBatch ? [...prev, ...batchedHikes] : batchedHikes);
-    setLoading(false);
-  };
+  //   setHikes(prev => nextBatch ? [...prev, ...batchedHikes] : batchedHikes);
+  //   setLoading(false);
+  // };
 
 
 
