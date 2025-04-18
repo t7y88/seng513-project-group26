@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { doSignINWithEmailAndPassword } from "../../firebase/auth";
+import { doSignInWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { seedFirestore } from "../../firebase/seedFirestore";
@@ -19,7 +19,7 @@ function Login() {
     e.preventDefault();
     if (!isSigningIn) {
       setIsSigningIn(true);
-      await doSignINWithEmailAndPassword(email, password);
+      await doSignInWithEmailAndPassword(email, password);
     }
   };
 
@@ -86,7 +86,7 @@ function Login() {
                 <div className="text-center mt-4">
                   <button
                     onClick={async () => {
-                      //await doSignINWithEmailAndPassword("devuser@example.com", "devpassword123");
+                      //await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
                       //await seedFirestore();
                     }
                   }

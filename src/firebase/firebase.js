@@ -23,9 +23,9 @@ const auth = getAuth(app);
 // Initialize Firestore
 const db = getFirestore(app);
 
-// Connect to the local Firestore emulator (only in dev mode)
-if (import.meta.env.MODE === "development") {
-  connectFirestoreEmulator(db, "localhost", 8080);
-}
+// // Connect to the local Firestore emulator (only in dev mode)
+// if (import.meta.env.MODE === "development") {
+//   connectFirestoreEmulator(db, "localhost", 8080);
+// }
 
 export { app, auth, db };
