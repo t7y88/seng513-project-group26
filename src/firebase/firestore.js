@@ -1,4 +1,5 @@
 // @ts-check
+/// <reference path="../types/firestoreModels.js" />
 
 import { db } from "./firebase"; // Adjust the import path as necessary
 import {
@@ -12,18 +13,45 @@ import {
   deleteDoc,
   query,
   where,
+  limit,
+  orderBy,
 } from "firebase/firestore";
 
 // ---------- USERS ----------
 
-// 1. Create a new user
+/** 1.
+ * Creates or overwrites a user document in the `users` collection using a predefined UID.
+ *
+ * Useful when syncing with Firebase Authentication UIDs.
+ *
+ * @param {string} uid - The UID to use as the document ID.
+ * @param {UserProfile} userData - The user profile data to store.
+ * @returns {Promise<void>} A promise that resolves when the document has been written.
+ */
 export const createUserInFirestore = async (uid, userData) => {
   const userRef = doc(db, "users", uid);
   await setDoc(userRef, userData);
 };
 
+/** 1.1
+ * Creates a new user document in the `users` collection using an automatically generated ID.
+ *
+ * This is unlikely to be needed, but just in case.
+ *
+ * This is used for when the document does not need to be tied to a authentication UID.
+ *
+ * @param {UserProfile} userData - The user profile data to store in Firestore.
+ * @returns {Promise<string>} The auto-generated document ID of the newly created user.
+ */
+export const addUserToFirestore = async (userData) => {
+  const usersRef = collection(db, "users");
+  const docRef = await addDoc(usersRef, userData);
+  return docRef.id;
+};
+
 // 2. Get user data
 export const getUserFromFirestore = async (uid) => {
+  console.log(uid);
   const userRef = doc(db, "users", uid);
   const userSnap = await getDoc(userRef);
   return userSnap.exists() ? userSnap.data() : null;
@@ -149,7 +177,7 @@ export const createCompletedHike = async ({
  * @returns {Promise<void>} A promise that resolves if the document is successfully deleted.
  * @throws {Error} If required fields are missing or if deletion fails.
  *
- * @autho aidan
+ * @author aidan
  */
 export const removeCompletedHike = async (completedHike) => {
   const { userId, hikeId, dateCompleted } = completedHike;
@@ -173,8 +201,72 @@ export const removeCompletedHike = async (completedHike) => {
   }
 };
 
-// Get all completed hikes for a specific user
-//export const getCompletedHikesByUser = async ()
+/**
+ * Retrieves all completed hikes for a specific user.
+ *
+ * NOTE: This assumes a structure like /completedHikes/{docId}, with userId as a field — not as part of the path.
+ * The query should likely be updated to filter by userId instead of including it in the path.
+ *
+ * @param {string} userId - The ID of the user whose completed hikes should be retrieved.
+ * @returns {Promise<CompletedHike[]>} A promise resolving to an array of completed hike objects.
+ *
+ * @author aidan
+ */
+export const getCompletedHikes = async (userId) => {
+  const completedHikesRef = collection(db, "completedHikes");
+
+  const q = query(
+    completedHikesRef,
+    where("userId", "==", userId),
+    orderBy("dateCompleted", "desc") // Most recent hike comes first
+  );
+
+  console.log(userId);
+
+  const snapshot = await getDocs(completedHikesRef);
+
+  //Give me all the document’s fields, and also include the document’s unique ID (key) as id
+  return snapshot.docs.map(
+    (doc) =>
+      /** @type {CompletedHike} */ ({
+        id: doc.id,
+        ...doc.data(),
+      })
+  );
+};
+
+/**
+ * Retrieves a limited number of the most recent completed hikes for a specific user.
+ *
+ * Results are sorted in descending order of dateCompleted (most recent hikes first).
+ * This is useful for previewing a user's recent activity (e.g. in a profile card).
+ *
+ * @param {string} userId - The ID of the user whose recent hikes should be retrieved.
+ * @param {number} numOfHikes - The number of most recent hikes to return.
+ * @returns {Promise<CompletedHike[]>} A promise resolving to a list of completed hikes.
+ *
+ * @author aidan
+ */
+export const getMostRecentCompletedHikes = async (userId, numOfHikes) => {
+  const completedHikesRef = collection(db, "completedHikes");
+
+  const q = query(
+    completedHikesRef,
+    where("userId", "==", userId),
+    orderBy("dateCompleted", "desc"), // Most recent hike comes first
+    limit(numOfHikes)
+  );
+
+  const snapshot = await getDocs(q);
+  //Give me all the document’s fields, and also include the document’s unique ID (key) as id
+  return snapshot.docs.map(
+    (doc) =>
+      /** @type {CompletedHike} */ ({
+        id: doc.id,
+        ...doc.data(),
+      })
+  );
+};
 
 // ---------- FRIENDSHIPS ----------
 

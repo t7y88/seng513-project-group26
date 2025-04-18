@@ -39,6 +39,12 @@ const seedFirestore = async () => {
       await delay(100);
     }
 
+    // console.log("Seeding completed hikes...");
+    // for (const hike of completedHikes) {
+    //   await createCompletedHike(hike);
+    //   console.log(`Added completed hike: ${hike.docId}`);
+    //   await delay(100);
+    // }
     // for (const completedHike of completedHikes) {
 
     // }
