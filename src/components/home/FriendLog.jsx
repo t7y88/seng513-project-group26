@@ -2,44 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import HikeCard from './HikeCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-export default function SuggestedHikes() {
-  const [hikes, setHikes] = useState([]);
-  // Re-enable when we set firebase up
-  // const [lastVisible, setLastVisible] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [allLoaded, setAllLoaded] = useState(false);
-  const scrollContainerRef = useRef(null);
-  const [initialScrollSet, setInitialScrollSet] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(true);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  
-  const HIKES_PER_PAGE = 5;
-
-  useEffect(() => {
-    if (hikes.length > 0 && !initialScrollSet) {
-      scrollToMiddle();
-      setInitialScrollSet(true);
-    } 
-  }, [hikes, initialScrollSet]);
-  // data fetch
-
-  useEffect(() => {
-  fetchHikes();
-  }, []); 
+export default function FriendLog() {
 
 
-  const getItemWidth = () => {
-    const container = scrollContainerRef.current;
-    if (!container || container.children.length === 0) return 352; // fallback
+  // const getItemWidth = () => {
+  //   const container = scrollContainerRef.current;
+  //   if (!container || container.children.length === 0) return 352; // fallback
     
-    // Get the first card element
-    const firstCard = container.children[0];
+  //   // Get the first card element
+  //   const firstCard = container.children[0];
     
-    // Calculate the full width including margin/spacing
-    // getBoundingClientRect().width gives the element width
-    // Adding the right margin (from space-x-8 class, which is 2rem or 32px)
-    return firstCard.getBoundingClientRect().width + 32;
-  };
+  //   // Calculate the full width including margin/spacing
+  //   // getBoundingClientRect().width gives the element width
+  //   // Adding the right margin (from space-x-8 class, which is 2rem or 32px)
+  //   return firstCard.getBoundingClientRect().width + 32;
+  // };
 
   // TODO:
   // - Add a link to the hike details page when the card is clicked
@@ -198,35 +175,7 @@ export default function SuggestedHikes() {
   //   }
   // };
 
-  const handleScroll = () => {
-    const container = scrollContainerRef.current;
-    if (!container || loading) return;
-    
-    // Update scroll indicators
-    checkScrollability();
-    
-    // Check if we need to load more items
-    const currentScroll = container.scrollLeft;
-    const scrollWidth = container.scrollWidth;
-    const containerWidth = container.clientWidth;
-    
-    // If we've scrolled to 80% of the available content, load more
-    if (!allLoaded && currentScroll + containerWidth > scrollWidth * 0.8) {
-      fetchHikes(true);
-    }
-  };
 
-  
-
-  const checkScrollability = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    setCanScrollLeft(container.scrollLeft > 0);
-  
-    setCanScrollRight(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 10
-    );
-  };
 
   // dummy function to simulate fetching hikes TODO: Replace with actual api call
   const fetchHikes = async (nextBatch = false) => {
@@ -253,64 +202,7 @@ export default function SuggestedHikes() {
   };
 
 
-  const scrollToMiddle = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    
-    const itemWidth = getItemWidth();
-    const scrollPosition = itemWidth * 1.5;
-    
-    container.scrollLeft = scrollPosition;
-    checkScrollability();
-  };
 
-
-  const scrollNext = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    
-    const currentScroll = container.scrollLeft;
-    const itemWidth = getItemWidth(); 
-    
-    if (currentScroll >= container.scrollWidth - container.clientWidth - 10) {
-      if (!allLoaded) {
-        fetchHikes(true);
-      } else {
-        container.scrollTo({
-          left: 0,
-          behavior: 'smooth'
-        });
-      }
-    } else {
-      container.scrollTo({
-        left: currentScroll + itemWidth,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const scrollPrevious = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    
-    const currentScroll = container.scrollLeft;
-    const itemWidth = getItemWidth();
-    
-    // Check if we're at the start
-    if (currentScroll <= 0) {
-      // loop to end
-      container.scrollTo({
-        left: container.scrollWidth - container.clientWidth,
-        behavior: 'smooth'
-      });
-    } else {
-      // Normal scroll to previous
-      container.scrollTo({
-        left: currentScroll - itemWidth,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   return (
     <div className="w-full h-fit py-2 min-md:px-16 relative">
