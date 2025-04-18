@@ -9,7 +9,7 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  where
+  where,
 } from "firebase/firestore";
 
 // ---------- USERS ----------
@@ -88,8 +88,23 @@ export const addFriendship = async (user1, user2) => {
   await addDoc(friendshipsRef, {
     user1,
     user2,
-    since: new Date()
+    since: new Date(),
   });
+};
+// Get all friends for a user
+export const getFriends = async (userId) => {
+  const friendshipsRef = collection(db, "friendships");
+  const q = query(friendshipsRef, where("user1", "==", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+// Get recent hikes by friends
+export const getRecentHikesByFriends = async (userId) => {
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("friends", "array-contains", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
 // ---------- REVIEWS ----------
@@ -99,7 +114,7 @@ export const addReview = async (reviewData) => {
   const reviewsRef = collection(db, "reviews");
   return await addDoc(reviewsRef, {
     ...reviewData,
-    createdAt: new Date()
+    createdAt: new Date(),
   });
 };
 
@@ -108,5 +123,5 @@ export const getReviewsForHike = async (hikeId) => {
   const reviewsRef = collection(db, "reviews");
   const q = query(reviewsRef, where("hikeId", "==", hikeId));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
