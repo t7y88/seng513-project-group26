@@ -84,7 +84,7 @@ service cloud.firestore {
      * - Not writable from the client (admin-only or preloaded server data)
      */
     match /hikes/{hikeId} {
-      allow read: if true;
+      allow read: if true; 
       allow write: if false;
     }
 

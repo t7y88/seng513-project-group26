@@ -1,7 +1,6 @@
 // @ts-check
 
-
-import { db } from "./firebase";
+import { db } from "./firebase"; // Adjust the import path as necessary
 import {
   collection,
   doc,
@@ -59,9 +58,14 @@ export const updateCompletedHikes = async (uid, completedHikes) => {
 
 // 1. Add a hike
 export const addHike = async (hikeData) => {
-  const hikesRef = collection(db, "hikes");  // 'hikes' is the collection name in Firestore
-  const hikeDoc = await addDoc(hikesRef, hikeData);
-  return hikeDoc.id;
+  try {
+    const hikesRef = collection(db, "hikes");
+    const hikeDoc = await addDoc(hikesRef, hikeData);
+    return hikeDoc.id;
+  } catch (error) {
+    console.error("Error adding hike:", error);
+    throw new Error("Failed to add hike");
+  }
 };
 
 // 2. Get all hikes
@@ -83,7 +87,6 @@ export const deleteHike = async (hikeId) => {
   await deleteDoc(hikeRef);
 };
 
-
 // ---------- HIKES BY USER ----------
 /**
  * Logs a completed hike to Firestore.
@@ -97,11 +100,16 @@ export const deleteHike = async (hikeId) => {
  *
  * @param {CompletedHike} data
  * @throws {Error} If required fields are missing or if the document (tuple) was not inserted into the Collection (database)
- * 
+ *
  * @author aidan
  */
-export const createCompletedHike = async ({ userId, hikeId, rating, notes, dateCompleted }) => {
-
+export const createCompletedHike = async ({
+  userId,
+  hikeId,
+  rating,
+  notes,
+  dateCompleted,
+}) => {
   if (!userId || !hikeId || typeof rating !== "number") {
     throw new Error("Missing required hike data (userId, hikeId, or rating)");
   }
@@ -119,40 +127,37 @@ export const createCompletedHike = async ({ userId, hikeId, rating, notes, dateC
       rating,
       notes,
       dateCompleted: date,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
-  }catch (error) {
+  } catch (error) {
     console.error("Failed to log completed hike:", error);
     throw new Error("Failed to save hike. Please try again.");
   }
-
 };
 
 /**
  * Removes a completed hike from the `completedHikes` collection in Firestore.
  *
  *This function constructs the document ID using the user's ID, hike ID, and date the hike was completed,
- * and attempts to delete the corresponding document from Firestore. 
- * 
- * Throws: 
- * - Error if required fields are missing 
+ * and attempts to delete the corresponding document from Firestore.
+ *
+ * Throws:
+ * - Error if required fields are missing
  * - Error if Firestore encounters an error during deletion.
  *
  * @param {CompletedHike} completedHike - The completed hike object to be removed. Must include `userId`, `hikeId`, and either `dateCompleted` or `dateHikeOccured`.
  * @returns {Promise<void>} A promise that resolves if the document is successfully deleted.
  * @throws {Error} If required fields are missing or if deletion fails.
- * 
+ *
  * @autho aidan
  */
 export const removeCompletedHike = async (completedHike) => {
-  const {
-    userId,
-    hikeId,
-    dateCompleted
-  } = completedHike;
+  const { userId, hikeId, dateCompleted } = completedHike;
 
   if (!userId || !hikeId || !dateCompleted) {
-    throw new Error("Missing required fields: userId, hikeId, or date (dateCompleted).");
+    throw new Error(
+      "Missing required fields: userId, hikeId, or date (dateCompleted)."
+    );
   }
 
   const docID = `${userId}_${hikeId}_${dateCompleted}`;
@@ -162,14 +167,14 @@ export const removeCompletedHike = async (completedHike) => {
     await deleteDoc(ref);
   } catch (error) {
     console.error("Failed to delete completed hike:", error);
-    throw new Error("An error occurred while trying to remove the hike from Firestore.");
+    throw new Error(
+      "An error occurred while trying to remove the hike from Firestore."
+    );
   }
 };
 
-
 // Get all completed hikes for a specific user
 //export const getCompletedHikesByUser = async ()
-
 
 // ---------- FRIENDSHIPS ----------
 
