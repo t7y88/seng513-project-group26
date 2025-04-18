@@ -51,14 +51,27 @@ firebase deploy --only firestore:indexes
 
 ## Firestore Security Rules
 
-Security rules are located in `firestore.rules`. The current environment is set to **test mode**, meaning anyone can read and write data. This is okay for our project because the development window is < 30 days - Google's enforced  security definition changover date.
+Firestore rules are defined in `firestore.rules`. The current setup provides:
 
-Example of stricter rules:
+- **Open read/write access to all documents until May 17, 2025** (grace period).
+- **Stricter rules for specific collections**, including:
+  - `/users/{userId}` – readable/writable only by the authenticated user or admins.
+  - `/completedHikes/{docId}` – user-scoped access based on document ID prefix.
+  - `/reviews/{reviewId}` – public reads, but only the author can write.
+  - `/hikes/{hikeId}` – public read-only.
+
+### Example user-specific rule:
 ```js
 match /users/{userId} {
   allow read, write: if request.auth != null && request.auth.uid == userId;
 }
 ```
+
+After editing your rules, you must deploy them with:
+
+ - firebase deploy --only firestore:rules
+
+
 
 ---
 
