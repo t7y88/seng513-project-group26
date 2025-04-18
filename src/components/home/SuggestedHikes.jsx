@@ -3,12 +3,10 @@ import HikeCard from "./HikeCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { collection, query, orderBy, startAfter, limit, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
-import {seedFirestore } from  "../../firebase/firebase/seedFirestore.js";
 
-const HIKES_PER_PAGE = 5;
+const HIKES_PER_PAGE = 3;
 
 export default function SuggestedHikes() {
-  seedFirestore();
   const [hikes, setHikes] = useState([]);
   const [allLoaded, setAllLoaded] = useState(false);
   const [lastVisible, setLastVisible] = useState(null);
@@ -18,7 +16,7 @@ export default function SuggestedHikes() {
   const fetchHikes = useCallback(async (nextBatch = false) => {
     if (allLoaded) return;
 
-    setLoading(true); // Set loading to true before fetching
+    // setLoading(true); // Set loading to true before fetching
     try {
       
       let hikesQuery;
@@ -69,7 +67,7 @@ export default function SuggestedHikes() {
     <div className="w-full h-fit py-2 relative bg-gray-red-100">
       <h1 className="px-16 text-2xl font-stretch-ultra-expanded text-left">Suggested Hikes</h1>
       <div ref={scrollContainerRef} className="flex overflow-x-auto">
-        {loading && <div>Loading...</div>} {/* Show loading indicator */}
+        {/* {loading && <div>Loading...</div>} Show loading indicator */}
         {hikes.map((hike) => (
           <HikeCard key={hike.id} {...hike} />
         ))}
