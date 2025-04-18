@@ -83,7 +83,27 @@ export const updateCompletedHikes = async (uid, completedHikes) => {
 };
 
 // ---------- HIKES ----------
+/**
+ * Adds or updates a hike in Firestore using the provided `hike.id` attribute as the document ID.
+ *
+ * @param {HikeEntity} hike - The hike data to add.
+ * @returns {Promise<void>}
+ */
+export const createHike = async (hike) => {
+  try {
+    if (!hike?.id) {
+      throw new Error("Missing hike.id field — cannot create hike.");
+    }
 
+    const hikeRef = doc(db, "hikes", hike.id); 
+    await setDoc(hikeRef, hike, {merge: true}); // Creates or overwrites the doc with ID = hikeId
+    console.log(`Successfully added hike: ${hike.id}`);
+
+  } catch (error) {
+    console.error(`Failed to add hike: ${hike?.id}:`, error);
+    throw new Error("Failed to add hike. Please try again.");
+  }
+};
 // 1. Add a hike
 export const addHike = async (hikeData) => {
   try {
