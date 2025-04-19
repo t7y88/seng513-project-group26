@@ -24,7 +24,7 @@ service cloud.firestore {
     }
 
     match /hikes/{hikeId} {
-      allow read: if true;
+      allow read: if true; 
       allow write: if false;
     }
 

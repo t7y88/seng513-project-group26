@@ -6,7 +6,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:firestore": "node src/firebase/seedFirestore.js"
   },
   "dependencies": {
     "20": "^1.0.0",

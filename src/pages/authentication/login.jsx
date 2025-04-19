@@ -86,7 +86,7 @@ function Login() {
                 <div className="text-center mt-4">
                   <button
                     onClick={async () => {
-                      //await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
+                      await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
                       await seedFirestore();
                     }
                   }
