@@ -2,24 +2,72 @@ import { createUserInFirestore, createHike, addReview } from "./firestore";
 import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 import { reviewEntities } from "../stubs/reviewEntities";
-// import { completedHikes } from "../stubs/completedHikes";
+import { completedHikes } from "../stubs/completedHikes";
+
+
+import { db } from "./firebase"; // Adjust the import path as necessary
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  limit,
+  orderBy,
+} from "firebase/firestore";
+
+
+/**
+ */
+const populateFirestoreWithCompletedHikeStubs = async (hikeData) => {
+  console.log("Hike object:", hikeData);
+  console.log("Hike ID:", hikeData.id);
+  await setDoc(doc(db, "completedHikes", hikeData.id), {
+    userId: hikeData.userId,
+    hikeId: hikeData.hikeId,
+    dateCompleted: hikeData.dateCompleted,
+    rating: hikeData.rating,
+    notes: hikeData.notes,
+    createdAt: new Date(),
+  });
+};
 
 // Utility function to delay for Firestore write limits (optional but safe)
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const seedFirestore = async () => {
+
   // --- Seed Hikes ---
+  // try {
+  //   console.log("Seeding hikes...");
+  //   for (const hikeId in hikeEntities) {
+  //     const hikeData = hikeEntities[hikeId];
+  //     await createHike(hikeData);
+  //     console.log(`Added hike: ${hikeData.title}`);
+  //   }
+  //   console.log("Hikes seeded successfully!");
+  // } catch (error) {
+  //   console.error("Error seeding hikes:", error);
+  // }
+
+  //--- Seed Completed Hikes ---
   try {
-    console.log("Seeding hikes...");
-    for (const hikeId in hikeEntities) {
-      const hikeData = hikeEntities[hikeId];
-      await createHike(hikeData);
-      console.log(`Added hike: ${hikeData.title}`);
+    console.log("Seeding completed hikes...");
+    for (const hikeData of completedHikes) {
+      await populateFirestoreWithCompletedHikeStubs(hikeData);
+      console.log(`Added completed hike: ${hikeData.id}`);
     }
-    console.log("Hikes seeded successfully!");
+    console.log("Completed hikes were seeded successfully!");
   } catch (error) {
-    console.error("Error seeding hikes:", error);
+    console.error("Error seeding completed hikes:", error);
   }
+
+  
 
   // --- Seed Users ---
   // try {
@@ -57,5 +105,8 @@ const seedFirestore = async () => {
   //   console.error("Error seeding reviews Firestore:", err);
   // }
 };
+
+
+
 
 export { seedFirestore };

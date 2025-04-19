@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import FriendHikePreviewList from "./FriendHikePreviewList";
-// Mock data from stubs
-import { hikeEntities } from "../../stubs/hikeEntities";
+
+import { getRecentHikesByFriend, getAllHikes } from "../../firebase/firestore";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
+
 
 /*
   FriendCard Component
@@ -29,8 +30,27 @@ import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 */
 
 function FriendCard({ friend, onViewProfile }) {
-  // Merge the user's completedHikes with the full hike data (to get title, image, etc.)
-  const mergedHikes = getMergedRecentHikes(friend.completedHikes, hikeEntities);
+  // Local state for this friend's merged hike previews
+  const [mergedHikes, setMergedHikes] = useState([]);
+
+  // Fetch and merge recent hikes after mount
+  useEffect(() => {
+    const loadFriendHikes = async () => {
+      try {
+        console.log("[FriendCard] friend.id =", friend.id, typeof friend.id === "string");
+        const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
+        const hikes = getAllHikes();
+        const merged = getMergedRecentHikes(friendCompletedHikes, hikes);
+        setMergedHikes(merged);
+      } catch (err) {
+        console.error("Failed to load friend hikes:", err);
+        setMergedHikes([]);
+      }
+    };
+  
+    loadFriendHikes();
+  }, [friend]);
+  
 
   return (
     // Card container: white background, padding, rounded corners, shadow
@@ -56,13 +76,6 @@ function FriendCard({ friend, onViewProfile }) {
           </div>
         </div>
 
-        {/* Recent Hikes list (only if user has completed hikes) */}
-        <div className = "w-full max-w-md overflow-hidden">
-          {friend.completedHikes?.length > 0 && (
-            <FriendHikePreviewList hikes = { mergedHikes } />
-          )}
-        </div>
-
         {/* Right section: view profile button */}
         <button
           className="generic-button-active" // Styled button class 
@@ -72,7 +85,12 @@ function FriendCard({ friend, onViewProfile }) {
         </button>
       </div>
 
-
+      {/* Recent Hikes list (only if user has completed hikes) */}
+      <div className="w-full max-w-md overflow-hidden">
+        {mergedHikes.length > 0 && (
+          <FriendHikePreviewList hikes={mergedHikes} />
+        )}
+      </div>
     </div>
   );
 }
