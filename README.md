@@ -36,3 +36,34 @@ Now you should have all the local dependencies built you can proceed with the be
   - ```bash
     docker compose down
     ```
+
+
+# TODO List:
+
+## Database, Queries, Search Optimization, Insertions and Deletions
+- [X] Set up front-end and back-end Firestore
+- [ ] Build functions for friend lookup - can't be only exact match, needs to have partial match as well, with best match at the top
+- [ ] Ensure firestore.rules is set up properly for all neccessary queries and insertions
+- [ ] Ensure any functions needed for the post login User profile creation stage are created (e.g. setUsername, setProfilePic, setName, setAge
+- [ ] Add wishlisted hike attribute to the
+
+## Typedefs / Collection Definitions
+- [ ] Add wishlist array attribute to User for storing hikeId's
+
+## Hike Page
+- [ ] Add dropdown menu with contextual actions to the Hike page for Administrators that sets a STATUS: field in the hike entity (closed for winter, open, bear in area, under repair, etc.)
+- [ ] Think of any admin only actions we can add (anywhere in the project)
+- [ ] Add context menu for user to set 'time/date completed'
+
+## Friends Page
+- [ ] Add friend removal to User Profile page
+- [ ] Add search bar to 'friends' page
+- [ ] Add 'wishlist' and 'you've hiked it' notes/icons to friends hikes
+
+## Login Page
+- [ ] Add administrator priveledged login
+- [ ] Complete 'forgot password' logic
+- [ ] Include "No such email exists with our registered accounts" for any emails that aren't linked to an account
+- [ ] Complete 'login with google' logic
+- [ ] Add user detail entry form for new users (username check and handling to ensure it is unique, DOB, age, location, etc)
+- [ ] Ensure error handling for each case

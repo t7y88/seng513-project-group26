@@ -30,6 +30,7 @@
  * @property {string} title - Name of the hike.
  * @property {string} image - Image URL.
  * @property {string} location - Geographic location.
+ * @property {string} province - Province/State of hike location
  * @property {string} difficulty - Difficulty level (e.g. Easy, Moderate, Hard).
  * @property {number} distance - Distance in numeric form.
  * @property {string} distanceUnit - Unit of distance (e.g. "km").

@@ -14,7 +14,7 @@ const seedFirestore = async () => {
     for (const hikeId in hikeEntities) {
       const hikeData = hikeEntities[hikeId];
       await createHike(hikeData);
-      console.log(`Added hike: ${hikeData.title}`); 
+      console.log(`Added hike: ${hikeData.title}`);
     }
     console.log("Hikes seeded successfully!");
   } catch (error) {
@@ -27,7 +27,7 @@ const seedFirestore = async () => {
   //   for (const user of sampleUsers) {
   //     const { username, ...userData } = user;
   //     await createUserInFirestore(username, userData);
-  //     console.log(`Added user: ${username}`); 
+  //     console.log(`Added user: ${username}`);
   //     await delay(100);
   //   }
   //   console.log("Firestore users seeded successfully!");
@@ -40,7 +40,7 @@ const seedFirestore = async () => {
   //   console.log("Seeding reviews...");
   //   for (const review of reviewEntities) {
   //     await addReview(review);
-  //     console.log(`Added review for hike ${review.hikeId} by ${review.userId}`); 
+  //     console.log(`Added review for hike ${review.hikeId} by ${review.userId}`);
   //     await delay(100);
   //   }
 
@@ -56,7 +56,6 @@ const seedFirestore = async () => {
   // } catch (err) {
   //   console.error("Error seeding reviews Firestore:", err);
   // }
-
 };
 
 export { seedFirestore };
