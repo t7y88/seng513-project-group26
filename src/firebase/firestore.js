@@ -63,7 +63,9 @@ export const getUserFromFirestore = async (uid) => {
 export const getAllUsers = async () => {
   const usersRef = collection(db, "users");
   const snapshot = await getDocs(usersRef);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => 
+    /** @type {UserProfile} */ ({ id: doc.id, ...doc.data() })
+  );
 };
 
 // 4. Update user
@@ -123,7 +125,9 @@ export const addHike = async (hikeData) => {
 export const getAllHikes = async () => {
   const hikesRef = collection(db, "hikes");
   const snapshot = await getDocs(hikesRef);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snapshot.docs.map((doc) => 
+    /** @type {HikeEntity} */ ({ id: doc.id, ...doc.data() })
+  );
 };
 
 // 3. Update hike
@@ -392,3 +396,90 @@ export const deleteReview = async (reviewId) => {
   const reviewRef = doc(db, "reviews", reviewId);
   await deleteDoc(reviewRef);
 };   
+
+// ---------- SEARCH FUNCTIONALITY ----------
+
+/**
+ * Searches hikes by title with closest matches first
+ * @param {string} searchTerm - The term to search for
+ * @returns {Promise<HikeEntity[]>} Array of matching hikes
+ */
+export const searchHikes = async (searchTerm) => {
+  try {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return [];
+
+    // Get all hikes with proper typing
+    const allHikes = await getAllHikes();
+
+    // Filter and sort client-side
+    const filteredHikes = allHikes.filter((hike) => 
+      hike.title.toLowerCase().includes(term)
+    );
+
+    filteredHikes.sort((a, b) => {
+      const aStartsWith = a.title.toLowerCase().startsWith(term);
+      const bStartsWith = b.title.toLowerCase().startsWith(term);
+      
+      // Starts-with matches come first
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      return 0;
+    });
+
+    return filteredHikes;
+  } catch (error) {
+    console.error("Error searching hikes:", error);
+    return [];
+  }
+};
+
+/**
+ * Searches users by name or username (excluding current user)
+ * @param {string} searchTerm - The term to search for
+ * @param {string} currentUserId - The ID of the current user to exclude
+ * @returns {Promise<UserProfile[]>} Array of matching users
+ */
+export const searchUsers = async (searchTerm, currentUserId) => {
+  try {
+    // Normalize search term
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return [];
+
+    // Get all users with proper typing
+    const allUsers = await getAllUsers();
+
+    // Filter out current user and search matches
+    const filteredUsers = allUsers
+      .filter(user => user.id !== currentUserId)
+      .filter(user => {
+        return (
+          user.name.toLowerCase().includes(term) ||
+          (user.username && user.username.toLowerCase().includes(term))
+        );
+      });
+
+    // Sort by best match
+    filteredUsers.sort((a, b) => {
+      const aNameStarts = a.name.toLowerCase().startsWith(term);
+      const bNameStarts = b.name.toLowerCase().startsWith(term);
+      const aUsernameStarts = a.username && a.username.toLowerCase().startsWith(term);
+      const bUsernameStarts = b.username && b.username.toLowerCase().startsWith(term);
+      
+      // Prioritize name matches
+      if (aNameStarts && !bNameStarts) return -1;
+      if (!aNameStarts && bNameStarts) return 1;
+      
+      // Then prioritize username matches
+      if (aUsernameStarts && !bUsernameStarts) return -1;
+      if (!aUsernameStarts && bUsernameStarts) return 1;
+      
+      return 0;
+    });
+
+    return filteredUsers;
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return [];
+  }
+};
