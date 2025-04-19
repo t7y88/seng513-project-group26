@@ -23,17 +23,22 @@
  * @property {string} profileImage - URL to the user’s profile image.
  */
 
+
 /**
  * @typedef {Object} HikeEntity
- * @property {string} hikeId - Unique ID for the hike.
+ * @property {string} id - Unique ID for the hike.
  * @property {string} title - Name of the hike.
  * @property {string} image - Image URL.
  * @property {string} location - Geographic location.
  * @property {string} difficulty - Difficulty level (e.g. Easy, Moderate, Hard).
- * @property {string} distance - Distance (e.g. "7.4 km").
- * @property {string} time - Estimated time (e.g. "~ 3-4 hours").
- * @property {string} elevation - Elevation gain (e.g. "763 m").
+ * @property {number} distance - Distance in numeric form.
+ * @property {string} distanceUnit - Unit of distance (e.g. "km").
+ * @property {number} timeEstimateMinutes - Estimated time in minutes.
+ * @property {number} elevation - Elevation gain (e.g. 763).
+ * @property {string} elevationUnit - Unit of elevation gain (e.g. "m").
+ * @property {string} [status] - (Optional) Trail status.
  */
+
 
 /**
  * @typedef {Object} ReviewEntity
