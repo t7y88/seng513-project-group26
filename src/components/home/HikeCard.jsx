@@ -21,7 +21,7 @@ export default function HikeCard(hikeData) {
 //   };
 
   return (
-    <div className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 shrink-0 max-sm:w-sm max-md:w-1/4 min-md:w-1/3">
+    <div className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 shrink-0 max-sm:w-xs max-md:w-1/4 min-md:w-1/3">
         <h2 className="font-bold text-l px-2 text-gray-800">{hikeData.title}, {hikeData.province}</h2>
         <div className="aspect-[16/9] w-full rounded-2xl">
             <img 

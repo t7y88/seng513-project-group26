@@ -7,7 +7,7 @@ export const hikeEntities = {
     image:
       "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
     location: "Jasper National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Moderate",
     distance: 4.5,
     distanceUnit: "km",
@@ -22,7 +22,7 @@ export const hikeEntities = {
     image:
       "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
     location: "Jasper National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Hard",
     distance: 8.0,
     distanceUnit: "km",
@@ -37,7 +37,7 @@ export const hikeEntities = {
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
     location: "Bow Valley Wildland Provincial Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Hard",
     distance: 7.4,
     distanceUnit: "km",
@@ -52,7 +52,7 @@ export const hikeEntities = {
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
     location: "Bow Valley Wildland Provincial Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Moderate",
     distance: 5.0,
     distanceUnit: "km",
@@ -67,7 +67,7 @@ export const hikeEntities = {
     image:
       "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
     location: "Banff National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Easy",
     distance: 5.0,
     distanceUnit: "km",
@@ -82,7 +82,7 @@ export const hikeEntities = {
     image:
       "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
     location: "Banff National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Moderate",
     distance: 7.0,
     distanceUnit: "km",
@@ -97,7 +97,7 @@ export const hikeEntities = {
     image:
       "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
     location: "Banff National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Moderate",
     distance: 10.6,
     distanceUnit: "km",
@@ -112,7 +112,7 @@ export const hikeEntities = {
     image:
       "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
     location: "Banff National Park",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Hard",
     distance: 12.0,
     distanceUnit: "km",
@@ -127,7 +127,7 @@ export const hikeEntities = {
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
     location: "Lake Louise",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Hard",
     distance: 14.6,
     distanceUnit: "km",
@@ -142,7 +142,7 @@ export const hikeEntities = {
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
     location: "Lake Louise",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Hard",
     distance: 18.0,
     distanceUnit: "km",
@@ -158,7 +158,7 @@ export const hikeEntities = {
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
     location: "Lake Louise",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Moderate",
     distance: 12.0,
     distanceUnit: "km",
@@ -173,7 +173,7 @@ export const hikeEntities = {
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
     location: "Lake Louise",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Easy",
     distance: 8.0,
     distanceUnit: "km",
@@ -188,7 +188,7 @@ export const hikeEntities = {
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
     location: "Lake Louise",
-    province: "Alberta",
+    province: "AB",
     difficulty: "Easy",
     distance: 6.0,
     distanceUnit: "km",
