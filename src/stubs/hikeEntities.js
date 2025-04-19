@@ -198,3 +198,4 @@ export const hikeEntities = {
     status: "open",
   },
 };
+
