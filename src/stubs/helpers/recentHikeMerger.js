@@ -17,14 +17,20 @@ recentHikes: [
 */
 
 export function getMergedRecentHikes(completedHikes, hikeEntities) {
-    return completedHikes.map((entry) => {
-      const hike = hikeEntities[entry.hikeId];
-      return {
-        ...hike,
-        ...entry 
-      };
-    });
+  if (!Array.isArray(completedHikes)) {
+    console.warn("getMergedRecentHikes called with non-array:", completedHikes);
+    return [];
   }
+
+  return completedHikes.map((entry) => {
+    const hike = hikeEntities[entry.hikeId] || {};
+    return {
+      ...hike,
+      ...entry
+    };
+  });
+}
+
 
 
   
