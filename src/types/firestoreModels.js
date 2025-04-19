@@ -1,11 +1,13 @@
 /**
  * @typedef {Object} CompletedHike
- * @property {string} [id] - Firestore document ID (added during retrieval).
- * @property {string} userId - The ID of the user who completed the hike.
+ * @property {string} id - Firestore document ID (added during retrieval).
+ * @property {string} userId - The Firestore document ID of the user who completed the hike.
+ * @property {string} username - The username of the user who completed the hike.
  * @property {string} hikeId - The ID of the hike.
  * @property {number} rating - The rating given by the user (0–5).
  * @property {string} [notes] - Optional notes or comments about the hike.
  * @property {string} [dateCompleted] - The date the hike occurred (YYYY-MM-DD). If omitted, today's date will be used.
+ * @property {Date} createdAt
  */
 
 /**
@@ -16,12 +18,13 @@
  * @property {string} name - The full name of the user.
  * @property {number} age - Age of the user.
  * @property {string} location - City or region.
- * @property {string[]} friends - List of usernames the user is friends with.
+ * @property {string[]} friends - List of user IDs (UIDs) representing this user's friends.
  * @property {string} memberSince - Date the user joined (display string).
  * @property {string} about - Short bio.
  * @property {string} description - Longer, personal description.
  * @property {string} profileImage - URL to the user’s profile image.
  */
+
 
 /**
  * @typedef {Object} HikeEntity
@@ -38,6 +41,7 @@
  * @property {string} elevationUnit - Unit of elevation gain (e.g. "m").
  * @property {string} [status] - (Optional) Trail status.
  */
+
 
 /**
  * @typedef {Object} ReviewEntity
