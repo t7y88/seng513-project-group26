@@ -101,7 +101,7 @@ export default function SuggestedHikes() {
     if (!container) return;
     
     // Calculate a position that's about 1-2 items in
-    const itemWidth = HikeCard.width; // Your card width + margin
+    const itemWidth = 352; // Your card width + margin
     const scrollPosition = itemWidth * 1.5; // Scroll about 1.5 items in
     
     // Set the scroll position without animation
@@ -208,7 +208,7 @@ export default function SuggestedHikes() {
         >
         {/* {loading && <div>Loading...</div>} Show loading indicator */}
         {hikes.map((hike) => (
-          <HikeCard ref={hikecard} key={hike.id} {...hike}/>
+          <HikeCard key={hike.id} {...hike}/>
         ))}
       </div>
     </div>
