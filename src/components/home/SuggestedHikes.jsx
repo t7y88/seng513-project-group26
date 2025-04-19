@@ -184,7 +184,7 @@ export default function SuggestedHikes() {
     };
   return (
     <div className="w-full h-fit py-2 relative bg-gray-red-100">
-      <h1 className="px-16 max-sm:px-2 text-2xl font-stretch-ultra-expanded text-left">Suggested Hikes</h1>
+      <h1 className="px-8 max-sm:px-2 text-2xl font-stretch-ultra-expanded text-left">Suggested Hikes</h1>
       <button 
         onClick={scrollPrevious}
         className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
