@@ -1,38 +1,59 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import ProfileData from "../components/profile/ProfileData";
 import HikesList from "../components/profile/HikesList";
+import { Link, useNavigate } from "react-router-dom";
+import { doSignOut } from "../firebase/auth";
+// Context hooks for accessing user data
+import { useAuth } from "../contexts/authContext"; 
+import { useUserData } from "../contexts/userDataContext"; 
+
+import { getCompletedHikes } from "../firebase/firestore"
+import { getUserFromFirestore } from "../firebase/firestore"
+
+// Mock data from stu
+import { sampleUsers } from "../stubs/sampleUsers";
+import { hikeEntities } from "../stubs/hikeEntities";
+
 
 function Profile() {
-  // Mock data
-  const userData = {
-    username: "usharabkhan",
-    age: 28,
-    location: "Calgary, AB",
-    friends: 142,
-    memberSince: "January 2024",
-    about: "Passionate hiker and nature enthusiast",
-    description: "Always seeking new adventures in the Canadian Rockies. Love photographing wildlife and mountain landscapes.",
-    profileImage: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9UdkG68P9AHESMfKJ-2Ybi9pfnqX1tqx3wQ&s",
-  };
+  const navigate = useNavigate();
+  const { userData, completedHikes, loading } = useUserData(); // shared user context
 
-  const completedHikes = [
-    {
-      name: "Valley of Five Lakes",
-      location: "Jasper National Park",
-      dateCompleted: "March 15, 2025",
-      timeCompleted: "2h 45min",
-      rating: 4.5
-    },
-  ];
+
+    // Logging to verify the data is loading
+    console.log("[Profile] loading:", loading);
+    console.log("[Profile] userData:", userData);
+    console.log("[Profile] completedHikes:", completedHikes);
+
+  if (loading || !userData) {
+    console.log("[Profile] Still loading user data...");
+    return <div className="text-center mt-20">Loading profile...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <ProfileData userData={userData} />
-        <HikesList completedHikes={completedHikes} />
+        <HikesList completedHikes = {completedHikes} /> 
+        
+
+        <div className="flex justify-center">
+          <Link
+            to="/login"
+            className="md:hidden w-full text-center bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
+            onClick={() => {
+              doSignOut().then(() => {
+                navigate("/login");
+              });
+            }}
+          >
+            Logout
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
+
 
 export default Profile;

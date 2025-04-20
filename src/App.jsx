@@ -56,14 +56,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="friends"
             element={
               <ProtectedRoute>
-                <div>Friends Page Coming Soon</div>
+                <Friends />
               </ProtectedRoute>
             }
-          />
+          /> */}
         </Routes>
         <BottomNavBar />
         {/* Widget for debug only. Helps us find the break points we want to set. */}

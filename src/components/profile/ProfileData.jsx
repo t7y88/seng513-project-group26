@@ -29,10 +29,12 @@ function ProfileData({ userData }) {
           <p>{userData.age} years old</p>
           <p>{userData.location}</p>
           <div className="flex justify-center items-center gap-2 md:justify-start">
-            <p>{userData.friends} friends</p>
-            <button className="generic-button-active mt-2">
-              Manage
-            </button>
+            <p>
+              {/* {userData.friends.map((friendUsername, index) => (
+                <span key={index}>@{friendUsername} </span>
+              ))} */}
+              {userData.friends.length > 0 ? userData.friends.length + " friends" : "no friends yet"}
+            </p>
           </div>
           <p>Member since {userData.memberSince}</p>
         </div>
@@ -43,8 +45,8 @@ function ProfileData({ userData }) {
         <h3 className="font-bold text-lg text-gray-900">About</h3>
         <p className="mt-2 text-gray-600">{userData.about}</p>
         <p className="mt-2 text-sm text-gray-500">{userData.description}</p>
-        <div className="flex justify-end">
-          <button 
+        <div className="flex justify-center md:justify-end ">
+          <button
             onClick={handleEditProfile}
             className="generic-button-active mt-2"
           >
