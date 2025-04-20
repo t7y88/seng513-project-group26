@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { SlMagnifier } from "react-icons/sl";
-import { searchHikes } from "../../firebase/firestore";
+import { searchUsers } from "../../firebase/firestore";
 import "../../index.css";
 
 /**
- * Search bar component for finding hikes by name
+ * Search bar component for finding friends by name or username
  * @param {Object} props
- * @param {function(HikeEntity[]): void} props.onSearchResults - Callback that receives search results
- * @param {string} [props.placeholder="Find a hike"] - Optional placeholder text
+ * @param {function(UserProfile[]): void} props.onSearchResults - Callback that receives search results
+ * @param {string} props.currentUserId - ID of current user to exclude from results
+ * @param {string} [props.placeholder="Find friends"] - Optional placeholder text
  * @param {string} [props.className=""] - Additional CSS classes for styling
  */
-export default function HikeSearchBar({ 
+export default function UserSearchBar({ 
   onSearchResults, 
-  placeholder = "Find a hike",
-  className = "" 
+  currentUserId,
+  placeholder = "Find friends by name or username",
+  className = ""
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -28,10 +30,10 @@ export default function HikeSearchBar({
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const results = await searchHikes(searchTerm);
+        const results = await searchUsers(searchTerm, currentUserId);
         onSearchResults(results);
       } catch (error) {
-        console.error("Search error:", error);
+        console.error("Friend search error:", error);
         onSearchResults([]);
       } finally {
         setIsSearching(false);
@@ -39,7 +41,7 @@ export default function HikeSearchBar({
     }, 300);
     
     return () => clearTimeout(timer);
-  }, [searchTerm, onSearchResults]);
+  }, [searchTerm, currentUserId, onSearchResults]);
 
   return (
     <div className={`relative ${className}`}>
@@ -54,7 +56,7 @@ export default function HikeSearchBar({
           className="flex-1 bg-transparent outline-none pl-2 pr-4 text-sm md:text-base w-full placeholder:text-gray-400"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          aria-label="Search for hikes"
+          aria-label="Search for friends"
         />
       </form>
       
