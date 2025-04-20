@@ -23,3 +23,6 @@ dist-ssr
 *.sw?
 .env
 /node_modules
+/package-lock.json
+
+./firebaseServiceAccountKey.json

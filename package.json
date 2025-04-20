@@ -6,10 +6,13 @@
     "dev": "vite dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:firestore": "node src/firebase/seedFirestore.js"
   },
   "dependencies": {
+    "20": "^1.0.0",
     "firebase": "^11.6.0",
+    "firebase-admin": "^13.2.0",
     "lucide-react": "^0.487.0",
     "mapbox-gl": "^3.11.0",
     "maplibre-gl": "^5.3.1",

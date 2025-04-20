@@ -26,13 +26,18 @@ function NavBar() {
 
           {/* Navigation Links */}
           <div className="flex space-x-1 ml-1 ">
+            {/* Only show the 'friends' option if a user is logged in */}
+            {userLoggedIn && (
+              <Link to="/friends" className="nav-link">
+                Friends
+              </Link>
+            )}
             {/* Only Show the profile option if a user is logged in */}
             {userLoggedIn && (
               <Link to="/profile" className="nav-link">
                 My Profile
               </Link>
             )}
-
             {/* Users only have the sign out option if they are logged in. */}
             {userLoggedIn ? (
               <Link

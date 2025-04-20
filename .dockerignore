@@ -1,1 +1,5 @@
-/node_modules/*
+# Ignore node_modules (whole directory, not just contents)
+node_modules
+
+# Ignore local .env file
+.env
