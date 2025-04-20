@@ -11,16 +11,22 @@ import "../../index.css";
  * @param {string} [props.className=""] - Additional CSS classes for styling
  */
 export default function HikeSearchBar({ 
-  onSearchResults, 
+  onSearchResults = () => {}, // Provide default empty function
   placeholder = "Find a hike",
   className = "" 
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
+  const safelyCallOnSearchResults = (results) => {
+    if (typeof onSearchResults === 'function') {
+      onSearchResults(results);
+    }
+  };
+  
   useEffect(() => {
     if (!searchTerm.trim()) {
-      onSearchResults([]);
+      safelyCallOnSearchResults([]);
       setIsSearching(false);
       return;
     }
@@ -29,10 +35,10 @@ export default function HikeSearchBar({
     const timer = setTimeout(async () => {
       try {
         const results = await searchHikes(searchTerm);
-        onSearchResults(results);
+        safelyCallOnSearchResults(results);
       } catch (error) {
         console.error("Search error:", error);
-        onSearchResults([]);
+        safelyCallOnSearchResults([]);
       } finally {
         setIsSearching(false);
       }
