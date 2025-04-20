@@ -15,10 +15,14 @@ import {
   where,
   limit,
   orderBy,
+  startAfter,
 } from "firebase/firestore";
 
 // utilites
-import { generateHikeDocId, normalizeDate } from "../../utils/hikeCompletionUtils.js"
+import {
+  generateHikeDocId,
+  normalizeDate,
+} from "../../utils/hikeCompletionUtils.js";
 
 // ---------- USERS ----------
 
@@ -34,6 +38,66 @@ import { generateHikeDocId, normalizeDate } from "../../utils/hikeCompletionUtil
 export const createUserInFirestore = async (uid, userData) => {
   const userRef = doc(db, "users", uid);
   await setDoc(userRef, userData);
+};
+
+/**
+ * Creates a user document if it doesn't exist, or returns existing user data.
+ * This is useful after authentication to ensure the user has a profile.
+ *
+ * @param {string} uid - The Firebase Authentication UID
+ * @param {Object} [authData] - Optional auth provider data (e.g., from Google signin)
+ * @returns {Promise<UserProfile>} The user profile data
+ */
+export const ensureUserExists = async (uid, authData = {}) => {
+  try {
+    // Try to get existing user data
+    const existingUser = await getUserFromFirestore(uid);
+
+    // If user exists, return their data
+    if (existingUser) {
+      return /** @type {UserProfile} */ (existingUser);
+    }
+
+    // User doesn't exist, create default profile
+    const defaultUserData = {
+      email: authData.email || "",
+      username: authData.displayName || "user" + uid.substring(0, 5),
+      name: authData.displayName || "",
+      age: 0,
+      location: "",
+      friends: [],
+      memberSince: new Date().toLocaleDateString(),
+      about: "",
+      description: "",
+      profileImage: authData.photoURL || "",
+    };
+
+    // Create the user document
+    await createUserInFirestore(uid, defaultUserData);
+    return defaultUserData;
+  } catch (error) {
+    console.error("Error ensuring user exists:", error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a username is already taken by another user
+ * @param {string} username - The username to check
+ * @returns {Promise<boolean>} - True if the username is available, false if taken
+ */
+export const isUsernameAvailable = async (username) => {
+  if (!username || username.trim() === "") return false;
+
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("username", "==", username.trim()));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty; // Return true if no documents found (username available)
+  } catch (error) {
+    console.error("Error checking username availability:", error);
+    return false; // Return false to be safe in case of errors
+  }
 };
 
 /** 1.1
@@ -63,8 +127,8 @@ export const getUserFromFirestore = async (uid) => {
 export const getAllUsers = async () => {
   const usersRef = collection(db, "users");
   const snapshot = await getDocs(usersRef);
-  return snapshot.docs.map((doc) => 
-    /** @type {UserProfile} */ ({ id: doc.id, ...doc.data() })
+  return snapshot.docs.map(
+    (doc) => /** @type {UserProfile} */ ({ id: doc.id, ...doc.data() })
   );
 };
 
@@ -99,10 +163,9 @@ export const createHike = async (hike) => {
       throw new Error("Missing hike.id field — cannot create hike.");
     }
 
-    const hikeRef = doc(db, "hikes", hike.id); 
-    await setDoc(hikeRef, hike, {merge: true}); // Creates or overwrites the doc with ID = hikeId
+    const hikeRef = doc(db, "hikes", hike.id);
+    await setDoc(hikeRef, hike, { merge: true }); // Creates or overwrites the doc with ID = hikeId
     console.log(`Successfully added hike: ${hike.id}`);
-
   } catch (error) {
     console.error(`Failed to add hike: ${hike?.id}:`, error);
     throw new Error("Failed to add hike. Please try again.");
@@ -125,8 +188,8 @@ export const addHike = async (hikeData) => {
 export const getAllHikes = async () => {
   const hikesRef = collection(db, "hikes");
   const snapshot = await getDocs(hikesRef);
-  return snapshot.docs.map((doc) => 
-    /** @type {HikeEntity} */ ({ id: doc.id, ...doc.data() })
+  return snapshot.docs.map(
+    (doc) => /** @type {HikeEntity} */ ({ id: doc.id, ...doc.data() })
   );
 };
 
@@ -191,7 +254,6 @@ export const createCompletedHike = async ({
   }
 };
 
-
 /**
  * Removes a completed hike from the `completedHikes` collection in Firestore.
  *
@@ -217,7 +279,7 @@ export const removeCompletedHike = async (completedHike) => {
     );
   }
 
-  const docID = generateHikeDocId(userId, hikeId, dateCompleted);;
+  const docID = generateHikeDocId(userId, hikeId, dateCompleted);
   const ref = doc(db, "completedHikes", docID);
 
   try {
@@ -329,7 +391,6 @@ export const getFriends = async (userId) => {
       friendUIDs.map(async (uid) => {
         const friend = await getUserFromFirestore(uid);
         return friend ? { id: uid, ...friend } : null;
-
       })
     );
 
@@ -340,7 +401,6 @@ export const getFriends = async (userId) => {
     return [];
   }
 };
-
 
 /**
  * Wrapper for friend-specific usage.
@@ -356,7 +416,6 @@ export const getRecentHikesByFriend = async (userId, numOfHikes = 5) => {
   }
   return await getMostRecentCompletedHikes(userId, numOfHikes);
 };
-
 
 // ---------- REVIEWS ----------
 
@@ -377,6 +436,200 @@ export const getReviewsForHike = async (hikeId) => {
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
+// Home Page - Get all reviews
+/**
+ * Retrieves completed hikes by the user's friends with full hike details.
+ *
+ * @param {string} userId - The ID of the user whose friends' hikes should be retrieved
+ * @param {number} batchSize - Number of hikes to retrieve per batch (default: 10)
+ * @param {Object} [lastDoc] - The last document from the previous batch (for pagination)
+ * @returns {Promise<{hikeData: Array, lastDoc: Object, hasMore: boolean}>} Complete hike data pairs, pagination info
+ */
+export const getFriendsCompletedHikesWithDetails = async (
+  userId,
+  batchSize = 10,
+  lastDoc = null
+) => {
+  try {
+    // First, get all the user's friends (unchanged from your current implementation)
+    const friendshipsRef = collection(db, "friendships");
+    const q1 = query(friendshipsRef, where("user1", "==", userId));
+    const q2 = query(friendshipsRef, where("user2", "==", userId));
+
+    const [snapshot1, snapshot2] = await Promise.all([
+      getDocs(q1),
+      getDocs(q2),
+    ]);
+
+    // Extract friend IDs
+    const friendIds = [
+      ...snapshot1.docs.map((doc) => doc.data().user2),
+      ...snapshot2.docs.map((doc) => doc.data().user1),
+    ];
+
+    if (friendIds.length === 0) {
+      return { hikeData: [], lastDoc: null, hasMore: false };
+    }
+
+    // Build query for completed hikes from all friends (unchanged)
+    const completedHikesRef = collection(db, "completedHikes");
+    let hikesQuery = query(
+      completedHikesRef,
+      where("userId", "in", friendIds),
+      orderBy("dateCompleted", "desc"),
+      limit(batchSize)
+    );
+
+    if (lastDoc) {
+      hikesQuery = query(hikesQuery, startAfter(lastDoc));
+    }
+
+    // Get the completed hikes
+    const hikesSnapshot = await getDocs(hikesQuery);
+    const completedHikes = hikesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      hikeId: doc.data().hikeId,
+      userId: doc.data().userId,
+      ...doc.data(),
+    }));
+
+    // NEW CODE: Fetch full hike details for each completed hike
+    const hikeDetailsPromises = completedHikes.map(async (completedHike) => {
+      const hikeRef = doc(db, "hikes", completedHike.hikeId);
+      const hikeSnap = await getDoc(hikeRef);
+
+      if (hikeSnap.exists()) {
+        const hikeData = hikeSnap.data();
+        // Return a combined object with both hike details and completion info
+        return {
+          hike: {
+            id: hikeSnap.id,
+            ...hikeData,
+          },
+          completion: completedHike,
+          // Add username who completed the hike
+          friendId: completedHike.userId,
+        };
+      }
+      return null;
+    });
+
+    const hikeData = (await Promise.all(hikeDetailsPromises)).filter(Boolean);
+
+    // Get the last document for next pagination call
+    const newLastDoc =
+      hikesSnapshot.docs.length > 0
+        ? hikesSnapshot.docs[hikesSnapshot.docs.length - 1]
+        : null;
+
+    return {
+      hikeData,
+      lastDoc: newLastDoc,
+      hasMore: hikesSnapshot.docs.length === batchSize,
+    };
+  } catch (error) {
+    console.error("Error fetching friends' hikes with details:", error);
+    throw new Error("Failed to retrieve friends' hiking activity");
+  }
+};
+
+// Home Page - Get all reviews
+/**
+ * Retrieves completed hikes by the user's friends with full hike details.
+ *
+ * @param {string} userId - The ID of the user whose friends' hikes should be retrieved
+ * @param {number} batchSize - Number of hikes to retrieve per batch (default: 10)
+ * @param {Object} [lastDoc] - The last document from the previous batch (for pagination)
+ * @returns {Promise<{hikeData: Array, lastDoc: Object, hasMore: boolean}>} Complete hike data pairs, pagination info
+ */
+export const getFriendsCompletedHikesWithDetails = async (
+  userId,
+  batchSize = 10,
+  lastDoc = null
+) => {
+  try {
+    // First, get all the user's friends (unchanged from your current implementation)
+    const friendshipsRef = collection(db, "friendships");
+    const q1 = query(friendshipsRef, where("user1", "==", userId));
+    const q2 = query(friendshipsRef, where("user2", "==", userId));
+
+    const [snapshot1, snapshot2] = await Promise.all([
+      getDocs(q1),
+      getDocs(q2),
+    ]);
+
+    // Extract friend IDs
+    const friendIds = [
+      ...snapshot1.docs.map((doc) => doc.data().user2),
+      ...snapshot2.docs.map((doc) => doc.data().user1),
+    ];
+
+    if (friendIds.length === 0) {
+      return { hikeData: [], lastDoc: null, hasMore: false };
+    }
+
+    // Build query for completed hikes from all friends (unchanged)
+    const completedHikesRef = collection(db, "completedHikes");
+    let hikesQuery = query(
+      completedHikesRef,
+      where("userId", "in", friendIds),
+      orderBy("dateCompleted", "desc"),
+      limit(batchSize)
+    );
+
+    if (lastDoc) {
+      hikesQuery = query(hikesQuery, startAfter(lastDoc));
+    }
+
+    // Get the completed hikes
+    const hikesSnapshot = await getDocs(hikesQuery);
+    const completedHikes = hikesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      hikeId: doc.data().hikeId,
+      userId: doc.data().userId,
+      ...doc.data(),
+    }));
+
+    // NEW CODE: Fetch full hike details for each completed hike
+    const hikeDetailsPromises = completedHikes.map(async (completedHike) => {
+      const hikeRef = doc(db, "hikes", completedHike.hikeId);
+      const hikeSnap = await getDoc(hikeRef);
+
+      if (hikeSnap.exists()) {
+        const hikeData = hikeSnap.data();
+        // Return a combined object with both hike details and completion info
+        return {
+          hike: {
+            id: hikeSnap.id,
+            ...hikeData,
+          },
+          completion: completedHike,
+          // Add username who completed the hike
+          friendId: completedHike.userId,
+        };
+      }
+      return null;
+    });
+
+    const hikeData = (await Promise.all(hikeDetailsPromises)).filter(Boolean);
+
+    // Get the last document for next pagination call
+    const newLastDoc =
+      hikesSnapshot.docs.length > 0
+        ? hikesSnapshot.docs[hikesSnapshot.docs.length - 1]
+        : null;
+
+    return {
+      hikeData,
+      lastDoc: newLastDoc,
+      hasMore: hikesSnapshot.docs.length === batchSize,
+    };
+  } catch (error) {
+    console.error("Error fetching friends' hikes with details:", error);
+    throw new Error("Failed to retrieve friends' hiking activity");
+  }
+};
+
 // Get all reviews by a specific user
 export const getReviewsByUser = async (userId) => {
   const reviewsRef = collection(db, "reviews");
@@ -395,7 +648,7 @@ export const updateReview = async (reviewId, updates) => {
 export const deleteReview = async (reviewId) => {
   const reviewRef = doc(db, "reviews", reviewId);
   await deleteDoc(reviewRef);
-};   
+};
 
 // ---------- SEARCH FUNCTIONALITY ----------
 
@@ -413,14 +666,14 @@ export const searchHikes = async (searchTerm) => {
     const allHikes = await getAllHikes();
 
     // Filter and sort client-side
-    const filteredHikes = allHikes.filter((hike) => 
+    const filteredHikes = allHikes.filter((hike) =>
       hike.title.toLowerCase().includes(term)
     );
 
     filteredHikes.sort((a, b) => {
       const aStartsWith = a.title.toLowerCase().startsWith(term);
       const bStartsWith = b.title.toLowerCase().startsWith(term);
-      
+
       // Starts-with matches come first
       if (aStartsWith && !bStartsWith) return -1;
       if (!aStartsWith && bStartsWith) return 1;
@@ -451,8 +704,8 @@ export const searchUsers = async (searchTerm, currentUserId) => {
 
     // Filter out current user and search matches
     const filteredUsers = allUsers
-      .filter(user => user.id !== currentUserId)
-      .filter(user => {
+      .filter((user) => user.id !== currentUserId)
+      .filter((user) => {
         return (
           user.name.toLowerCase().includes(term) ||
           (user.username && user.username.toLowerCase().includes(term))
@@ -463,17 +716,128 @@ export const searchUsers = async (searchTerm, currentUserId) => {
     filteredUsers.sort((a, b) => {
       const aNameStarts = a.name.toLowerCase().startsWith(term);
       const bNameStarts = b.name.toLowerCase().startsWith(term);
-      const aUsernameStarts = a.username && a.username.toLowerCase().startsWith(term);
-      const bUsernameStarts = b.username && b.username.toLowerCase().startsWith(term);
-      
+      const aUsernameStarts =
+        a.username && a.username.toLowerCase().startsWith(term);
+      const bUsernameStarts =
+        b.username && b.username.toLowerCase().startsWith(term);
+
       // Prioritize name matches
       if (aNameStarts && !bNameStarts) return -1;
       if (!aNameStarts && bNameStarts) return 1;
-      
+
       // Then prioritize username matches
       if (aUsernameStarts && !bUsernameStarts) return -1;
       if (!aUsernameStarts && bUsernameStarts) return 1;
-      
+
+      return 0;
+    });
+
+    return filteredUsers;
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return [];
+  }
+};
+
+// Get all reviews by a specific user
+export const getReviewsByUser = async (userId) => {
+  const reviewsRef = collection(db, "reviews");
+  const q = query(reviewsRef, where("userId", "==", userId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+// Update a review
+export const updateReview = async (reviewId, updates) => {
+  const reviewRef = doc(db, "reviews", reviewId);
+  await updateDoc(reviewRef, updates);
+};
+
+// Delete a review
+export const deleteReview = async (reviewId) => {
+  const reviewRef = doc(db, "reviews", reviewId);
+  await deleteDoc(reviewRef);
+};
+
+// ---------- SEARCH FUNCTIONALITY ----------
+
+/**
+ * Searches hikes by title with closest matches first
+ * @param {string} searchTerm - The term to search for
+ * @returns {Promise<HikeEntity[]>} Array of matching hikes
+ */
+export const searchHikes = async (searchTerm) => {
+  try {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return [];
+
+    // Get all hikes with proper typing
+    const allHikes = await getAllHikes();
+
+    // Filter and sort client-side
+    const filteredHikes = allHikes.filter((hike) =>
+      hike.title.toLowerCase().includes(term)
+    );
+
+    filteredHikes.sort((a, b) => {
+      const aStartsWith = a.title.toLowerCase().startsWith(term);
+      const bStartsWith = b.title.toLowerCase().startsWith(term);
+
+      // Starts-with matches come first
+      if (aStartsWith && !bStartsWith) return -1;
+      if (!aStartsWith && bStartsWith) return 1;
+      return 0;
+    });
+
+    return filteredHikes;
+  } catch (error) {
+    console.error("Error searching hikes:", error);
+    return [];
+  }
+};
+
+/**
+ * Searches users by name or username (excluding current user)
+ * @param {string} searchTerm - The term to search for
+ * @param {string} currentUserId - The ID of the current user to exclude
+ * @returns {Promise<UserProfile[]>} Array of matching users
+ */
+export const searchUsers = async (searchTerm, currentUserId) => {
+  try {
+    // Normalize search term
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return [];
+
+    // Get all users with proper typing
+    const allUsers = await getAllUsers();
+
+    // Filter out current user and search matches
+    const filteredUsers = allUsers
+      .filter((user) => user.id !== currentUserId)
+      .filter((user) => {
+        return (
+          user.name.toLowerCase().includes(term) ||
+          (user.username && user.username.toLowerCase().includes(term))
+        );
+      });
+
+    // Sort by best match
+    filteredUsers.sort((a, b) => {
+      const aNameStarts = a.name.toLowerCase().startsWith(term);
+      const bNameStarts = b.name.toLowerCase().startsWith(term);
+      const aUsernameStarts =
+        a.username && a.username.toLowerCase().startsWith(term);
+      const bUsernameStarts =
+        b.username && b.username.toLowerCase().startsWith(term);
+
+      // Prioritize name matches
+      if (aNameStarts && !bNameStarts) return -1;
+      if (!aNameStarts && bNameStarts) return 1;
+
+      // Then prioritize username matches
+      if (aUsernameStarts && !bUsernameStarts) return -1;
+      if (!aUsernameStarts && bUsernameStarts) return 1;
+
       return 0;
     });
 

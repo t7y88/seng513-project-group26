@@ -203,7 +203,7 @@ export default function SuggestedHikes() {
               {/* Scrollable content */}
       <div 
           ref={scrollContainerRef}
-          className="flex flex-nowrap overflow-x-auto overscroll-y-none snap-x space-x-4 h-full no-scrollbar relative"
+          className="flex flex-nowrap overflow-x-auto overscroll-y-none snap-x snap-mandatory space-x-4 h-full no-scrollbar relative scroll-smooth"
           onScroll={handleScroll}
         >
         {/* {loading && <div>Loading...</div>} Show loading indicator */}
