@@ -19,7 +19,10 @@ import {
 } from "firebase/firestore";
 
 // utilites
-import { generateHikeDocId, normalizeDate } from "../../utils/hikeCompletionUtils.js"
+import {
+  generateHikeDocId,
+  normalizeDate,
+} from "../../utils/hikeCompletionUtils.js";
 
 // ---------- USERS ----------
 
@@ -35,6 +38,66 @@ import { generateHikeDocId, normalizeDate } from "../../utils/hikeCompletionUtil
 export const createUserInFirestore = async (uid, userData) => {
   const userRef = doc(db, "users", uid);
   await setDoc(userRef, userData);
+};
+
+/**
+ * Creates a user document if it doesn't exist, or returns existing user data.
+ * This is useful after authentication to ensure the user has a profile.
+ *
+ * @param {string} uid - The Firebase Authentication UID
+ * @param {Object} [authData] - Optional auth provider data (e.g., from Google signin)
+ * @returns {Promise<UserProfile>} The user profile data
+ */
+export const ensureUserExists = async (uid, authData = {}) => {
+  try {
+    // Try to get existing user data
+    const existingUser = await getUserFromFirestore(uid);
+
+    // If user exists, return their data
+    if (existingUser) {
+      return /** @type {UserProfile} */ (existingUser);
+    }
+
+    // User doesn't exist, create default profile
+    const defaultUserData = {
+      email: authData.email || "",
+      username: authData.displayName || "user" + uid.substring(0, 5),
+      name: authData.displayName || "",
+      age: 0,
+      location: "",
+      friends: [],
+      memberSince: new Date().toLocaleDateString(),
+      about: "",
+      description: "",
+      profileImage: authData.photoURL || "",
+    };
+
+    // Create the user document
+    await createUserInFirestore(uid, defaultUserData);
+    return defaultUserData;
+  } catch (error) {
+    console.error("Error ensuring user exists:", error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a username is already taken by another user
+ * @param {string} username - The username to check
+ * @returns {Promise<boolean>} - True if the username is available, false if taken
+ */
+export const isUsernameAvailable = async (username) => {
+  if (!username || username.trim() === "") return false;
+
+  try {
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("username", "==", username.trim()));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.empty; // Return true if no documents found (username available)
+  } catch (error) {
+    console.error("Error checking username availability:", error);
+    return false; // Return false to be safe in case of errors
+  }
 };
 
 /** 1.1
@@ -187,7 +250,6 @@ export const createCompletedHike = async ({
   }
 };
 
-
 /**
  * Removes a completed hike from the `completedHikes` collection in Firestore.
  *
@@ -213,7 +275,7 @@ export const removeCompletedHike = async (completedHike) => {
     );
   }
 
-  const docID = generateHikeDocId(userId, hikeId, dateCompleted);;
+  const docID = generateHikeDocId(userId, hikeId, dateCompleted);
   const ref = doc(db, "completedHikes", docID);
 
   try {
@@ -325,7 +387,6 @@ export const getFriends = async (userId) => {
       friendUIDs.map(async (uid) => {
         const friend = await getUserFromFirestore(uid);
         return friend ? { id: uid, ...friend } : null;
-
       })
     );
 
@@ -336,7 +397,6 @@ export const getFriends = async (userId) => {
     return [];
   }
 };
-
 
 /**
  * Wrapper for friend-specific usage.
@@ -352,7 +412,6 @@ export const getRecentHikesByFriend = async (userId, numOfHikes = 5) => {
   }
   return await getMostRecentCompletedHikes(userId, numOfHikes);
 };
-
 
 // ---------- REVIEWS ----------
 
