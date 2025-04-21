@@ -2,7 +2,7 @@
 
 export const hikeEntities = {
   "valley-of-five-lakes": {
-    id: "valley-of-five-lakes",
+    hikeId: "valley-of-five-lakes",
     title: "Valley of Five Lakes",
     image:
       "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
@@ -17,7 +17,7 @@ export const hikeEntities = {
     status: "open",
   },
   "valley-of-five-lakes-2": {
-    id: "valley-of-five-lakes-2", // Ensure this matches the key
+    hikeId: "valley-of-five-lakes-2", // Ensure this matches the key
     title: "Valley of Five Lakes - Extended Loop",
     image:
       "https://beckerschalets.com/wp-content/uploads/2020/07/five-lakes-2.jpg",
@@ -32,7 +32,7 @@ export const hikeEntities = {
     status: "open",
   },
   "ha-ling-peak": {
-    id: "ha-ling-peak",
+    hikeId: "ha-ling-peak",
     title: "Ha Ling Peak",
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
@@ -47,7 +47,7 @@ export const hikeEntities = {
     status: "open",
   },
   "ha-ling-peak-2": {
-    id: "ha-ling-peak-2",
+    hikeId: "ha-ling-peak-2",
     title: "Ha Ling Peak - Ridge Trail",
     image:
       "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Ha-Ling-aerial.jpg/1920px-Ha-Ling-aerial.jpg",
@@ -62,7 +62,7 @@ export const hikeEntities = {
     status: "open",
   },
   "johnston-canyon": {
-    id: "johnston-canyon",
+    hikeId: "johnston-canyon",
     title: "Johnston Canyon",
     image:
       "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
@@ -77,7 +77,7 @@ export const hikeEntities = {
     status: "open",
   },
   "johnston-canyon-2": {
-    id: "johnston-canyon-2",
+    hikeId: "johnston-canyon-2",
     title: "Johnston Canyon - Upper Falls",
     image:
       "https://outandacross.com/wp-content/uploads/2022/01/johnston-canyon-hike-in-banff-np-1024x768.jpg",
@@ -92,7 +92,7 @@ export const hikeEntities = {
     status: "open",
   },
   "lake-louise-teahouse": {
-    id: "lake-louise-teahouse",
+    hikeId: "lake-louise-teahouse",
     title: "Lake Louise Teahouse",
     image:
       "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
@@ -107,7 +107,7 @@ export const hikeEntities = {
     status: "open",
   },
   "lake-louise-teahouse-2": {
-    id: "lake-louise-teahouse-2",
+    hikeId: "lake-louise-teahouse-2",
     title: "Lake Louise Teahouse - Scenic Route",
     image:
       "https://cdn.sanity.io/images/lr9tta69/production/f05e7cd7431d57a20074e6a1f8c2533fe226da1e-640x480.jpg",
@@ -122,7 +122,7 @@ export const hikeEntities = {
     status: "open",
   },
   "plain-of-six-glaciers": {
-    id: "plain-of-six-glaciers",
+    hikeId: "plain-of-six-glaciers",
     title: "Plain of Six Glaciers",
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
@@ -137,7 +137,7 @@ export const hikeEntities = {
     status: "open",
   },
   "plain-of-six-glaciers-2": {
-    id: "plain-of-six-glaciers-2",
+    hikeId: "plain-of-six-glaciers-2",
     title: "Plain of Six Glaciers - Extended Trail",
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
@@ -151,9 +151,8 @@ export const hikeEntities = {
     elevationUnit: "m",
     status: "open",
   },
-
   "plain-of-six-glaciers-3": {
-    id: "plain-of-six-glaciers-3",
+    hikeId: "plain-of-six-glaciers-3",
     title: "Plain of Six Glaciers - Scenic Route",
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
@@ -168,7 +167,7 @@ export const hikeEntities = {
     status: "open",
   },
   "plain-of-six-glaciers-4": {
-    id: "plain-of-six-glaciers-4",
+    hikeId: "plain-of-six-glaciers-4",
     title: "Plain of Six Glaciers - Easy Route",
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
@@ -183,7 +182,7 @@ export const hikeEntities = {
     status: "open",
   },
   "plain-of-six-glaciers-5": {
-    id: "plain-of-six-glaciers-5",
+    hikeId: "plain-of-six-glaciers-5",
     title: "Plain of Six Glaciers - Family Friendly Route",
     image:
       "https://www.travelbanffcanada.com/wp-content/uploads/2020/09/The-Lake-Louise-Lakeshore-Trail-and-the-plain-of-six-glaciers-hike-share-the-same-trail-960x720.jpg",
@@ -197,5 +196,20 @@ export const hikeEntities = {
     elevationUnit: "m",
     status: "open",
   },
+  "throat-of-the-world": {
+    hikeId: "throat-of-the-world",
+    title: "Throat of the World",
+    image:
+      "https://images.uesp.net/5/55/SR-place-Throat_of_the_World.jpg",
+    location: "The Pale",
+    province: "Skyrim", 
+    difficulty: "Hard",
+    distance: 120,
+    distanceUnit: "m",
+    timeEstimateMinutes: 360,
+    elevation: 1430, 
+    elevationUnit: "m",
+    status: "open",
+  }
 };
 

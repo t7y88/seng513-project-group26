@@ -1,59 +1,135 @@
 import { useEffect, useState } from "react";
 import ProfileData from "../components/profile/ProfileData";
 import HikesList from "../components/profile/HikesList";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { doSignOut } from "../firebase/auth";
-// Context hooks for accessing user data
 import { useAuth } from "../contexts/authContext"; 
-import { useUserData } from "../contexts/userDataContext"; 
+import { useUserData } from "../contexts/userDataContext/useUserData"; 
 
-import { getCompletedHikes } from "../firebase/firestore"
-import { getUserFromFirestore } from "../firebase/firestore"
+import { getCompletedHikes,
+         getUserFromFirestore,
+         getFriendship,
+         acceptFriendship,
+         removeFriendship,
+         requestFriendship
+                              } from "../firebase/firestore"
 
-// Mock data from stu
-import { sampleUsers } from "../stubs/sampleUsers";
-import { hikeEntities } from "../stubs/hikeEntities";
 
 
 function Profile() {
   const navigate = useNavigate();
-  const { userData, completedHikes, loading } = useUserData(); // shared user context
+  const { userId } = useParams(); // Get userId from URL
+  const { currentUser } = useAuth();
+  const { userData: currentUserData, completedHikes: currentUserHikes, loading: currentUserLoading } = useUserData();
+  
+  // State for viewed profile data
+  const [profileData, setProfileData] = useState(null);
+  const [profileHikes, setProfileHikes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [friendshipStatus, setFriendshipStatus] = useState(null);
+  
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        setLoading(true);
+        // If no userId provided or it matches current user, show own profile
+        if (!userId || userId === currentUser?.uid) {
+          setProfileData(currentUserData);
+          setProfileHikes(currentUserHikes);
+        } else {
+          // Load other user's profile
+          const userData = await getUserFromFirestore(userId);
+          const userHikes = await getCompletedHikes(userId);
+          setProfileData(userData);
+          setProfileHikes(userHikes);
+          
+          // Check friendship status
+          const friendship = await getFriendship(currentUser.uid, userId);
+          setFriendshipStatus(friendship.length > 0 ? friendship[0] : null);
+          console.log(friendship.length)
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (!currentUserLoading) {
+      loadProfileData();
+    }
+  }, [userId, currentUser, currentUserData, currentUserHikes, currentUserLoading]);
 
-    // Logging to verify the data is loading
-    console.log("[Profile] loading:", loading);
-    console.log("[Profile] userData:", userData);
-    console.log("[Profile] completedHikes:", completedHikes);
+  const handleFriendshipAction = async () => {
+    try {
+      if (!friendshipStatus) {
+        // Send friend request
+        await requestFriendship(currentUser.uid, userId);
+        const friendship = await getFriendship(currentUser.uid, userId);
+        setFriendshipStatus(friendship[0]);
+      } else if (friendshipStatus.status === "pending") {
+        if (friendshipStatus.senderId === currentUser.uid) {
+          // Cancel request
+          await removeFriendship(friendshipStatus.id);
+          setFriendshipStatus(null);
+        } else {
+          // Accept request
+          await acceptFriendship(friendshipStatus.id);
+          const friendship = await getFriendship(currentUser.uid, userId);
+          setFriendshipStatus(friendship[0]);
+        }
+      } else {
+        // Remove friendship
+        await removeFriendship(friendshipStatus.id);
+        setFriendshipStatus(null);
+      }
+    } catch (error) {
+      console.error("Error managing friendship:", error);
+    }
+  };
 
-  if (loading || !userData) {
-    console.log("[Profile] Still loading user data...");
-    return <div className="text-center mt-20">Loading profile...</div>;
+  if (loading || !profileData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
+
+  const isOwnProfile = !userId || userId === currentUser?.uid;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <ProfileData userData={userData} />
-        <HikesList completedHikes = {completedHikes} /> 
-        
+      <div className="max-w-5xl mx-auto space-y-8">
+        <ProfileData 
+          userData={profileData} 
+          isOwnProfile={isOwnProfile}
+          friendshipStatus={friendshipStatus}
+          onFriendshipAction={handleFriendshipAction}
+        />
+        <HikesList completedHikes={profileHikes} /> 
 
-        <div className="flex justify-center">
-          <Link
-            to="/login"
-            className="md:hidden w-full text-center bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
-            onClick={() => {
-              doSignOut().then(() => {
-                navigate("/login");
-              });
-            }}
-          >
-            Logout
-          </Link>
-        </div>
+        {isOwnProfile && (
+          <div className="flex justify-center">
+            <Link
+              to="/login"
+              className="md:hidden w-full text-center bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-200"
+              onClick={() => {
+                doSignOut().then(() => {
+                  navigate("/login");
+                });
+              }}
+            >
+              Logout
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
 
 export default Profile;

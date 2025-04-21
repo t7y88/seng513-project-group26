@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
+import { UserDataProvider } from "./contexts/userDataContext";
 import NavBar from "./components/navbar/NavBar";
 import BottomNavBar from "./components/BottomNavBar";
 import Home from "./pages/home";
@@ -16,6 +17,8 @@ import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Map from "./components/Map";
+import Friends from "./pages/friends";
+import FriendshipTester from "./components/admin/FriendshipTester";
 import "./index.css";
 
 function App() {
@@ -37,7 +40,25 @@ function App() {
           />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path="home" element={<Home />} />
+          <Route
+            path="home"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
+          {/* <Route 
+            path="admin/friendship-tester" 
+            element={
+              <ProtectedRoute>
+                <FriendshipTester />
+              </ProtectedRoute>
+            } 
+          /> */}
+
+          <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
           <Route path="map" element={<Map />} />
           <Route
@@ -48,6 +69,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="profile/:userId" element={<Profile />} />
           <Route
             path="profile/edit"
             element={

@@ -16,6 +16,7 @@ import {
   limit,
   orderBy,
   startAfter,
+  documentId,
 } from "firebase/firestore";
 
 // utilites
@@ -26,18 +27,88 @@ import {
 
 // ---------- USERS ----------
 
-/** 1.
+/**
  * Creates or overwrites a user document in the `users` collection using a predefined UID.
  *
- * Useful when syncing with Firebase Authentication UIDs.
+ * This is typically called after Firebase Authentication creates the user,
+ * so the UID from Firebase Auth is used as the Firestore document ID.
  *
- * @param {string} uid - The UID to use as the document ID.
- * @param {UserProfile} userData - The user profile data to store.
- * @returns {Promise<void>} A promise that resolves when the document has been written.
+ * Throws:
+ * - Error if required fields in the `userData` object are missing
+ * - Error if the Firestore operation fails
+ *
+ * Notes:
+ * - This function **overwrites** any existing document with the same UID.
+ * - Validation ensures required fields are present before attempting write.
+ *
+ * @param {string} uid - The UID to use as the document ID (from Firebase Auth).
+ * @param {UserProfile} userData - The full user profile data to store in Firestore.
+ * @throws {Error} If required fields are missing or if Firestore fails to write the document.
+ * @returns {Promise<void>}
+ * @author aidan
  */
 export const createUserInFirestore = async (uid, userData) => {
+  if (!uid || typeof uid !== "string") {
+    throw new Error("Invalid or missing UID.");
+  }
+
+  const requiredFields = [
+    "email",
+    "username",
+    "name",
+    "age",
+    "location",
+    "friends",
+    "memberSince",
+    "admin",
+  ];
+  for (const field of requiredFields) {
+    if (userData[field] === undefined || userData[field] === null) {
+      throw new Error(`Missing required user field: ${field}`);
+    }
+  }
+
   const userRef = doc(db, "users", uid);
-  await setDoc(userRef, userData);
+
+  try {
+    await setDoc(userRef, userData);
+    console.log(
+      `User document for UID ${uid} created or updated successfully.`
+    );
+  } catch (error) {
+    console.error("Failed to create user in Firestore:", error);
+    throw new Error("Failed to create user. Please try again.");
+  }
+};
+
+/**
+ * Updates the 'admin' field of a user document in Firestore.
+ *
+ * This function checks whether the user document exists before attempting to update it.
+ * If the user is found, the 'admin' field is updated to the provided boolean value.
+ * If the user does not exist, an error is logged and no changes are made.
+ *
+ * @param {string} uid - The UID of the user whose admin status is being updated.
+ * @param {boolean} isAdmin - A boolean value indicating whether the user should be marked as an admin (true) or not (false).
+ * @returns {Promise<void>} A Promise that resolves when the operation is complete.
+ */
+export const setUserAdminStatus = async (uid, isAdmin) => {
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    console.error(`User with UID ${uid} not found.`);
+    return;
+  }
+
+  try {
+    await updateDoc(userRef, {
+      admin: isAdmin,
+    });
+    console.log(`Updated admin status for UID ${uid} to ${isAdmin}`);
+  } catch (err) {
+    console.error("Failed to update admin status:", err);
+  }
 };
 
 /**
@@ -66,6 +137,7 @@ export const ensureUserExists = async (uid, authData = {}) => {
       age: 0,
       location: "",
       friends: [],
+      admin: false,
       memberSince: new Date().toLocaleDateString(),
       about: "",
       description: "",
@@ -117,10 +189,34 @@ export const addUserToFirestore = async (userData) => {
 };
 
 // 2. Get user data
-export const getUserFromFirestore = async (uid) => {
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  return userSnap.exists() ? userSnap.data() : null;
+/**
+ * Retrieves a user's profile data from Firestore.
+ *
+ * @param {string} userId - The ID of the user to retrieve
+ * @returns {Promise<UserProfile|null>} The user profile or null if not found
+ */
+export const getUserFromFirestore = async (userId) => {
+  try {
+    // console.log(`Attempting to fetch user with ID: ${userId}`);
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      console.log("User document found:", data);
+
+      return /** @type {UserProfile} */ ({
+        ...data,
+        id: userSnap.id, // this overrides any accidental id field
+      });
+    } else {
+      console.log(`No user found with ID: ${userId}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting user from Firestore:", error);
+    throw error;
+  }
 };
 
 // 3. Get all users
@@ -151,40 +247,115 @@ export const updateCompletedHikes = async (uid, completedHikes) => {
 };
 
 // ---------- HIKES ----------
+
 /**
- * Adds or updates a hike in Firestore using the provided `hike.id` attribute as the document ID.
+ * Adds a hike to Firestore using an auto-generated document ID.
+ * The generated ID is also saved as the `id` field inside the document.
  *
- * @param {HikeEntity} hike - The hike data to add.
- * @returns {Promise<void>}
+ * @param {HikeEntity} hike - The hike data to store.
+ * @returns {Promise<string>} The generated document ID.
  */
 export const createHike = async (hike) => {
   try {
-    if (!hike?.id) {
-      throw new Error("Missing hike.id field — cannot create hike.");
-    }
+    const hikesRef = collection(db, "hikes");
 
-    const hikeRef = doc(db, "hikes", hike.id);
-    await setDoc(hikeRef, hike, { merge: true }); // Creates or overwrites the doc with ID = hikeId
-    console.log(`Successfully added hike: ${hike.id}`);
+    // Temporarily add the doc without an `id` so we can get one from Firestore
+    const docRef = await addDoc(hikesRef, { ...hike });
+
+    // Add the generated ID to the document itself under `id`
+    await updateDoc(docRef, { id: docRef.id });
+
+    console.log(`Successfully added hike: ${docRef.id}`);
+    return docRef.id;
   } catch (error) {
-    console.error(`Failed to add hike: ${hike?.id}:`, error);
+    console.error("Failed to add hike:", error);
     throw new Error("Failed to add hike. Please try again.");
   }
 };
 
-// 1. Add a hike
+/**
+ * Adds a hike to Firestore with an auto-generated document ID,
+ * and stores that ID in the `id` field of the document itself.
+ *
+ * @param {HikeEntity} hikeData - The hike data to store.
+ * @returns {Promise<string>} The Firestore-generated document ID.
+ */
 export const addHike = async (hikeData) => {
   try {
     const hikesRef = collection(db, "hikes");
-    const hikeDoc = await addDoc(hikesRef, hikeData);
-    return hikeDoc.id;
+
+    // Step 1: Add the hike (Firestore generates the ID)
+    const docRef = await addDoc(hikesRef, hikeData);
+
+    // Step 2: Update the same doc with its generated ID in the `id` field
+    await setDoc(docRef, { ...hikeData, id: docRef.id }, { merge: true });
+
+    console.log(`Added hike with Firestore ID: ${docRef.id}`);
+    return docRef.id;
   } catch (error) {
     console.error("Error adding hike:", error);
-    throw new Error("Failed to add hike");
+    throw new Error("Failed to add hike.");
   }
 };
 
-// 2. Get all hikes
+/**
+ * Retrieves a single hike from Firestore by its document ID.
+ *
+ * @param {string} id - The Firestore document ID of the hike.
+ * @returns {Promise<HikeEntity|null>} The hike object (with `id` field), or null if not found.
+ */
+export const getHikeById = async (id) => {
+  try {
+    const hikeRef = doc(db, "hikes", id);
+    const hikeSnap = await getDoc(hikeRef);
+
+    if (!hikeSnap.exists()) {
+      console.warn(`No hike found with ID: ${id}`);
+      return null;
+    }
+
+    return /** @type {HikeEntity} */ ({
+      id: hikeSnap.id,
+      ...hikeSnap.data(),
+    });
+  } catch (error) {
+    console.error(`Failed to fetch hike with ID ${id}:`, error);
+    throw new Error("Error retrieving hike");
+  }
+};
+
+/**
+ * Retrieves the title of a hike using the custom `hikeId` field (not the Firestore document ID).
+ *
+ * @param {string} hikeId - The custom hikeId field inside the hike document.
+ * @returns {Promise<string|null>} The hike title, or null if not found.
+ */
+export const getHikeTitleByHikeId = async (hikeId) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+    const q = query(hikesRef, where("hikeId", "==", hikeId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      console.warn(`No hike found with hikeId: ${hikeId}`);
+      return null;
+    }
+
+    const hikeDoc = snapshot.docs[0];
+    return hikeDoc.data().title ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch hike title by hikeId ${hikeId}:`, error);
+    throw new Error("Error retrieving hike title by hikeId");
+  }
+};
+
+/**
+ * Retrieves all hikes from Firestore as an array.
+ *
+ * Each returned hike includes its Firestore-generated `id` field along with the rest of the hike data.
+ *
+ * @returns {Promise<HikeEntity[]>} An array of hike objects.
+ */
 export const getAllHikes = async () => {
   const hikesRef = collection(db, "hikes");
   const snapshot = await getDocs(hikesRef);
@@ -193,19 +364,77 @@ export const getAllHikes = async () => {
   );
 };
 
-// 3. Update hike
+/**
+ * Retrieves all hikes from Firestore and returns them as an object map,
+ * using each hike's `hikeId` property as the key.
+ *
+ * Useful for fast lookup of hikes by `hikeId` instead of looping through an array.
+ *
+ * @returns Promise<Record<string, HikeEntity>> A map of hikes keyed by `hikeId`.
+ */
+export const getAllHikesAsMap = async () => {
+  const hikesRef = collection(db, "hikes");
+  const snapshot = await getDocs(hikesRef);
+
+  const hikes = {};
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    hikes[data.hikeId] = { id: doc.id, ...data };
+  });
+
+  return hikes;
+};
+
+/**
+ * Updates an existing hike document in Firestore using the provided hikeId (which matches the Firestore doc ID).
+ *
+ * @param {string} hikeId - The Firestore document ID of the hike to update.
+ * @param {Partial<HikeEntity>} updates - The fields to update on the hike.
+ * @returns {Promise<void>}
+ */
 export const updateHike = async (hikeId, updates) => {
   const hikeRef = doc(db, "hikes", hikeId);
   await updateDoc(hikeRef, updates);
 };
 
-// 4. Delete hike
-export const deleteHike = async (hikeId) => {
-  const hikeRef = doc(db, "hikes", hikeId);
+/**
+ * Deletes a hike from Firestore using the `hikeId` field stored inside the document.
+ *
+ * Firestore document IDs are different from hikeId.
+ * It will search the 'hikes' collection for a document where `hikeId` matches
+ * and delete that document.
+ *
+ * @param {string} hikeId - The hike's unique internal ID (not the Firestore doc ID).
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByHikeId = async (hikeId) => {
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("hikeId", "==", hikeId));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    throw new Error(`No hike found with hikeId: ${hikeId}`);
+  }
+
+  const docToDelete = snapshot.docs[0]; // assuming hikeId is unique
+  await deleteDoc(doc(db, "hikes", docToDelete.id));
+};
+
+/**
+ * Deletes a hike from Firestore using the explicit Firestore document ID (`docId`).
+ *
+ * This is useful when the document ID was auto-generated by Firestore and does not match the hikeId.
+ *
+ * @param {string} docId - The Firestore document ID to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByDocId = async (docId) => {
+  const hikeRef = doc(db, "hikes", docId);
   await deleteDoc(hikeRef);
 };
 
 // ---------- HIKES BY USER ----------
+
 /**
  * Logs a completed hike to Firestore.
  *
@@ -214,23 +443,37 @@ export const deleteHike = async (hikeId) => {
  * - Error if Firestore fails to write the document
  *
  * Notes:
- * - Uses composite ID (userId + hikeId + date)
+ * Uses a composite key for the document ID: `${userId}_${hikeId}_${dateCompleted}`
  * - This composite ID is generated by the helper utility function <generateHikeId()>
  *
  * @param {CompletedHike} data
  * @throws {Error} If required fields are missing or if the document (tuple) was not inserted into the Collection (database)
- *
+ * @returns {Promise<void>}
  * @author aidan
  */
 export const createCompletedHike = async ({
+  id,
   userId,
+  username,
   hikeId,
   rating,
   notes,
   dateCompleted,
+  timeToComplete,
+  timeUnit,
 }) => {
-  if (!userId || !hikeId || typeof rating !== "number") {
-    throw new Error("Missing required hike data (userId, hikeId, or rating)");
+  // Validate required fields
+  if (
+    !userId ||
+    !username ||
+    !hikeId ||
+    typeof rating !== "number" ||
+    typeof timeToComplete !== "number" ||
+    !timeUnit
+  ) {
+    throw new Error(
+      "Missing required hike data (userId, username, hikeId, rating, timeToComplete, or timeUnit)"
+    );
   }
 
   const date = normalizeDate(dateCompleted ?? new Date());
@@ -241,11 +484,15 @@ export const createCompletedHike = async ({
 
   try {
     await setDoc(ref, {
+      id,
       userId,
+      username,
       hikeId,
       rating,
       notes,
       dateCompleted: date,
+      timeToComplete,
+      timeUnit,
       createdAt: new Date(),
     });
   } catch (error) {
@@ -360,45 +607,316 @@ export const getMostRecentCompletedHikes = async (userId, numOfHikes) => {
 };
 
 // ---------- FRIENDSHIPS ----------
+/**
+ * Retrieves a friendship between two users.
+ * This function checks both directions (user1 to user2 and user2 to user1).
+ * If a friendship exists in either direction, it will be returned.
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<Friendship[]>} A promise that resolves to an array of friendship objects.
+ * @throws {Error} If an error occurs while fetching the friendship.
+ *
+ * @author Kyle
+ **/
 
-// Add a friendship
-export const addFriendship = async (user1, user2) => {
+export const getFriendship = async (user1, user2) => {
+  const friendshipsRef = collection(db, "friendships");
+  // Check both directions
+  const q1 = query(
+    friendshipsRef,
+    where("user1", "==", user1),
+    where("user2", "==", user2)
+  );
+  const q2 = query(
+    friendshipsRef,
+    where("user1", "==", user2),
+    where("user2", "==", user1)
+  );
+
+  const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+  const results = [
+    ...snapshot1.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1, // user1 is always the sender
+    })),
+    ...snapshot2.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1, // user1 is always the sender
+    })),
+  ];
+
+  return results;
+};
+/**
+ * Requests a friendship between two users after verifying both users exist.
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<void>} A promise that resolves when the friendship request has been sent.
+ * @throws {Error} If either user doesn't exist or if an error occurs while sending the request.
+ */
+export const requestFriendship = async (user1, user2) => {
+  // Validate input parameters
+  if (!user1 || !user2) {
+    throw new Error("Both user IDs are required");
+  }
+
+  if (user1 === user2) {
+    throw new Error("Cannot create friendship with yourself");
+  }
+
+  // Check if both users exist
+  const [user1Exists, user2Exists] = await Promise.all([
+    getUserFromFirestore(user1),
+    getUserFromFirestore(user2),
+  ]);
+
+  if (!user1Exists) {
+    throw new Error(`User with ID ${user1} doesn't exist`);
+  }
+
+  if (!user2Exists) {
+    throw new Error(`User with ID ${user2} doesn't exist`);
+  }
+
+  // Check if friendship already exists
+  const existingFriendship = await getFriendship(user1, user2);
+  if (existingFriendship && existingFriendship.length > 0) {
+    throw new Error(
+      "A friendship or request already exists between these users"
+    );
+  }
+
+  // Create the friendship request
   const friendshipsRef = collection(db, "friendships");
   await addDoc(friendshipsRef, {
     user1,
     user2,
+    status: "pending",
     since: new Date(),
+  });
+
+  console.log(`Friendship request created between ${user1} and ${user2}`);
+};
+
+/**
+ * Retrieves all pending friendship requests for a specific user.
+ * This function queries the `friendships` collection for documents
+ * where the user is either user1 or user2 and the status is "pending".
+ *
+ * @param {string} userId - The ID of the user whose pending requests should be retrieved.
+ * @returns {Promise<Friendship[]>} A promise that resolves to an array of pending friendship requests.
+ * @throws {Error} If an error occurs while fetching the pending requests.
+ *
+ * @author Kyle
+ **/
+export const getAllPendingFriendship = async (userId) => {
+  const friendshipsRef = collection(db, "friendships");
+  // Get requests sent to this user (where they are user2)
+  const q1 = query(
+    friendshipsRef,
+    where("user2", "==", userId),
+    where("status", "==", "pending")
+  );
+  // Get requests sent by this user (where they are user1)
+  const q2 = query(
+    friendshipsRef,
+    where("user1", "==", userId),
+    where("status", "==", "pending")
+  );
+
+  const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+  return [
+    ...snapshot1.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1,
+    })),
+    ...snapshot2.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1,
+    })),
+  ];
+};
+
+export const acceptFriendship = async (friendshipId) => {
+  const friendshipRef = doc(db, "friendships", friendshipId);
+  await updateDoc(friendshipRef, {
+    status: "accepted",
   });
 };
 
-// Get all friends for a user
-export const getFriends = async (userId) => {
-  try {
-    // Step 1: Get the user document
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
+/**
+ * Accepts a friendship request between two users.
+ * This function updates the status of the friendship document
+ * to "accepted".
+ *
+ * @param {string} friendshipId - The ID of the friendship document to update.
+ * @returns {Promise<void>} A promise that resolves when the friendship has been accepted.
+ * @throws {Error} If an error occurs while accepting the friendship.
+ *
+ * @author Kyle
+ **/
+export const removeFriendship = async (friendshipId) => {
+  const friendshipRef = doc(db, "friendships", friendshipId);
+  await deleteDoc(friendshipRef);
+};
 
-    if (!userSnap.exists()) {
-      console.warn("No user found with UID:", userId);
+/**
+ * Adds a direct friendship between two users after verifying both users exist.
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<void>} A promise that resolves when the friendship has been added.
+ * @throws {Error} If either user doesn't exist or if an error occurs while adding the friendship.
+ */
+export const addFriendship = async (user1, user2) => {
+  // Validate input parameters
+  if (!user1 || !user2) {
+    throw new Error("Both user IDs are required");
+  }
+
+  if (user1 === user2) {
+    throw new Error("Cannot create friendship with yourself");
+  }
+
+  // Check if both users exist
+  const [user1Exists, user2Exists] = await Promise.all([
+    getUserFromFirestore(user1),
+    getUserFromFirestore(user2),
+  ]);
+
+  if (!user1Exists) {
+    throw new Error(`User with ID ${user1} doesn't exist`);
+  }
+
+  if (!user2Exists) {
+    throw new Error(`User with ID ${user2} doesn't exist`);
+  }
+
+  // Check if friendship already exists
+  const existingFriendship = await getFriendship(user1, user2);
+  if (existingFriendship && existingFriendship.length > 0) {
+    throw new Error("A friendship already exists between these users");
+  }
+
+  // Create the friendship with accepted status
+  const friendshipsRef = collection(db, "friendships");
+  await addDoc(friendshipsRef, {
+    user1,
+    user2,
+    status: "accepted",
+    since: new Date(),
+  });
+
+  console.log(`Direct friendship created between ${user1} and ${user2}`);
+};
+
+/**
+ * Retrieves all friends of a specific user with improved efficiency.
+ *
+ * @param {string} userId - The ID of the user whose friends should be retrieved.
+ * @param {number} [maxlimit=50] - Maximum number of friends to retrieve
+ * @returns {Promise<UserProfile[]>} A promise that resolves to an array of user profiles
+ * @throws {Error} If an error occurs while fetching the friends.
+ */
+export const getFriends = async (userId, maxlimit = 50) => {
+  try {
+    console.log(`Getting friends for user: ${userId}`);
+
+    if (!userId) throw new Error("userId is required");
+
+    const friendshipsRef = collection(db, "friendships");
+
+    // Get friendships where user is either user1 or user2
+    const q1 = query(
+      friendshipsRef,
+      where("user1", "==", userId),
+      where("status", "==", "accepted"),
+      limit(maxlimit)
+    );
+
+    const q2 = query(
+      friendshipsRef,
+      where("user2", "==", userId),
+      where("status", "==", "accepted"),
+      limit(maxlimit)
+    );
+
+    const [snapshot1, snapshot2] = await Promise.all([
+      getDocs(q1),
+      getDocs(q2),
+    ]);
+
+    // console.log(
+    //   `Found ${snapshot1.docs.length + snapshot2.docs.length} friendships`
+    // );
+
+    const friendIds = new Set([
+      ...snapshot1.docs.map((doc) => doc.data().user2),
+      ...snapshot2.docs.map((doc) => doc.data().user1),
+    ]);
+
+    // console.log(`Extracted ${friendIds.size} unique friend IDs`);
+
+    if (friendIds.size === 0) {
       return [];
     }
 
-    const userData = userSnap.data();
-    const friendUIDs = userData.friends || [];
+    const usersRef = collection(db, "users");
+    const friendData = [];
 
-    // Step 2: Fetch each friend's user data
-    const friendDocs = await Promise.all(
-      friendUIDs.map(async (uid) => {
-        const friend = await getUserFromFirestore(uid);
-        return friend ? { id: uid, ...friend } : null;
-      })
-    );
+    // Process in batches of 10 (Firestore's 'in' operator limit)
+    const idBatches = Array.from(friendIds).reduce((batches, id, index) => {
+      const batchIndex = Math.floor(index / 10);
+      if (!batches[batchIndex]) batches[batchIndex] = [];
+      batches[batchIndex].push(id);
+      return batches;
+    }, []);
 
-    // Step 3: Filter out null results
-    return friendDocs.filter((f) => f !== null);
+    // Process each batch
+    for (const batch of idBatches) {
+      try {
+        const batchQuery = query(usersRef, where(documentId(), "in", batch));
+        const batchSnapshot = await getDocs(batchQuery);
+
+        // console.log(`Batch fetched ${batchSnapshot.docs.length} users`);
+
+        batchSnapshot.docs.forEach((doc) => {
+          if (doc.exists()) {
+            friendData.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          }
+        });
+      } catch (batchError) {
+        console.error(`Error processing batch: ${batchError.message}`);
+      }
+    }
+
+    return friendData;
   } catch (error) {
     console.error("Failed to get friends:", error);
-    return [];
+    throw new Error(`Failed to retrieve friends: ${error.message}`);
   }
 };
 
@@ -410,7 +928,7 @@ export const getFriends = async (userId) => {
  * @param {number} numOfHikes - Optional: number of hikes to retrieve (default 5)
  * @returns {Promise<CompletedHike[]>}
  */
-export const getRecentHikesByFriend = async (userId, numOfHikes = 5) => {
+export const getRecentHikesByFriend = async (userId, numOfHikes = 10) => {
   if (typeof userId !== "string") {
     throw new Error("getRecentHikesByFriend: userId must be a string");
   }
@@ -593,10 +1111,9 @@ export const searchHikes = async (searchTerm) => {
 /**
  * Searches users by name or username (excluding current user)
  * @param {string} searchTerm - The term to search for
- * @param {string} currentUserId - The ID of the current user to exclude
  * @returns {Promise<UserProfile[]>} Array of matching users
  */
-export const searchUsers = async (searchTerm, currentUserId) => {
+export const searchUsers = async (searchTerm) => {
   try {
     // Normalize search term
     const term = searchTerm.toLowerCase().trim();
@@ -605,15 +1122,13 @@ export const searchUsers = async (searchTerm, currentUserId) => {
     // Get all users with proper typing
     const allUsers = await getAllUsers();
 
-    // Filter out current user and search matches
-    const filteredUsers = allUsers
-      .filter((user) => user.id !== currentUserId)
-      .filter((user) => {
-        return (
-          user.name.toLowerCase().includes(term) ||
-          (user.username && user.username.toLowerCase().includes(term))
-        );
-      });
+    // Filter search matches (no longer excluding current user)
+    const filteredUsers = allUsers.filter((user) => {
+      return (
+        user.name.toLowerCase().includes(term) ||
+        (user.username && user.username.toLowerCase().includes(term))
+      );
+    });
 
     // Sort by best match
     filteredUsers.sort((a, b) => {
