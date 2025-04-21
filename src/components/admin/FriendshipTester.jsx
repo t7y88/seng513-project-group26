@@ -6,7 +6,7 @@ import {
   removeFriendship,
   addFriendship,
   getFriends,
-  getUserFromFirestore // Add this import
+  getUserFromFirestore
 } from "../../firebase/firestore";
 
 export default function FriendshipTester() {
@@ -21,10 +21,23 @@ export default function FriendshipTester() {
     setLoading(true);
     setError(null);
     try {
-      const result = await func(...args);
+      // Trim whitespace from any string arguments
+      const trimmedArgs = args.map(arg => 
+        typeof arg === 'string' ? arg.trim() : arg
+      );
+      
+      // Log the original and trimmed values for debugging
+      if (trimmedArgs.some((arg, i) => typeof arg === 'string' && arg !== args[i])) {
+        console.log('Trimmed input values:', {
+          original: args.filter(arg => typeof arg === 'string'),
+          trimmed: trimmedArgs.filter(arg => typeof arg === 'string')
+        });
+      }
+      
+      const result = await func(...trimmedArgs);
       setResults({
         function: funcName,
-        arguments: args,
+        arguments: trimmedArgs, // Show trimmed arguments in results
         data: result
       });
       console.log(`${funcName} result:`, result);
