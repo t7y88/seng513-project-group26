@@ -4,8 +4,14 @@ import HikesList from "../components/profile/HikesList";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { doSignOut } from "../firebase/auth";
 import { useAuth } from "../contexts/authContext"; 
-import { useUserData } from "../contexts/userDataContext"; 
-import { getCompletedHikes, getUserFromFirestore, getFriendship, requestFriendship, removeFriendship } from "../firebase/firestore";
+import { useUserData } from "../contexts/userDataContext/useUserData"; 
+
+import { getCompletedHikes,
+         getUserFromFirestore,
+         getFriendship
+                              } from "../firebase/firestore"
+
+
 
 function Profile() {
   const navigate = useNavigate();
@@ -75,7 +81,7 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-8">
         <ProfileData 
           userData={profileData} 
           isOwnProfile={isOwnProfile}
