@@ -25,7 +25,6 @@
  * @property {string} profileImage - URL to the user’s profile image.
  */
 
-
 /**
  * @typedef {Object} HikeEntity
  * @property {string} id - Unique ID for the hike.
@@ -42,7 +41,6 @@
  * @property {string} [status] - (Optional) Trail status.
  */
 
-
 /**
  * @typedef {Object} ReviewEntity
  * @property {string} [id] - Firestore document ID (added during retrieval).
@@ -51,4 +49,13 @@
  * @property {number} rating - The user's rating for the hike.
  * @property {string} notes - The written portion of the review.
  * @property {Date} [createdAt] - Timestamp when the review was submitted.
+ */
+
+/**
+ * @typedef {Object} Friendship
+ * @property {string} id - The unique ID of the friendship document.
+ * @property {string} user1 - The ID of the first user in the friendship.
+ * @property {string} user2 - The ID of the second user in the friendship.
+ * @property {Date} since - The date the friendship was established.
+ * @property {string} [status] - Optional status of the friendship (e.g., "accepted", "pending").
  */

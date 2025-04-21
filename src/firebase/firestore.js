@@ -16,6 +16,7 @@ import {
   limit,
   orderBy,
   startAfter,
+  documentId,
 } from "firebase/firestore";
 
 // utilites
@@ -117,10 +118,32 @@ export const addUserToFirestore = async (userData) => {
 };
 
 // 2. Get user data
-export const getUserFromFirestore = async (uid) => {
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  return userSnap.exists() ? userSnap.data() : null;
+/**
+ * Retrieves a user's profile data from Firestore.
+ *
+ * @param {string} userId - The ID of the user to retrieve
+ * @returns {Promise<UserProfile|null>} The user profile or null if not found
+ */
+export const getUserFromFirestore = async (userId) => {
+  try {
+    console.log(`Attempting to fetch user with ID: ${userId}`);
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      console.log("User document found:", userSnap.data());
+      return /** @type {UserProfile} */ ({
+        id: userSnap.id,
+        ...userSnap.data(),
+      });
+    } else {
+      console.log(`No user found with ID: ${userId}`);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting user from Firestore:", error);
+    throw error;
+  }
 };
 
 // 3. Get all users
@@ -360,45 +383,225 @@ export const getMostRecentCompletedHikes = async (userId, numOfHikes) => {
 };
 
 // ---------- FRIENDSHIPS ----------
+/**
+ * Retrieves a friendship between two users.
+ * This function checks both directions (user1 to user2 and user2 to user1).
+ * If a friendship exists in either direction, it will be returned.
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<Friendship[]>} A promise that resolves to an array of friendship objects.
+ * @throws {Error} If an error occurs while fetching the friendship.
+ *
+ * @author Kyle
+ **/
 
-// Add a friendship
+export const getFriendship = async (user1, user2) => {
+  const friendshipsRef = collection(db, "friendships");
+  // Check both directions
+  const q1 = query(
+    friendshipsRef,
+    where("user1", "==", user1),
+    where("user2", "==", user2)
+  );
+  const q2 = query(
+    friendshipsRef,
+    where("user1", "==", user2),
+    where("user2", "==", user1)
+  );
+
+  const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+
+  const results = [
+    ...snapshot1.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      since: doc.data().since,
+    })),
+    ...snapshot2.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      since: doc.data().since,
+    })),
+  ];
+
+  return /** @type {Friendship[]} */ (results);
+};
+/**
+ * Requests a friendship between two users.
+ * This function creates a new document in the `friendships` collection with
+ * the user IDs and the status set to "pending".
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<void>} A promise that resolves when the friendship request has been sent.
+ * @throws {Error} If an error occurs while sending the friendship request.
+ *
+ * @author Kyle
+ **/
+
+export const requestFriendship = async (user1, user2) => {
+  const friendshipsRef = collection(db, "friendships");
+  await addDoc(friendshipsRef, {
+    user1,
+    user2,
+    status: "pending",
+    since: new Date(),
+  });
+};
+
+/**
+ * Retrieves all pending friendship requests for a specific user.
+ * This function queries the `friendships` collection for documents
+ * where the user is either user1 or user2 and the status is "pending".
+ *
+ * @param {string} userId - The ID of the user whose pending requests should be retrieved.
+ * @returns {Promise<Friendship[]>} A promise that resolves to an array of pending friendship requests.
+ * @throws {Error} If an error occurs while fetching the pending requests.
+ *
+ * @author Kyle
+ **/
+export const getAllPendingFriendship = async (userId) => {
+  const friendshipsRef = collection(db, "friendships");
+  const q = query(
+    friendshipsRef,
+    where("user1", "==", userId),
+    where("status", "==", "pending")
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    user1: doc.data().user1,
+    user2: doc.data().user2,
+    since: doc.data().since,
+  }));
+};
+
+/**
+ * Accepts a friendship request between two users.
+ * This function updates the status of the friendship document
+ * to "accepted".
+ *
+ * @param {string} friendshipId - The ID of the friendship document to update.
+ * @returns {Promise<void>} A promise that resolves when the friendship has been accepted.
+ * @throws {Error} If an error occurs while accepting the friendship.
+ *
+ * @author Kyle
+ **/
+export const removeFriendship = async (friendshipId) => {
+  const friendshipRef = doc(db, "friendships", friendshipId);
+  await deleteDoc(friendshipRef);
+};
+
+/**
+ * Adds a friendship between two users to the Firestore database.
+ * This function creates a new document in the `friendships` collection with the user IDs and the date the friendship was established.
+ *
+ * @param {string} user1 - The ID of the first user.
+ * @param {string} user2 - The ID of the second user.
+ * @returns {Promise<void>} A promise that resolves when the friendship has been added.
+ * @throws {Error} If an error occurs while adding the friendship.
+ *
+ * */
 export const addFriendship = async (user1, user2) => {
   const friendshipsRef = collection(db, "friendships");
   await addDoc(friendshipsRef, {
     user1,
     user2,
+    status: "accepted",
     since: new Date(),
   });
 };
 
-// Get all friends for a user
-export const getFriends = async (userId) => {
+/**
+ * Retrieves all friends of a specific user with improved efficiency.
+ *
+ * @param {string} userId - The ID of the user whose friends should be retrieved.
+ * @param {number} [maxlimit=50] - Maximum number of friends to retrieve
+ * @returns {Promise<UserProfile[]>} A promise that resolves to an array of user profiles
+ * @throws {Error} If an error occurs while fetching the friends.
+ */
+export const getFriends = async (userId, maxlimit = 50) => {
   try {
-    // Step 1: Get the user document
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
+    console.log(`Getting friends for user: ${userId}`);
 
-    if (!userSnap.exists()) {
-      console.warn("No user found with UID:", userId);
+    if (!userId) throw new Error("userId is required");
+
+    const friendshipsRef = collection(db, "friendships");
+
+    // Get friendships where user is either user1 or user2
+    const q1 = query(
+      friendshipsRef,
+      where("user1", "==", userId),
+      where("status", "==", "accepted"),
+      limit(maxlimit)
+    );
+
+    const q2 = query(
+      friendshipsRef,
+      where("user2", "==", userId),
+      where("status", "==", "accepted"),
+      limit(maxlimit)
+    );
+
+    const [snapshot1, snapshot2] = await Promise.all([
+      getDocs(q1),
+      getDocs(q2),
+    ]);
+
+    console.log(
+      `Found ${snapshot1.docs.length + snapshot2.docs.length} friendships`
+    );
+
+    const friendIds = new Set([
+      ...snapshot1.docs.map((doc) => doc.data().user2),
+      ...snapshot2.docs.map((doc) => doc.data().user1),
+    ]);
+
+    console.log(`Extracted ${friendIds.size} unique friend IDs`);
+
+    if (friendIds.size === 0) {
       return [];
     }
 
-    const userData = userSnap.data();
-    const friendUIDs = userData.friends || [];
+    const usersRef = collection(db, "users");
+    const friendData = [];
 
-    // Step 2: Fetch each friend's user data
-    const friendDocs = await Promise.all(
-      friendUIDs.map(async (uid) => {
-        const friend = await getUserFromFirestore(uid);
-        return friend ? { id: uid, ...friend } : null;
-      })
-    );
+    // Process in batches of 10 (Firestore's 'in' operator limit)
+    const idBatches = Array.from(friendIds).reduce((batches, id, index) => {
+      const batchIndex = Math.floor(index / 10);
+      if (!batches[batchIndex]) batches[batchIndex] = [];
+      batches[batchIndex].push(id);
+      return batches;
+    }, []);
 
-    // Step 3: Filter out null results
-    return friendDocs.filter((f) => f !== null);
+    // Process each batch
+    for (const batch of idBatches) {
+      try {
+        const batchQuery = query(usersRef, where(documentId(), "in", batch));
+        const batchSnapshot = await getDocs(batchQuery);
+
+        console.log(`Batch fetched ${batchSnapshot.docs.length} users`);
+
+        batchSnapshot.docs.forEach((doc) => {
+          if (doc.exists()) {
+            friendData.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          }
+        });
+      } catch (batchError) {
+        console.error(`Error processing batch: ${batchError.message}`);
+      }
+    }
+
+    return friendData;
   } catch (error) {
     console.error("Failed to get friends:", error);
-    return [];
+    throw new Error(`Failed to retrieve friends: ${error.message}`);
   }
 };
 
