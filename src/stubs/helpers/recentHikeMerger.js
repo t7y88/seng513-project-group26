@@ -24,6 +24,7 @@ export function getMergedRecentHikes(completedHikes, hikeEntities) {
 
   return completedHikes.map((entry) => {
     const hike = hikeEntities[entry.hikeId] || {};
+    console.log("Friend Completed Hike -> docId: " + hike.docId + " | title: " + hike.title + " | hikeId: " + hike.hikeId)
     return {
       ...hike,
       ...entry
