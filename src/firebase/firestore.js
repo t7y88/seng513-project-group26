@@ -26,19 +26,82 @@ import {
 
 // ---------- USERS ----------
 
-/** 1.
+/**
  * Creates or overwrites a user document in the `users` collection using a predefined UID.
  *
- * Useful when syncing with Firebase Authentication UIDs.
+ * This is typically called after Firebase Authentication creates the user,
+ * so the UID from Firebase Auth is used as the Firestore document ID.
  *
- * @param {string} uid - The UID to use as the document ID.
- * @param {UserProfile} userData - The user profile data to store.
- * @returns {Promise<void>} A promise that resolves when the document has been written.
+ * Throws:
+ * - Error if required fields in the `userData` object are missing
+ * - Error if the Firestore operation fails
+ *
+ * Notes:
+ * - This function **overwrites** any existing document with the same UID.
+ * - Validation ensures required fields are present before attempting write.
+ *
+ * @param {string} uid - The UID to use as the document ID (from Firebase Auth).
+ * @param {UserProfile} userData - The full user profile data to store in Firestore.
+ * @throws {Error} If required fields are missing or if Firestore fails to write the document.
+ * @returns {Promise<void>}
+ * @author aidan
  */
 export const createUserInFirestore = async (uid, userData) => {
+  if (!uid || typeof uid !== "string") {
+    throw new Error("Invalid or missing UID.");
+  }
+
+  const requiredFields = ["email", "username", "name", "age", "location", "friends", "memberSince", "admin"];
+  for (const field of requiredFields) {
+    if (userData[field] === undefined || userData[field] === null) {
+      throw new Error(`Missing required user field: ${field}`);
+    }
+  }
+
   const userRef = doc(db, "users", uid);
-  await setDoc(userRef, userData);
+
+  try {
+    await setDoc(userRef, userData);
+    console.log(`User document for UID ${uid} created or updated successfully.`);
+  } catch (error) {
+    console.error("Failed to create user in Firestore:", error);
+    throw new Error("Failed to create user. Please try again.");
+  }
 };
+
+
+/**
+ * Updates the 'admin' field of a user document in Firestore.
+ *
+ * This function checks whether the user document exists before attempting to update it.
+ * If the user is found, the 'admin' field is updated to the provided boolean value.
+ * If the user does not exist, an error is logged and no changes are made.
+ *
+ * @param {string} uid - The UID of the user whose admin status is being updated.
+ * @param {boolean} isAdmin - A boolean value indicating whether the user should be marked as an admin (true) or not (false).
+ * @returns {Promise<void>} A Promise that resolves when the operation is complete.
+ */
+export const setUserAdminStatus = async (uid, isAdmin) => {
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    console.error(`User with UID ${uid} not found.`);
+    return;
+  }
+
+  try {
+    await updateDoc(userRef, {
+      admin: isAdmin,
+    });
+    console.log(`Updated admin status for UID ${uid} to ${isAdmin}`);
+  } catch (err) {
+    console.error("Failed to update admin status:", err);
+  }
+};
+
+
+
 
 /**
  * Creates a user document if it doesn't exist, or returns existing user data.
@@ -66,6 +129,7 @@ export const ensureUserExists = async (uid, authData = {}) => {
       age: 0,
       location: "",
       friends: [],
+      admin: false,
       memberSince: new Date().toLocaleDateString(),
       about: "",
       description: "",
@@ -225,7 +289,7 @@ export const getAllHikes = async () => {
  * 
  * Useful for fast lookup of hikes by `hikeId` instead of looping through an array.
  *
- * @returns {Promise<Record<string, HikeEntity>>} A map of hikes keyed by `hikeId`.
+ * @returns Promise<Record<string, HikeEntity>> A map of hikes keyed by `hikeId`.
  */
 export const getAllHikesAsMap = async () => {
   const hikesRef = collection(db, "hikes");

@@ -23,6 +23,7 @@
  * @property {string[]} friends - List of user IDs (UIDs) representing this user's friends.
  * @property {string} memberSince - Date the user joined (display string).
  * @property {string} [about] - Short bio.
+ * @property {boolean} admin - Admin status flag.
  * @property {string} [description] - Longer, personal description.
  * @property {string} [profileImage] - URL to the user’s profile image.
  */
