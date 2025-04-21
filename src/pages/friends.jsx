@@ -11,13 +11,15 @@ function Friends() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      {/* Search Bar */}
-      <div className="hidden md:block flex-1 max-w-md mx-4 ">
-        <SearchBar />
-      </div>
-      <div className="max-w-4xl mx-auto space-y-8">
+      {/* Centered content container */}
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Optional: Search bar */}
+        <div className="hidden md:block w-full">
+          <SearchBar />
+        </div>
 
-        <FriendsList friends = { friends } />
+        {/* Main content area */}
+        <FriendsList friends={friends} />
       </div>
     </div>
   );
