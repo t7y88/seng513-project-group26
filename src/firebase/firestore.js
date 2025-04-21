@@ -605,15 +605,13 @@ export const searchUsers = async (searchTerm, currentUserId) => {
     // Get all users with proper typing
     const allUsers = await getAllUsers();
 
-    // Filter out current user and search matches
-    const filteredUsers = allUsers
-      .filter((user) => user.id !== currentUserId)
-      .filter((user) => {
-        return (
-          user.name.toLowerCase().includes(term) ||
-          (user.username && user.username.toLowerCase().includes(term))
-        );
-      });
+    // Filter search matches (no longer excluding current user)
+    const filteredUsers = allUsers.filter((user) => {
+      return (
+        user.name.toLowerCase().includes(term) ||
+        (user.username && user.username.toLowerCase().includes(term))
+      );
+    });
 
     // Sort by best match
     filteredUsers.sort((a, b) => {
