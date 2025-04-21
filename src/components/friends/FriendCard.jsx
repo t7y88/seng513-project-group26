@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import FriendHikePreviewList from "./FriendHikePreviewList";
 import { getRecentHikesByFriend, getAllHikesAsMap } from "../../firebase/firestore";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
-
+import { FaUserCircle } from "react-icons/fa";
 // For carousel
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -75,11 +75,15 @@ return (
         {/* Left section: Profile */}
         <div className="flex flex-col items-center gap-2 flex-[1_1_25%] w-full sm:w-xs md:w-1/4 lg:w-1/3 min-w-[6ch] sm:min-w-[9ch] md:min-w-[12ch] self-center">
           <div className="w-full max-w-[6rem] aspect-square rounded-full overflow-hidden">
-            <img
-              src={friend.profileImage}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
+          {friend.profileImage ? 
+                <img
+                  src={friend.profileImage}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              : 
+                <FaUserCircle className="w-full h-full object-cover"/>
+              }
           </div>
 
           <div className="text-center w-full">
