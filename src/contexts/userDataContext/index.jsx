@@ -23,26 +23,8 @@ const defaultContextValue = {
 
 // Create the context object that will store and provide user data.
 // This will be consumed using useContext in child components.
-const UserDataContext = createContext(defaultContextValue);
+export const UserDataContext = createContext(defaultContextValue);
 
-/**
- * Custom React hook to access the user data context.
- * 
- * This provides components with access to:
- * - userData: the user profile document from Firestore
- * - completedHikes: an array of hike records completed by the user
- * - loading: a boolean indicating whether the data is still being fetched
- * 
- * This hook throws an error if used outside of <UserDataProvider>, to prevent
- * unintentional usage before the context is ready.
- */
-export const useUserData = () => {
-  const context = useContext(UserDataContext);
-  if (!context) {
-    throw new Error("useUserData must be used within a UserDataProvider");
-  }
-  return context;
-};
 
 /**
  * Context provider component that fetches and provides user data to its children.

@@ -14,16 +14,30 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!isSigningIn) {
       setIsSigningIn(true);
-      await doSignInWithEmailAndPassword(email, password);
+      setError("");
+      try {
+        await doSignInWithEmailAndPassword(email, password);
+      } catch (err) {
+        let errorMessage = "Failed to sign in. Please try again.";
+        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+          errorMessage = "Invalid email or password";
+        } else if (err.code === "auth/invalid-email") {
+          errorMessage = "Invalid email address";
+        } else if (err.code === "auth/too-many-requests") {
+          errorMessage = "Too many failed attempts. Please try again later.";
+        }
+        setError(errorMessage);
+        setIsSigningIn(false);
+      }
     }
   };
-
-  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <>
@@ -35,6 +49,11 @@ function Login() {
               Welcome Back!
             </h1>
             <form onSubmit={onSubmit}>
+              {error && (
+                <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
+                  {error}
+                </div>
+              )}
               <div className="mb-4">
                 <label className="block text-gray-700" htmlFor="email">
                   Email
@@ -77,8 +96,9 @@ function Login() {
               <button
                 type="submit"
                 className="generic-button-active w-full"
+                disabled={isSigningIn}
               >
-                Log In
+                {isSigningIn ? "Signing in..." : "Log In"}
               </button>
             </form>
             {/* TODO [Aidan 4-16]: This is for development purposes only - must be removed before the final submission */}
@@ -88,7 +108,7 @@ function Login() {
                     onClick={async () => {
                       //await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
                       
-                      //await seedFirestore();
+                      await seedFirestore();
                     }
                   }
                     className="generic-button-inactive w-full"
