@@ -1,19 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaPencil } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from "../../contexts/authContext";
 
 function ProfileData({ userData, isOwnProfile, friendshipStatus, onFriendshipAction }) {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const [isAddingFriend, setIsAddingFriend] = useState(false);
+  const [isRemovingFriend, setIsRemovingFriend] = useState(false);
 
   const handleEditProfile = () => {
     navigate('/profile/edit', { state: { userData } });
   };
 
+  const handleFriendshipAction = async () => {
+    setIsAddingFriend(!friendshipStatus);
+    setIsRemovingFriend(!!friendshipStatus);
+    await onFriendshipAction();
+    setIsAddingFriend(false);
+    setIsRemovingFriend(false);
+  };
+
   const getFriendshipButtonText = () => {
-    if (!friendshipStatus) return "Add Friend";
-    if (friendshipStatus.status === "pending") return "Cancel Request";
-    return "Remove Friend";
+    if (!friendshipStatus) {
+      return isAddingFriend ? "Sending Request..." : "Add Friend";
+    }
+    if (friendshipStatus.status === "pending") {
+      return friendshipStatus.senderId === currentUser?.uid 
+        ? (isRemovingFriend ? "Canceling..." : "Cancel Request")
+        : (isRemovingFriend ? "Accepting..." : "Accept Request");
+    }
+    return isRemovingFriend ? "Removing..." : "Remove Friend";
+  };
+
+  const getFriendshipButtonStyle = () => {
+    if (!friendshipStatus) return "active";
+    if (friendshipStatus.status === "pending") {
+      return friendshipStatus.senderId !== currentUser?.uid ? "active" : "inactive";
+    }
+    return "inactive";
   };
 
   return (
@@ -64,8 +90,9 @@ function ProfileData({ userData, isOwnProfile, friendshipStatus, onFriendshipAct
             </button>
           ) : (
             <button
-              onClick={onFriendshipAction}
-              className={`generic-button-${friendshipStatus?.status === 'accepted' ? 'inactive' : 'active'}`}
+              onClick={handleFriendshipAction}
+              className={`generic-button-${getFriendshipButtonStyle()}`}
+              disabled={isAddingFriend || isRemovingFriend}
             >
               {getFriendshipButtonText()}
             </button>
