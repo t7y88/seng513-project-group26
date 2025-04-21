@@ -135,7 +135,6 @@ export const ensureUserExists = async (uid, authData = {}) => {
       about: "",
       description: "",
       profileImage: authData.photoURL || "",
-      admin: false,
     };
 
     // Create the user document
