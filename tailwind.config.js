@@ -6,6 +6,7 @@ export default {
   theme: {
     extend: {
       screens: {
+        xs: "440px",
         sm: "640px", // Small screens
         md: "768px", // Medium screens
         lg: "1024px", // Large screens

@@ -135,7 +135,6 @@ export const ensureUserExists = async (uid, authData = {}) => {
       about: "",
       description: "",
       profileImage: authData.photoURL || "",
-      admin: false,
     };
 
     // Create the user document
@@ -196,10 +195,12 @@ export const getUserFromFirestore = async (userId) => {
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists()) {
-      console.log("User document found:", userSnap.data());
+      const data = userSnap.data();
+      console.log("User document found:", data);
+
       return /** @type {UserProfile} */ ({
-        id: userSnap.id,
-        ...userSnap.data(),
+        ...data,
+        id: userSnap.id, // this overrides any accidental id field
       });
     } else {
       console.log(`No user found with ID: ${userId}`);
@@ -210,6 +211,7 @@ export const getUserFromFirestore = async (userId) => {
     throw error;
   }
 };
+
 
 // 3. Get all users
 export const getAllUsers = async () => {

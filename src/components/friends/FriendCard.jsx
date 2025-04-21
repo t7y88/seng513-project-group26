@@ -74,7 +74,7 @@ function FriendCard({ friend, onViewProfile }) {
         {/* Left section: Profile */}
         <div className="
                       flex flex-col items-center gap-2
-                      flex-[1_1_25%]
+                      flex-[1_1_15%]
                       w-full sm:w-xs md:w-1/4 lg:w-1/3
                       min-w-[6ch] sm:min-w-[9ch] md:min-w-[12ch]
                       self-center"
@@ -96,7 +96,8 @@ function FriendCard({ friend, onViewProfile }) {
 
         {/* Middle section: Hike previews */}
         {mergedHikes.length > 0 && (
-          <div className="flex-[3_1_60%] min-w-0">
+          /* hidden when screen size is */
+          <div className="hidden xs:block flex-[3_1_75%] min-w-0">
             <div className="overflow-x-auto" ref={scrollRef}>
               <div className="flex gap-4">
                 <FriendHikePreviewList hikes={mergedHikes} />
@@ -106,16 +107,17 @@ function FriendCard({ friend, onViewProfile }) {
         )}
 
         {/* Right section: Button */}
-        <div className="flex items-center justify-end flex-[1_1_15%] min-w-0 self-center">
+        <div className="flex items-center justify-end flex-[1_1_10%] min-w-[4rem] self-center">
           <button
             className="
         generic-button-active
         text-xs sm:text-sm md:text-base
-        w-full max-w-[8rem]
+        w-full max-w-[5rem]
       "
             onClick={() => onViewProfile(friend)}
           >
-            View Profile
+            View
+            Profile
           </button>
         </div>
       </div>

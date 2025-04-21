@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { doSignOut } from "../firebase/auth";
 // Context hooks for accessing user data
 import { useAuth } from "../contexts/authContext"; 
-import { useUserData } from "../contexts/userDataContext"; 
+import { useUserData } from "../contexts/userDataContext/useUserData"; 
 
 import { getCompletedHikes } from "../firebase/firestore"
 import { getUserFromFirestore } from "../firebase/firestore"

@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import FriendsList from "../components/friends/FriendsList";
 import UserSearchBar from "../components/navbar/UserSearchBar";
-import { useUserData } from "../contexts/userDataContext";
+import { useUserData } from "../contexts/userDataContext/useUserData";
 
 function Friends() {
-  const { userData, friends } = useUserData();
-
-  
-  
+  const { userData, friends, loading } = useUserData();  
 
   // State to hold search results
   const [filteredFriends, setFilteredFriends] = useState([]);
 
   // Show filtered friends if searching, otherwise show all
   const friendsToDisplay = filteredFriends.length > 0 ? filteredFriends : friends;
+
+  if ( loading || !userData?.id ) {
+    return <div className="text-center py-10 text-gray-500">Fetching your friends list...</div>;
+  }
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -28,7 +30,7 @@ function Friends() {
         </div>
 
         {/* Friends List */}
-        <FriendsList friends={friendsToDisplay} />
+        <FriendsList friends = { friendsToDisplay } />
       </div>
     </div>
   );
