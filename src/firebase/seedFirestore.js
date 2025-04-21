@@ -3,7 +3,7 @@ import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 import { reviewEntities } from "../stubs/reviewEntities";
 import { completedHikes } from "../stubs/completedHikes";
-import { addFieldToDocs } from "./addFieldToDocs";
+import { addFieldToDocs, addDocIdToAllDocs } from "./addFieldToDocs";
 
 
 import { db } from "./firebase"; // Adjust the import path as necessary
@@ -50,6 +50,10 @@ const seedFirestore = async () => {
 
   //// Add field to users
   //addFieldToDocs("users", "admin", false);
+
+
+  //// Add docId field to all users
+  //addDocIdToAllDocs("users");
 
 
   // //--- Seed Hikes ---
