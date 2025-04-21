@@ -4,17 +4,17 @@ import UserSearchBar from "../components/navbar/UserSearchBar";
 import { useUserData } from "../contexts/userDataContext";
 
 function Friends() {
-  const { userData, friends } = useUserData();
-
+  const { userData, friends, loading } = useUserData();
   
-  
-
   // State to hold search results
   const [filteredFriends, setFilteredFriends] = useState([]);
 
   // Show filtered friends if searching, otherwise show all
   const friendsToDisplay = filteredFriends.length > 0 ? filteredFriends : friends;
 
+  if (loading || !userData) {
+    return <div className="p-4">Loading user data...</div>;
+  }
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
