@@ -11,6 +11,7 @@ import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Friends from "./pages/friends";
+import FriendshipTester from "./components/admin/FriendshipTester";
 import "./index.css";
 
 function App() {
@@ -28,6 +29,18 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="home" element={<Home />} />
+          <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
+          {/* <Route 
+            path="admin/friendship-tester" 
+            element={
+              <ProtectedRoute>
+                <FriendshipTester />
+              </ProtectedRoute>
+            } 
+          /> */}
+
+
+          <Route path="admin/friendship" element={<FriendshipTester/>} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
           <Route 
             path="profile" 
