@@ -16,6 +16,7 @@ function Signup() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
   
   // Username validation states
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
@@ -94,6 +95,7 @@ function Signup() {
     e.preventDefault();
     if (!isRegistering && isFormValid()) {
       setIsRegistering(true);
+      setError("");
       try {
         const { user } = await doCreateUserWithEmailAndPassword(email, password);
 
@@ -108,11 +110,22 @@ function Signup() {
           about: "",
           description: "",
           profileImage: "",
+          admin: false
         });
 
         navigate("/home");
-      } catch {
-        console.error("Signup failed");
+      } catch (err) {
+        let errorMessage = "Failed to create account. Please try again.";
+        if (err.code === "auth/email-already-in-use") {
+          errorMessage = "An account with this email already exists";
+        } else if (err.code === "auth/invalid-email") {
+          errorMessage = "Invalid email address";
+        } else if (err.code === "auth/weak-password") {
+          errorMessage = "Password should be at least 6 characters";
+        } else if (err.code === "auth/network-request-failed") {
+          errorMessage = "Network error. Please check your connection.";
+        }
+        setError(errorMessage);
         setIsRegistering(false);
       }
     }
@@ -123,8 +136,13 @@ function Signup() {
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-          <h1 className="text-4xl font-bold text-center mb-6">Welcome Back!</h1>
+          <h1 className="text-4xl font-bold text-center mb-6">Create Account</h1>
           <form onSubmit={onSubmit}>
+            {error && (
+              <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
+                {error}
+              </div>
+            )}
             {/* Email */}
             <div className="mb-4">
               <label className="block text-gray-700" htmlFor="email">
@@ -241,7 +259,7 @@ function Signup() {
               type="submit" 
               className={`w-full py-2 px-4 rounded-lg ${isFormValid() ? 'generic-button-active' : 'generic-button-inactive'}`}
             >
-              {isRegistering ? "Signing Up..." : "Sign Up"}
+              {isRegistering ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
           <div className="text-center mt-4 mb-4">
