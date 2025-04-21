@@ -320,6 +320,38 @@ export const getHikeById = async (id) => {
   }
 };
 
+
+/**
+ * Retrieves the full hike document using the custom `hikeId` field (not the Firestore document ID).
+ * 
+ * Typically this is used when trying to retrieve a HikeEntity with a CompletedHike.
+ *
+ * @param {string} hikeId - The custom hikeId field inside the hike document.
+ * @returns {Promise<HikeEntity|null>} The full hike object (including `id`), or null if not found.
+ */
+export const getHikeByHikeId = async (hikeId) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+    const q = query(hikesRef, where("hikeId", "==", hikeId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      console.warn(`No hike found with hikeId: ${hikeId}`);
+      return null;
+    }
+
+    const docSnap = snapshot.docs[0];
+    return /** @type {HikeEntity} */ ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    });
+  } catch (error) {
+    console.error(`Failed to fetch hike by hikeId "${hikeId}":`, error);
+    throw new Error("Error retrieving hike by hikeId");
+  }
+};
+
+
 /**
  * Retrieves the title of a hike using the custom `hikeId` field (not the Firestore document ID).
  *
