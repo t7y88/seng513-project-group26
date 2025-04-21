@@ -8,7 +8,10 @@ import { useUserData } from "../contexts/userDataContext/useUserData";
 
 import { getCompletedHikes,
          getUserFromFirestore,
-         getFriendship
+         getFriendship,
+         acceptFriendship,
+         removeFriendship,
+         requestFriendship
                               } from "../firebase/firestore"
 
 
