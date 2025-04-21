@@ -219,7 +219,6 @@ export const getUserFromFirestore = async (userId) => {
   }
 };
 
-
 // 3. Get all users
 export const getAllUsers = async () => {
   const usersRef = collection(db, "users");
@@ -350,7 +349,6 @@ export const getHikeTitleByHikeId = async (hikeId) => {
   }
 };
 
-
 /**
  * Retrieves all hikes from Firestore as an array.
  *
@@ -436,7 +434,6 @@ export const deleteHikeByDocId = async (docId) => {
 };
 
 // ---------- HIKES BY USER ----------
-
 
 /**
  * Logs a completed hike to Firestore.
@@ -646,7 +643,7 @@ export const getFriendship = async (user1, user2) => {
       user2: doc.data().user2,
       status: doc.data().status,
       since: doc.data().since,
-      senderId: doc.data().user1 // user1 is always the sender
+      senderId: doc.data().user1, // user1 is always the sender
     })),
     ...snapshot2.docs.map((doc) => ({
       id: doc.id,
@@ -654,8 +651,8 @@ export const getFriendship = async (user1, user2) => {
       user2: doc.data().user2,
       status: doc.data().status,
       since: doc.data().since,
-      senderId: doc.data().user1 // user1 is always the sender
-    }))
+      senderId: doc.data().user1, // user1 is always the sender
+    })),
   ];
 
   return results;
@@ -737,9 +734,9 @@ export const getAllPendingFriendship = async (userId) => {
     where("user1", "==", userId),
     where("status", "==", "pending")
   );
-  
+
   const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
-  
+
   return [
     ...snapshot1.docs.map((doc) => ({
       id: doc.id,
@@ -747,7 +744,7 @@ export const getAllPendingFriendship = async (userId) => {
       user2: doc.data().user2,
       status: doc.data().status,
       since: doc.data().since,
-      senderId: doc.data().user1
+      senderId: doc.data().user1,
     })),
     ...snapshot2.docs.map((doc) => ({
       id: doc.id,
@@ -755,15 +752,15 @@ export const getAllPendingFriendship = async (userId) => {
       user2: doc.data().user2,
       status: doc.data().status,
       since: doc.data().since,
-      senderId: doc.data().user1
-    }))
+      senderId: doc.data().user1,
+    })),
   ];
 };
 
 export const acceptFriendship = async (friendshipId) => {
   const friendshipRef = doc(db, "friendships", friendshipId);
   await updateDoc(friendshipRef, {
-    status: "accepted"
+    status: "accepted",
   });
 };
 
@@ -921,49 +918,6 @@ export const getFriends = async (userId, maxlimit = 50) => {
     console.error("Failed to get friends:", error);
     throw new Error(`Failed to retrieve friends: ${error.message}`);
   }
-};
-
-/**
- * Accepts a friendship request after verifying both users still exist.
- *
- * @param {string} friendshipId - The ID of the friendship document to update.
- * @returns {Promise<void>} A promise that resolves when the friendship has been accepted.
- * @throws {Error} If either user no longer exists or if an error occurs.
- */
-export const acceptFriendship = async (friendshipId) => {
-  // Get the friendship document
-  const friendshipRef = doc(db, "friendships", friendshipId);
-  const friendshipSnap = await getDoc(friendshipRef);
-
-  if (!friendshipSnap.exists()) {
-    throw new Error(`Friendship with ID ${friendshipId} doesn't exist`);
-  }
-
-  const friendshipData = friendshipSnap.data();
-
-  if (friendshipData.status === "accepted") {
-    throw new Error("This friendship is already accepted");
-  }
-
-  // Verify both users still exist
-  const [user1Exists, user2Exists] = await Promise.all([
-    getUserFromFirestore(friendshipData.user1),
-    getUserFromFirestore(friendshipData.user2),
-  ]);
-
-  if (!user1Exists || !user2Exists) {
-    throw new Error(
-      "Cannot accept friendship - one or both users no longer exist"
-    );
-  }
-
-  // Update the friendship status to accepted
-  await updateDoc(friendshipRef, {
-    status: "accepted",
-    since: new Date(),
-  });
-
-  console.log(`Friendship ${friendshipId} has been accepted`);
 };
 
 /**
@@ -1157,10 +1111,9 @@ export const searchHikes = async (searchTerm) => {
 /**
  * Searches users by name or username (excluding current user)
  * @param {string} searchTerm - The term to search for
- * @param {string} currentUserId - The ID of the current user to exclude
  * @returns {Promise<UserProfile[]>} Array of matching users
  */
-export const searchUsers = async (searchTerm, currentUserId) => {
+export const searchUsers = async (searchTerm) => {
   try {
     // Normalize search term
     const term = searchTerm.toLowerCase().trim();
