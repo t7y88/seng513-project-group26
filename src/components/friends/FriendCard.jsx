@@ -52,7 +52,7 @@ function FriendCard({ friend, onViewProfile }) {
   useEffect(() => {
     const loadFriendHikes = async () => {
       try {
-        console.log("[FriendCard] friend.id =", friend.id, typeof friend.id === "string");
+        //console.log("[FriendCard] friend.id =", friend.id, typeof friend.id === "string");
         const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
         const hikeEntities = await getAllHikesAsMap();
         const merged = getMergedRecentHikes(friendCompletedHikes, hikeEntities);
