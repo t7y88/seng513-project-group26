@@ -4,7 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import { updateUser } from '../../firebase/firestore';
 import { uploadFile } from '../../firebase/storage';
 import { useAuth } from '../../contexts/authContext';
-import { useUserData } from '../../contexts/userDataContext';
+import { useUserData } from '../../contexts/userDataContext/useUserData';
 
 function EditProfile({ userData: initialUserData }) {
   const navigate = useNavigate();
