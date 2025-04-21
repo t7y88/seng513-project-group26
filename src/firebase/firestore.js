@@ -27,19 +27,82 @@ import {
 
 // ---------- USERS ----------
 
-/** 1.
+/**
  * Creates or overwrites a user document in the `users` collection using a predefined UID.
  *
- * Useful when syncing with Firebase Authentication UIDs.
+ * This is typically called after Firebase Authentication creates the user,
+ * so the UID from Firebase Auth is used as the Firestore document ID.
  *
- * @param {string} uid - The UID to use as the document ID.
- * @param {UserProfile} userData - The user profile data to store.
- * @returns {Promise<void>} A promise that resolves when the document has been written.
+ * Throws:
+ * - Error if required fields in the `userData` object are missing
+ * - Error if the Firestore operation fails
+ *
+ * Notes:
+ * - This function **overwrites** any existing document with the same UID.
+ * - Validation ensures required fields are present before attempting write.
+ *
+ * @param {string} uid - The UID to use as the document ID (from Firebase Auth).
+ * @param {UserProfile} userData - The full user profile data to store in Firestore.
+ * @throws {Error} If required fields are missing or if Firestore fails to write the document.
+ * @returns {Promise<void>}
+ * @author aidan
  */
 export const createUserInFirestore = async (uid, userData) => {
+  if (!uid || typeof uid !== "string") {
+    throw new Error("Invalid or missing UID.");
+  }
+
+  const requiredFields = ["email", "username", "name", "age", "location", "friends", "memberSince", "admin"];
+  for (const field of requiredFields) {
+    if (userData[field] === undefined || userData[field] === null) {
+      throw new Error(`Missing required user field: ${field}`);
+    }
+  }
+
   const userRef = doc(db, "users", uid);
-  await setDoc(userRef, userData);
+
+  try {
+    await setDoc(userRef, userData);
+    console.log(`User document for UID ${uid} created or updated successfully.`);
+  } catch (error) {
+    console.error("Failed to create user in Firestore:", error);
+    throw new Error("Failed to create user. Please try again.");
+  }
 };
+
+
+/**
+ * Updates the 'admin' field of a user document in Firestore.
+ *
+ * This function checks whether the user document exists before attempting to update it.
+ * If the user is found, the 'admin' field is updated to the provided boolean value.
+ * If the user does not exist, an error is logged and no changes are made.
+ *
+ * @param {string} uid - The UID of the user whose admin status is being updated.
+ * @param {boolean} isAdmin - A boolean value indicating whether the user should be marked as an admin (true) or not (false).
+ * @returns {Promise<void>} A Promise that resolves when the operation is complete.
+ */
+export const setUserAdminStatus = async (uid, isAdmin) => {
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    console.error(`User with UID ${uid} not found.`);
+    return;
+  }
+
+  try {
+    await updateDoc(userRef, {
+      admin: isAdmin,
+    });
+    console.log(`Updated admin status for UID ${uid} to ${isAdmin}`);
+  } catch (err) {
+    console.error("Failed to update admin status:", err);
+  }
+};
+
+
+
 
 /**
  * Creates a user document if it doesn't exist, or returns existing user data.
@@ -67,6 +130,7 @@ export const ensureUserExists = async (uid, authData = {}) => {
       age: 0,
       location: "",
       friends: [],
+      admin: false,
       memberSince: new Date().toLocaleDateString(),
       about: "",
       description: "",
@@ -175,40 +239,66 @@ export const updateCompletedHikes = async (uid, completedHikes) => {
 };
 
 // ---------- HIKES ----------
+
 /**
- * Adds or updates a hike in Firestore using the provided `hike.id` attribute as the document ID.
+ * Adds a hike to Firestore using an auto-generated document ID.
+ * The generated ID is also saved as the `id` field inside the document.
  *
- * @param {HikeEntity} hike - The hike data to add.
- * @returns {Promise<void>}
+ * @param {HikeEntity} hike - The hike data to store.
+ * @returns {Promise<string>} The generated document ID.
  */
 export const createHike = async (hike) => {
   try {
-    if (!hike?.id) {
-      throw new Error("Missing hike.id field — cannot create hike.");
-    }
+    const hikesRef = collection(db, "hikes");
 
-    const hikeRef = doc(db, "hikes", hike.id);
-    await setDoc(hikeRef, hike, { merge: true }); // Creates or overwrites the doc with ID = hikeId
-    console.log(`Successfully added hike: ${hike.id}`);
+    // Temporarily add the doc without an `id` so we can get one from Firestore
+    const docRef = await addDoc(hikesRef, { ...hike });
+
+    // Add the generated ID to the document itself under `id`
+    await updateDoc(docRef, { id: docRef.id });
+
+    console.log(`Successfully added hike: ${docRef.id}`);
+    return docRef.id;
   } catch (error) {
-    console.error(`Failed to add hike: ${hike?.id}:`, error);
+    console.error("Failed to add hike:", error);
     throw new Error("Failed to add hike. Please try again.");
   }
 };
 
-// 1. Add a hike
+
+/**
+ * Adds a hike to Firestore with an auto-generated document ID,
+ * and stores that ID in the `id` field of the document itself.
+ *
+ * @param {HikeEntity} hikeData - The hike data to store.
+ * @returns {Promise<string>} The Firestore-generated document ID.
+ */
 export const addHike = async (hikeData) => {
   try {
     const hikesRef = collection(db, "hikes");
-    const hikeDoc = await addDoc(hikesRef, hikeData);
-    return hikeDoc.id;
+
+    // Step 1: Add the hike (Firestore generates the ID)
+    const docRef = await addDoc(hikesRef, hikeData);
+
+    // Step 2: Update the same doc with its generated ID in the `id` field
+    await setDoc(docRef, { ...hikeData, id: docRef.id }, { merge: true });
+
+    console.log(`Added hike with Firestore ID: ${docRef.id}`);
+    return docRef.id;
   } catch (error) {
     console.error("Error adding hike:", error);
-    throw new Error("Failed to add hike");
+    throw new Error("Failed to add hike.");
   }
 };
 
-// 2. Get all hikes
+
+/**
+ * Retrieves all hikes from Firestore as an array.
+ * 
+ * Each returned hike includes its Firestore-generated `id` field along with the rest of the hike data.
+ *
+ * @returns {Promise<HikeEntity[]>} An array of hike objects.
+ */
 export const getAllHikes = async () => {
   const hikesRef = collection(db, "hikes");
   const snapshot = await getDocs(hikesRef);
@@ -217,17 +307,75 @@ export const getAllHikes = async () => {
   );
 };
 
-// 3. Update hike
+/**
+ * Retrieves all hikes from Firestore and returns them as an object map,
+ * using each hike's `hikeId` property as the key.
+ * 
+ * Useful for fast lookup of hikes by `hikeId` instead of looping through an array.
+ *
+ * @returns Promise<Record<string, HikeEntity>> A map of hikes keyed by `hikeId`.
+ */
+export const getAllHikesAsMap = async () => {
+  const hikesRef = collection(db, "hikes");
+  const snapshot = await getDocs(hikesRef);
+
+  const hikes = {};
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    hikes[data.hikeId] = { id: doc.id, ...data };
+  });
+
+  return hikes;
+};
+
+/**
+ * Updates an existing hike document in Firestore using the provided hikeId (which matches the Firestore doc ID).
+ *
+ * @param {string} hikeId - The Firestore document ID of the hike to update.
+ * @param {Partial<HikeEntity>} updates - The fields to update on the hike.
+ * @returns {Promise<void>}
+ */
 export const updateHike = async (hikeId, updates) => {
   const hikeRef = doc(db, "hikes", hikeId);
   await updateDoc(hikeRef, updates);
 };
 
-// 4. Delete hike
-export const deleteHike = async (hikeId) => {
-  const hikeRef = doc(db, "hikes", hikeId);
+/**
+ * Deletes a hike from Firestore using the `hikeId` field stored inside the document.
+ * 
+ * Firestore document IDs are different from hikeId.
+ * It will search the 'hikes' collection for a document where `hikeId` matches
+ * and delete that document.
+ *
+ * @param {string} hikeId - The hike's unique internal ID (not the Firestore doc ID).
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByHikeId = async (hikeId) => {
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("hikeId", "==", hikeId));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    throw new Error(`No hike found with hikeId: ${hikeId}`);
+  }
+
+  const docToDelete = snapshot.docs[0]; // assuming hikeId is unique
+  await deleteDoc(doc(db, "hikes", docToDelete.id));
+};
+
+/**
+ * Deletes a hike from Firestore using the explicit Firestore document ID (`docId`).
+ * 
+ * This is useful when the document ID was auto-generated by Firestore and does not match the hikeId.
+ *
+ * @param {string} docId - The Firestore document ID to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByDocId = async (docId) => {
+  const hikeRef = doc(db, "hikes", docId);
   await deleteDoc(hikeRef);
 };
+
 
 // ---------- HIKES BY USER ----------
 /**
@@ -238,23 +386,28 @@ export const deleteHike = async (hikeId) => {
  * - Error if Firestore fails to write the document
  *
  * Notes:
- * - Uses composite ID (userId + hikeId + date)
+ * Uses a composite key for the document ID: `${userId}_${hikeId}_${dateCompleted}`
  * - This composite ID is generated by the helper utility function <generateHikeId()>
  *
  * @param {CompletedHike} data
  * @throws {Error} If required fields are missing or if the document (tuple) was not inserted into the Collection (database)
- *
+ * @returns {Promise<void>}
  * @author aidan
  */
 export const createCompletedHike = async ({
+  id,
   userId,
+  username,
   hikeId,
   rating,
   notes,
   dateCompleted,
+  timeToComplete,
+  timeUnit
 }) => {
-  if (!userId || !hikeId || typeof rating !== "number") {
-    throw new Error("Missing required hike data (userId, hikeId, or rating)");
+  // Validate required fields
+  if (!userId || !username || !hikeId || typeof rating !== "number" || typeof timeToComplete !== "number" || !timeUnit) {
+    throw new Error("Missing required hike data (userId, username, hikeId, rating, timeToComplete, or timeUnit)");
   }
 
   const date = normalizeDate(dateCompleted ?? new Date());
@@ -265,18 +418,23 @@ export const createCompletedHike = async ({
 
   try {
     await setDoc(ref, {
+      id,
       userId,
+      username,
       hikeId,
       rating,
       notes,
       dateCompleted: date,
-      createdAt: new Date(),
+      timeToComplete,
+      timeUnit,
+      createdAt: new Date()
     });
   } catch (error) {
     console.error("Failed to log completed hike:", error);
     throw new Error("Failed to save hike. Please try again.");
   }
 };
+
 
 /**
  * Removes a completed hike from the `completedHikes` collection in Firestore.
@@ -614,7 +772,7 @@ export const getFriends = async (userId, maxlimit = 50) => {
  * @param {number} numOfHikes - Optional: number of hikes to retrieve (default 5)
  * @returns {Promise<CompletedHike[]>}
  */
-export const getRecentHikesByFriend = async (userId, numOfHikes = 5) => {
+export const getRecentHikesByFriend = async (userId, numOfHikes = 10) => {
   if (typeof userId !== "string") {
     throw new Error("getRecentHikesByFriend: userId must be a string");
   }

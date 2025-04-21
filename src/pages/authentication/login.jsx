@@ -88,7 +88,7 @@ function Login() {
                     onClick={async () => {
                       //await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
                       
-                      //await seedFirestore();
+                      await seedFirestore();
                     }
                   }
                     className="generic-button-inactive w-full"
