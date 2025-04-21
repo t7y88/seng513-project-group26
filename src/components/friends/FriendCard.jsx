@@ -70,7 +70,7 @@ function FriendCard({ friend, onViewProfile }) {
 return (
     // Card container: full width, white background, padding, rounded corners, shadow
     // `flex flex-col gap-4` stacks children vertically with spacing
-    <div className="w-full bg-white p-4 rounded shadow flex flex-col gap-4">
+    <div className="w-full bg-gray-160 p-4 rounded shadow-md flex flex-col gap-4 border border-gray-200">
       <div className="flex flex-row justify-between items-start md:items-center gap-4 w-full">
         {/* Left section: Profile */}
         <div className="
@@ -102,7 +102,7 @@ return (
         {/* Middle section: Hike previews */}
         {mergedHikes.length > 0 && (
           /* hidden when screen size is */
-          <div className="hidden xs:block flex-[3_1_75%] min-w-0">
+          <div className="hidden sm:block flex-[3_1_75%] min-w-0">
             <div className="overflow-x-auto" ref={scrollRef}>
               <div className="flex gap-4">
                 <FriendHikePreviewList hikes={mergedHikes} />

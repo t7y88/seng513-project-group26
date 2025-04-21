@@ -3,6 +3,7 @@ import HikeHistoryCard from "./HikeHistoryCard";
 
 function HikesList({ completedHikes }) {
   const [activeView, setActiveView] = useState('past'); // 'past' or 'wishlist'
+  const [mergedHikes, setMergedHikes] = useState([]);
 
   return (
     <div className="bg-white rounded-lg shadow p-6">

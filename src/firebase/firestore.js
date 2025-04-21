@@ -295,6 +295,58 @@ export const addHike = async (hikeData) => {
 
 
 /**
+ * Retrieves a single hike from Firestore by its document ID.
+ *
+ * @param {string} id - The Firestore document ID of the hike.
+ * @returns {Promise<HikeEntity|null>} The hike object (with `id` field), or null if not found.
+ */
+export const getHikeById = async (id) => {
+  try {
+    const hikeRef = doc(db, "hikes", id);
+    const hikeSnap = await getDoc(hikeRef);
+
+    if (!hikeSnap.exists()) {
+      console.warn(`No hike found with ID: ${id}`);
+      return null;
+    }
+
+    return /** @type {HikeEntity} */ ({
+      id: hikeSnap.id,
+      ...hikeSnap.data(),
+    });
+  } catch (error) {
+    console.error(`Failed to fetch hike with ID ${id}:`, error);
+    throw new Error("Error retrieving hike");
+  }
+};
+
+/**
+ * Retrieves the title of a hike using the custom `hikeId` field (not the Firestore document ID).
+ *
+ * @param {string} hikeId - The custom hikeId field inside the hike document.
+ * @returns {Promise<string|null>} The hike title, or null if not found.
+ */
+export const getHikeTitleByHikeId = async (hikeId) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+    const q = query(hikesRef, where("hikeId", "==", hikeId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      console.warn(`No hike found with hikeId: ${hikeId}`);
+      return null;
+    }
+
+    const hikeDoc = snapshot.docs[0];
+    return hikeDoc.data().title ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch hike title by hikeId ${hikeId}:`, error);
+    throw new Error("Error retrieving hike title by hikeId");
+  }
+};
+
+
+/**
  * Retrieves all hikes from Firestore as an array.
  * 
  * Each returned hike includes its Firestore-generated `id` field along with the rest of the hike data.
@@ -380,6 +432,8 @@ export const deleteHikeByDocId = async (docId) => {
 
 
 // ---------- HIKES BY USER ----------
+
+
 /**
  * Logs a completed hike to Firestore.
  *
