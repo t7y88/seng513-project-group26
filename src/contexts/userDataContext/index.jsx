@@ -36,7 +36,7 @@ const UserDataContext = createContext(defaultContextValue);
  * This hook throws an error if used outside of <UserDataProvider>, to prevent
  * unintentional usage before the context is ready.
  */
-export const useUserData = () => {
+export function useUserData() {
   const context = useContext(UserDataContext);
   if (!context) {
     throw new Error("useUserData must be used within a UserDataProvider");
