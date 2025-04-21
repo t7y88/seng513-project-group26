@@ -6,12 +6,11 @@ import { doSignOut } from "../firebase/auth";
 import { useAuth } from "../contexts/authContext"; 
 import { useUserData } from "../contexts/userDataContext/useUserData"; 
 
-import { getCompletedHikes } from "../firebase/firestore"
-import { getUserFromFirestore } from "../firebase/firestore"
+import { getCompletedHikes,
+         getUserFromFirestore,
+         getFriendship
+                              } from "../firebase/firestore"
 
-// Mock data from stu
-import { sampleUsers } from "../stubs/sampleUsers";
-import { hikeEntities } from "../stubs/hikeEntities";
 
 
 function Profile() {
@@ -82,7 +81,7 @@ function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-5xl mx-auto space-y-8">
         <ProfileData 
           userData={profileData} 
           isOwnProfile={isOwnProfile}
