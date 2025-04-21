@@ -23,6 +23,7 @@
  * @property {string} about - Short bio.
  * @property {string} description - Longer, personal description.
  * @property {string} profileImage - URL to the user’s profile image.
+ * @property {boolean} admin - Indicates if the user is an admin.
  */
 
 /**

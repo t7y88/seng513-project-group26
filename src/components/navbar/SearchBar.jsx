@@ -23,11 +23,11 @@ export default function HikeSearchBar({
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const safelyCallOnSearchResults = (results) => {
+  const safelyCallOnSearchResults = React.useCallback((results) => {
     if (typeof onSearchResults === "function") {
       onSearchResults(results);
     }
-  };
+  }, [onSearchResults]);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -36,7 +36,7 @@ export default function HikeSearchBar({
       safelyCallOnSearchResults([]);
       return;
     }
-
+  
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
@@ -51,9 +51,9 @@ export default function HikeSearchBar({
         setIsSearching(false);
       }
     }, 300);
-
+  
     return () => clearTimeout(timer);
-  }, [searchTerm, onSearchResults]);
+  }, [searchTerm]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
