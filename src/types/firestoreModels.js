@@ -1,12 +1,14 @@
 /**
  * @typedef {Object} CompletedHike
- * @property {string} id - Firestore document ID (added during retrieval).
+ * @property {string} id - Custom composite key for the document ID: `${userId}_${hikeId}_${dateCompleted}`
  * @property {string} userId - The Firestore document ID of the user who completed the hike.
  * @property {string} username - The username of the user who completed the hike.
  * @property {string} hikeId - The ID of the hike.
  * @property {number} rating - The rating given by the user (0–5).
- * @property {string} [notes] - Optional notes or comments about the hike.
- * @property {string} [dateCompleted] - The date the hike occurred (YYYY-MM-DD). If omitted, today's date will be used.
+ * @property {string} dateCompleted - The date the hike occurred (YYYY-MM-DD). If omitted, today's date will be used.
+ * @property {number} timeToComplete - Actual time taken to complete the hike (in minutes)
+ * @property {string} timeUnit - The unit of time for 'timeToComplete'
+ * @property {string} [notes] - Optional notes or comments about the hike. 
  * @property {Date} createdAt
  */
 
@@ -23,12 +25,13 @@
  * @property {string} about - Short bio.
  * @property {string} description - Longer, personal description.
  * @property {string} profileImage - URL to the user’s profile image.
- * @property {boolean} admin - Indicates if the user is an admin.
+ * @property {boolean} admin - Flag value. Indicates if the user is an admin.
  */
 
 /**
  * @typedef {Object} HikeEntity
- * @property {string} id - Unique ID for the hike.
+ * @property {string} [id] - Firestore document ID (added during retrieval).
+ * @property {string} hikeId - Unique ID for the hike. (sluggified version of hike title)
  * @property {string} title - Name of the hike.
  * @property {string} image - Image URL.
  * @property {string} location - Geographic location.
@@ -48,7 +51,7 @@
  * @property {string} userId - The ID of the user who wrote the review.
  * @property {string} hikeId - The ID of the hike being reviewed.
  * @property {number} rating - The user's rating for the hike.
- * @property {string} notes - The written portion of the review.
+ * @property {string} [notes] - The written portion of the review.
  * @property {Date} [createdAt] - Timestamp when the review was submitted.
  */
 
