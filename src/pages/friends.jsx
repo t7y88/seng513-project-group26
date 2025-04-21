@@ -20,6 +20,7 @@ function Friends() {
   if (loading || !userData) {
     return <div className="p-4">Loading user data...</div>;
   }
+  console.log(friends.length);
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
