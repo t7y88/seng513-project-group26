@@ -43,6 +43,7 @@ function Profile() {
           // Check friendship status
           const friendship = await getFriendship(currentUser.uid, userId);
           setFriendshipStatus(friendship.length > 0 ? friendship[0] : null);
+          console.log(friendship.length)
         }
       } catch (error) {
         console.error("Error loading profile:", error);
@@ -63,6 +64,17 @@ function Profile() {
         await requestFriendship(currentUser.uid, userId);
         const friendship = await getFriendship(currentUser.uid, userId);
         setFriendshipStatus(friendship[0]);
+      } else if (friendshipStatus.status === "pending") {
+        if (friendshipStatus.senderId === currentUser.uid) {
+          // Cancel request
+          await removeFriendship(friendshipStatus.id);
+          setFriendshipStatus(null);
+        } else {
+          // Accept request
+          await acceptFriendship(friendshipStatus.id);
+          const friendship = await getFriendship(currentUser.uid, userId);
+          setFriendshipStatus(friendship[0]);
+        }
       } else {
         // Remove friendship
         await removeFriendship(friendshipStatus.id);
@@ -74,7 +86,14 @@ function Profile() {
   };
 
   if (loading || !profileData) {
-    return <div className="text-center mt-20">Loading profile...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-8 h-8 border-t-2 border-b-2 border-black rounded-full animate-spin"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   const isOwnProfile = !userId || userId === currentUser?.uid;

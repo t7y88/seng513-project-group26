@@ -197,7 +197,7 @@ export const addUserToFirestore = async (userData) => {
  */
 export const getUserFromFirestore = async (userId) => {
   try {
-    console.log(`Attempting to fetch user with ID: ${userId}`);
+    // console.log(`Attempting to fetch user with ID: ${userId}`);
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
 
@@ -644,17 +644,21 @@ export const getFriendship = async (user1, user2) => {
       id: doc.id,
       user1: doc.data().user1,
       user2: doc.data().user2,
+      status: doc.data().status,
       since: doc.data().since,
+      senderId: doc.data().user1 // user1 is always the sender
     })),
     ...snapshot2.docs.map((doc) => ({
       id: doc.id,
       user1: doc.data().user1,
       user2: doc.data().user2,
+      status: doc.data().status,
       since: doc.data().since,
-    })),
+      senderId: doc.data().user1 // user1 is always the sender
+    }))
   ];
 
-  return /** @type {Friendship[]} */ (results);
+  return results;
 };
 /**
  * Requests a friendship between two users after verifying both users exist.
@@ -721,18 +725,46 @@ export const requestFriendship = async (user1, user2) => {
  **/
 export const getAllPendingFriendship = async (userId) => {
   const friendshipsRef = collection(db, "friendships");
-  const q = query(
+  // Get requests sent to this user (where they are user2)
+  const q1 = query(
+    friendshipsRef,
+    where("user2", "==", userId),
+    where("status", "==", "pending")
+  );
+  // Get requests sent by this user (where they are user1)
+  const q2 = query(
     friendshipsRef,
     where("user1", "==", userId),
     where("status", "==", "pending")
   );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    user1: doc.data().user1,
-    user2: doc.data().user2,
-    since: doc.data().since,
-  }));
+  
+  const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+  
+  return [
+    ...snapshot1.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1
+    })),
+    ...snapshot2.docs.map((doc) => ({
+      id: doc.id,
+      user1: doc.data().user1,
+      user2: doc.data().user2,
+      status: doc.data().status,
+      since: doc.data().since,
+      senderId: doc.data().user1
+    }))
+  ];
+};
+
+export const acceptFriendship = async (friendshipId) => {
+  const friendshipRef = doc(db, "friendships", friendshipId);
+  await updateDoc(friendshipRef, {
+    status: "accepted"
+  });
 };
 
 /**
@@ -837,16 +869,16 @@ export const getFriends = async (userId, maxlimit = 50) => {
       getDocs(q2),
     ]);
 
-    console.log(
-      `Found ${snapshot1.docs.length + snapshot2.docs.length} friendships`
-    );
+    // console.log(
+    //   `Found ${snapshot1.docs.length + snapshot2.docs.length} friendships`
+    // );
 
     const friendIds = new Set([
       ...snapshot1.docs.map((doc) => doc.data().user2),
       ...snapshot2.docs.map((doc) => doc.data().user1),
     ]);
 
-    console.log(`Extracted ${friendIds.size} unique friend IDs`);
+    // console.log(`Extracted ${friendIds.size} unique friend IDs`);
 
     if (friendIds.size === 0) {
       return [];
@@ -869,7 +901,7 @@ export const getFriends = async (userId, maxlimit = 50) => {
         const batchQuery = query(usersRef, where(documentId(), "in", batch));
         const batchSnapshot = await getDocs(batchQuery);
 
-        console.log(`Batch fetched ${batchSnapshot.docs.length} users`);
+        // console.log(`Batch fetched ${batchSnapshot.docs.length} users`);
 
         batchSnapshot.docs.forEach((doc) => {
           if (doc.exists()) {
