@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
 import FriendHikePreviewList from "./FriendHikePreviewList";
-
 import { getRecentHikesByFriend, getAllHikesAsMap } from "../../firebase/firestore";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 
@@ -34,6 +33,7 @@ import { useNavigate } from "react-router-dom";
 */
 
 function FriendCard({ friend, onViewProfile }) {
+  const navigate = useNavigate();
   // Local state for this friend's merged hike previews
   const [mergedHikes, setMergedHikes] = useState([]);
 
@@ -48,12 +48,11 @@ function FriendCard({ friend, onViewProfile }) {
     }
   };
 
-  // Fetch and merge recent hikes after mount
-  useEffect(() => {
+// Fetch and merge recent hikes after mount
+    useEffect(() => {
     const loadFriendHikes = async () => {
       try {
-        //console.log("[FriendCard] friend.id =", friend.id, typeof friend.id === "string");
-        const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
+                const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
         const hikeEntities = await getAllHikesAsMap();
         const merged = getMergedRecentHikes(friendCompletedHikes, hikeEntities);
         setMergedHikes(merged);
@@ -63,23 +62,18 @@ function FriendCard({ friend, onViewProfile }) {
       }
     };
 
-    loadFriendHikes();
-  }, [friend]);
+    loadFriendHikes()},
+    [friend]);
 
-  return (
+  // Card container: full width, white background, padding, rounded corners, shadow
+    // `flex flex-col gap-4` stacks children vertically with spacing
+return (
     // Card container: full width, white background, padding, rounded corners, shadow
     // `flex flex-col gap-4` stacks children vertically with spacing
     <div className="w-full bg-white p-4 rounded shadow flex flex-col gap-4">
       <div className="flex flex-row justify-between items-start md:items-center gap-4 w-full">
         {/* Left section: Profile */}
-        <div className="
-                      flex flex-col items-center gap-2
-                      flex-[1_1_25%]
-                      w-full sm:w-xs md:w-1/4 lg:w-1/3
-                      min-w-[6ch] sm:min-w-[9ch] md:min-w-[12ch]
-                      self-center"
-                    >
-
+        <div className="flex flex-col items-center gap-2 flex-[1_1_25%] w-full sm:w-xs md:w-1/4 lg:w-1/3 min-w-[6ch] sm:min-w-[9ch] md:min-w-[12ch] self-center">
           <div className="w-full max-w-[6rem] aspect-square rounded-full overflow-hidden">
             <img
               src={friend.profileImage}
@@ -108,20 +102,14 @@ function FriendCard({ friend, onViewProfile }) {
         {/* Right section: Button */}
         <div className="flex items-center justify-end flex-[1_1_15%] min-w-0 self-center">
           <button
-            className="
-        generic-button-active
-        text-xs sm:text-sm md:text-base
-        w-full max-w-[8rem]
-      "
-            onClick={() => onViewProfile(friend)}
+            className="generic-button-active text-xs sm:text-sm md:text-base w-full max-w-[8rem]"
+            onClick={() => navigate(`/profile/${friend.id}`)}
           >
             View Profile
           </button>
         </div>
       </div>
-
     </div>
-
   );
 }
 
