@@ -3,9 +3,9 @@ import { Eye, EyeOff } from "lucide-react";
 import { doSignInWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
-import { seedFirestore } from "../../firebase/seedFirestore";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../firebase/firebase.js"; 
 import "../../index.css";
-
 
 function Login() {
   const { userLoggedIn } = useAuth();
@@ -16,6 +16,7 @@ function Login() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false); 
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -39,100 +40,95 @@ function Login() {
     }
   };
 
+  // Function to handle password reset
+  const handleForgotPassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetEmailSent(true);  // Show confirmation message
+      setError("");  // Clear any previous errors
+    } catch (err) {
+      setError("Error resetting password. Please try again.");
+    }
+  };
+
   return (
     <>
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
-      <>
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-          <div className="flex flex-col justify-center bg-white p-8 rounded-xl shadow-lg w-96">
-            <h1 className="text-4xl font-bold text-center mb-6">
-              Welcome Back!
-            </h1>
-            <form onSubmit={onSubmit}>
-              {error && (
-                <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
-                  {error}
-                </div>
-              )}
-              <div className="mb-4">
-                <label className="block text-gray-700" htmlFor="email">
-                  Email
-                </label>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col justify-center bg-white p-8 rounded-xl shadow-lg w-96">
+          <h1 className="text-4xl font-bold text-center mb-6">Welcome Back!</h1>
+          <form onSubmit={onSubmit}>
+            {error && (
+              <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
+                {error}
+              </div>
+            )}
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="password">
+                Password
+              </label>
+              <div className="relative">
                 <input
-                  type="email"
-                  id="email"
+                  type={showPassword ? "text" : "password"}
+                  id="password"
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700" htmlFor="password">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="generic-button-active w-full"
-                disabled={isSigningIn}
-              >
-                {isSigningIn ? "Signing in..." : "Log In"}
-              </button>
-            </form>
-            {/* TODO [Aidan 4-16]: This is for development purposes only - must be removed before the final submission */}
-            {process.env.NODE_ENV === "development" && (
-                <div className="text-center mt-4">
-                  <button
-                    onClick={async () => {
-                      //await doSignInWithEmailAndPassword("devuser@example.com", "devpassword123");
-                      
-                      await seedFirestore();
-                    }
-                  }
-                    className="generic-button-inactive w-full"
-                  >
-                    Dev Login
-                  </button>
-                </div>
-              )}
-  
-
-            <div className="text-center mt-4 mb-4">
-              <a href="#" className="text-gray-600 hover:underline">
-                Forgot password?
-              </a>
             </div>
             <button
-              onClick={() => navigate("/signup")}
-              className="generic-button-inactive"
+              type="submit"
+              className="generic-button-active w-full"
+              disabled={isSigningIn}
             >
-              Sign Up
+              {isSigningIn ? "Signing in..." : "Log In"}
             </button>
+          </form>
+
+          <div className="text-center mt-4 mb-4">
+            {resetEmailSent ? (
+              <p className="text-green-500">Password reset email sent. Please check your inbox.</p>
+            ) : (
+              <a
+                href="#"
+                className="text-gray-600 hover:underline"
+                onClick={handleForgotPassword} // Trigger password reset
+              >
+                Forgot password?
+              </a>
+            )}
           </div>
+
+          <button
+            onClick={() => navigate("/signup")}
+            className="generic-button-inactive"
+          >
+            Sign Up
+          </button>
         </div>
-      </>
+      </div>
     </>
   );
 }

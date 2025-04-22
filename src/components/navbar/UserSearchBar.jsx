@@ -42,7 +42,7 @@ export default function UserSearchBar({
     setIsSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const fetchedResults = await searchUsers(searchTerm, currentUserId);
+        const fetchedResults = await searchUsers(searchTerm);
         setResults(fetchedResults);
         setShowDropdown(true);
         safelyCallOnSearchResults(fetchedResults);
