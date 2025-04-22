@@ -16,11 +16,9 @@ function Friends() {
     return <div className="text-center py-10 text-gray-500">Fetching your friends list...</div>;
   }
   
-
   if (loading || !userData) {
     return <div className="p-4">Loading user data...</div>;
   }
-  console.log(friends.length);
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -32,18 +30,6 @@ function Friends() {
       placeholder="Search for new friends"
     />
   </div>
-
-  {/* Conditionally show Clear Selection */}
-  {filteredFriends.length > 0 && (
-    <div className="text-right">
-      <button
-        className="text-md text-blue-800 hover:text-red-500 hover:underline"
-        onClick={() => setFilteredFriends([])}
-      >
-        Clear Selection
-      </button>
-    </div>
-  )}
 
   {/* Friends List */}
   <FriendsList friends={friendsToDisplay} />

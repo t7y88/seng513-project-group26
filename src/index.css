@@ -41,7 +41,12 @@
 
 /* Primary button style: black background, white text */
 .generic-button-active {
-  @apply px-4 py-2 rounded-lg cursor-pointer bg-black text-white hover:bg-gray-800;
+  @apply px-4 py-2 rounded-lg cursor-pointer bg-black text-white hover:bg-gray-600;
+}
+
+/* Primary button style: black background, white text */
+.generic-delete-button-active {
+  @apply px-4 py-2 rounded-lg cursor-pointer bg-black text-white hover:bg-red-700;
 }
 
 /* Secondary button style: gray background, gray text */
