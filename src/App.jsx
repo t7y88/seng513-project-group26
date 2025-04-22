@@ -59,7 +59,7 @@ function App() {
             {/* Supposed to be moved to clicking the cards on home */}
             <Route
               path="home/hikeinfo"
-              element={<HikeInfo trailName="Lake Minnewanka" />}
+              element={<HikeInfo trailName="Goodsir Pass" />}
             />
             <Route
               path="profile"
