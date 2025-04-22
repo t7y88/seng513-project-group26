@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Eye, EyeOff, Check, AlertCircle } from "lucide-react";
 import { doCreateUserWithEmailAndPassword } from "../../firebase/auth";
-import { createUserInFirestore, isUsernameAvailable } from "../../firebase/firestore";
+import { createUserInFirestore, isUsernameAvailable } from "../../firebase/";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
 

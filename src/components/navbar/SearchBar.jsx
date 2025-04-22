@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SlMagnifier } from "react-icons/sl";
-import { searchHikes } from "../../firebase/firestore";
+import { searchHikes } from "../../firebase/";
 import { useNavigate } from "react-router-dom";
 import "../../index.css";
 

@@ -1,6 +1,6 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./firebase";
-import { createUserInFirestore } from "./firestore";
+import { auth } from "../firebase";
+import { createUserInFirestore } from "../firebase/";
 
 const registerAndSeedUser = async () => {
   const email = "devuser@example.com";

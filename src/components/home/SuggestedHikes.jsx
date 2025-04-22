@@ -58,7 +58,19 @@ export default function SuggestedHikes() {
         ...doc.data(),
       }));
 
-      setHikes((prev) => (nextBatch ? [...prev, ...newHikes] : newHikes));
+      setHikes((prev) => {
+        if (nextBatch) {
+          // Create a Set of IDs we already have
+          const existingIds = new Set(prev.map(hike => hike.id));
+          
+          // Only add hikes that aren't already in the array
+          const uniqueNewHikes = newHikes.filter(hike => !existingIds.has(hike.id));
+          
+          return [...prev, ...uniqueNewHikes];
+        } else {
+          return newHikes;
+        }
+      });
     } catch (error) {
       console.error("Error fetching hikes:", error);
     } finally {
@@ -82,7 +94,7 @@ export default function SuggestedHikes() {
     const container = scrollContainerRef.current;
     if (!container) return;
     
-    // For visual continuity, we never hide the arrows, but we still track real scroll position
+
     const realCanScrollLeft = container.scrollLeft > 0;
     const realCanScrollRight = 
       container.scrollLeft < container.scrollWidth - container.clientWidth - 10;
@@ -139,17 +151,16 @@ export default function SuggestedHikes() {
       const currentScroll = container.scrollLeft;
       const itemWidth = 352;
       
-      // Check if we're at the end
       if (currentScroll >= container.scrollWidth - container.clientWidth - 10) {
-        // If we're at the end, either load more or loop back to start
-        if (!allLoaded) {
-          fetchHikes(true); // Load more data
-        } else {
-          // Optional: loop back to start
-          container.scrollTo({
-            left: 0,
-            behavior: 'smooth'
-          });
+        // Always loop back to start
+        container.scrollTo({
+          left: 0,
+          behavior: 'smooth'
+        });
+        
+        // Optionally still fetch more in the background
+        if (!allLoaded && !loading) {
+          fetchHikes(true);
         }
       } else {
         // Normal scroll to next
@@ -165,6 +176,8 @@ export default function SuggestedHikes() {
       if (!container) return;
       
       const currentScroll = container.scrollLeft;
+      // I want to eventually change the item width to be more responsive. currently this is
+      // just an arbitrary value
       const itemWidth = 352;
       
       // Check if we're at the start
