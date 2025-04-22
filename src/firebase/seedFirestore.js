@@ -50,6 +50,8 @@ const seedFirestore = async () => {
 
   //// Add field to users
   //addFieldToDocs("users", "admin", false);
+  //// Add wishlist array of HikeEntity docId's
+  //await addFieldToDocs("users", "wishlist", ["mwkZpUFsZbOzgrUbZy3g", "8x6FJjSbJNDkRc8xX543", "po3osv5XEq5kf04kVKz9"]);
 
 
   //// Add docId field to all users
