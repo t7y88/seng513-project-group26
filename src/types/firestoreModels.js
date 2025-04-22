@@ -13,6 +13,15 @@
  */
 
 /**
+ * @typedef {Object} WishlistedHike
+ * @property {string} id - Composite key: `${userId}_${hikeId}`
+ * @property {string} userId - The Firestore document ID of the user who wishlisted the hike.
+ * @property {string} username - The username of the user who wishlisted the hike.
+ * @property {string} hikeId - The ID of the hike.
+ * @property {Date} createdAt - The timestamp of when the hike was wishlisted.
+ */
+
+/**
  * @typedef {Object} UserProfile
  * @property {string} [id] - Firestore document ID (added during retrieval).
  * @property {string} email - The user's email address (copied from Firebase Auth at account creation).
