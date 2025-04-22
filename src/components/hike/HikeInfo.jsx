@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import BookmarkButton from "../components/hike/Bookmark";
-import PlusButton from "../components/hike/AddHike";
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getHikeByHikeId } from '../../firebase/services/hikeService';
+import BookmarkButton from './Bookmark';
+import PlusButton from './AddHike';
+import mapboxgl from 'mapbox-gl';
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-const HikeInfo = ({ trailName }) => {
+const HikeInfo = ({ trailName, hikeData ={} }) => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -74,9 +74,26 @@ const HikeInfo = ({ trailName }) => {
         <h1 className="text-3xl md:text-4xl italic mb-4 pr-10 pt-5">
           {trailName}
         </h1>
-        <BookmarkButton onToggle={undefined} />
-        <PlusButton onClick={undefined} />
+        {hikeData && (
+          <>
+            <BookmarkButton hikeId={hikeData.id} />
+            <PlusButton onClick={() => /* handle adding hike to completed */ } />
+          </>
+        )}
       </div>
+      
+      {/* Display difficulty, distance, elevation */}
+      {hikeData && (
+        <div className="flex justify-center mb-6">
+          <div className="text-lg text-gray-700 flex gap-4">
+            <span>{hikeData.difficulty}</span>
+            <span>{hikeData.distance} {hikeData.distanceUnit}</span>
+            <span>Elev. {hikeData.elevation} {hikeData.elevationUnit}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Map container */}
       <div className="flex justify-center items-center py-4">
         <div
           ref={mapContainerRef}

@@ -19,9 +19,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PageSizeWidget from "./components/PageSizeWidget";
 import { UserDataProvider } from "./contexts/userDataContext";
 import { Outlet } from "react-router-dom";
-import Map from "./components/hike/Map";
 import "./index.css";
-import HikeInfo from "./pages/hikeInfo";
+import HikePage from "./components/hike/HikePage";
 
 const ProtectedLayout = () => (
   <UserDataProvider>
@@ -57,10 +56,7 @@ function App() {
             />
 
             {/* Supposed to be moved to clicking the cards on home */}
-            <Route
-              path="home/hikeinfo"
-              element={<HikeInfo trailName="Goodsir Pass" />}
-            />
+            <Route path="/hike/:hikeId" element={<HikePage />} />
             <Route
               path="profile"
               element={
@@ -98,7 +94,6 @@ function App() {
           <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
           <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
-          <Route path="map" element={<Map />} />
           <Route
             path="profile"
             element={
