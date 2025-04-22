@@ -33,8 +33,6 @@ function App() {
       {/* Add padding for bottom nav */}
       <NavBar />
       <div className="pb-16 md:pb-0">
-      <NavBar />
-      <div className="pb-16 md:pb-0">
         <Routes>
           <Route
             path="/"
