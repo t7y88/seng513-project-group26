@@ -65,7 +65,7 @@ Now you should have all the local dependencies built you can proceed with the be
 
 ## Login Page
 
-- [ ] Complete 'forgot password' logic
+- [x] Complete 'forgot password' logic
 - [x] Include "No such email exists with our registered accounts" for any emails that aren't linked to an account
 - [ ] Complete 'login with google' logic
 - [X] Add user detail entry form for new users (DOB, age, location, etc) - this is done in the User's profile
@@ -73,10 +73,10 @@ Now you should have all the local dependencies built you can proceed with the be
 
 ## User Settings Page
 
-- [ ] delete user.
-- [ ] deletes all Friendships associated with user.
-- [ ] deletes all wishlisted hikes by user
-- [ ] deletes all completed hikes by a user
+- [x] delete user.
+- [x] deletes all Friendships associated with user.
+- [x] deletes all wishlisted hikes by user
+- [x] deletes all completed hikes by a user
 - [ ] Change username
 
 ## Admin Page - reachable via user settings.
