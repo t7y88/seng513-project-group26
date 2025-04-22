@@ -60,11 +60,14 @@ export default function HikeSearchBar({
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setShowDropdown(false);
+        setSearchTerm(""); // Clear text when clicking outside
+        safelyCallOnSearchResults([]); // Optional: reset results outside as well
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [safelyCallOnSearchResults]);
+  
 
   const handleResultClick = (hike) => {
     setShowDropdown(false);
