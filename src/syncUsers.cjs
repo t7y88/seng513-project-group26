@@ -76,7 +76,7 @@ async function syncUsers() {
           memberSince: new Date().toLocaleDateString(),
           about: "",
           description: "",
-          profileImage: authUser.photoURL || "",
+          profileImage: authUser.image || "",
         };
 
         // Create user document in Firestore

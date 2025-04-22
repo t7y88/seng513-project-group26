@@ -4,20 +4,75 @@ import { getHikeByHikeId } from '../../firebase/services/hikeService';
 import BookmarkButton from './Bookmark';
 import PlusButton from './AddHike';
 import mapboxgl from 'mapbox-gl';
+import { useAuth } from '../../contexts/authContext';
+import { useUserData } from '../../contexts/userDataContext/useUserData';
 
 
-const HikeInfo = ({ trailName, hikeData ={} }) => {
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+// Ensure mapbox-gl CSS is imported
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+const HikeInfo = () => {
+  const { hikeId } = useParams();
+  const { currentUser } = useAuth();
+  const { userData } = useUserData();
+
+  const [hikeData, setHikeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
+  // Fetch hike data
   useEffect(() => {
+    const fetchHikeData = async () => {
+      try {
+        setLoading(true);
+        const hike = await getHikeByHikeId(hikeId);
+        if (hike) {
+          setHikeData(hike);
+        } else {
+          setError('Hike not found');
+        }
+      } catch (err) {
+        console.error('Error loading hike:', err);
+        setError('Failed to load hike details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (hikeId) {
+      fetchHikeData();
+      console.log('Hike ID:', hikeId);
+    }
+  }, [hikeId]);
+
+
+  useEffect(() => {
+    if (!hikeData || !mapContainerRef.current) return;
+    
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/outdoors-v12",
       center: [-106.3468, 56.1304],
       zoom: 6,
+      transformRequest: (url, resourceType) => {
+        // Disable y-flip for images to prevent warning
+        if (resourceType === 'Image' && !url.includes('mapbox.com')) {
+          return {
+            url,
+            credentials: 'same-origin',
+            headers: {
+              'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8'
+            }
+          };
+        }
+      }
     });
-
+  
     mapRef.current = map;
 
     map.on("load", async () => {
@@ -28,9 +83,9 @@ const HikeInfo = ({ trailName, hikeData ={} }) => {
       const filteredFeatures = geojson.features.filter((feature) => {
         return (
           feature.properties["Name_Official_e"]?.toLowerCase() ===
-            trailName.toLowerCase() ||
+            hikeData.title.toLowerCase() ||
           feature.properties["Label_e_5k_less"]?.toLowerCase() ===
-            trailName.toLowerCase()
+            hikeData.title.toLowerCase()
         );
       });
 
@@ -65,33 +120,35 @@ const HikeInfo = ({ trailName, hikeData ={} }) => {
       }
     });
 
-    return () => map.remove();
-  }, [trailName]);
+    return () => map?.remove();
+  }, [hikeData]);
+
+  if (loading) return <div className="text-center p-8">Loading hike information...</div>;
+  if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
+  if (!hikeData) return <div className="text-center p-8">No hike found</div>;
 
   return (
     <>
       <div className="flex justify-center">
         <h1 className="text-3xl md:text-4xl italic mb-4 pr-10 pt-5">
-          {trailName}
+          {hikeData.title}
         </h1>
-        {hikeData && (
-          <>
-            <BookmarkButton hikeId={hikeData.id} />
-            <PlusButton onClick={() => /* handle adding hike to completed */ } />
-          </>
-        )}
+        <BookmarkButton 
+    hikeId={hikeData.hikeId} 
+    userId={currentUser?.uid}
+    username={userData?.username}
+  />
+        <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
       </div>
       
       {/* Display difficulty, distance, elevation */}
-      {hikeData && (
-        <div className="flex justify-center mb-6">
-          <div className="text-lg text-gray-700 flex gap-4">
-            <span>{hikeData.difficulty}</span>
-            <span>{hikeData.distance} {hikeData.distanceUnit}</span>
-            <span>Elev. {hikeData.elevation} {hikeData.elevationUnit}</span>
-          </div>
+      <div className="flex justify-center mb-6">
+        <div className="text-lg text-gray-700 flex gap-4">
+          <span>{hikeData.difficulty}</span>
+          <span>{hikeData.distance} {hikeData.distanceUnit}</span>
+          <span>Elev. {hikeData.elevation} {hikeData.elevationUnit}</span>
         </div>
-      )}
+      </div>
 
       {/* Map container */}
       <div className="flex justify-center items-center py-4">

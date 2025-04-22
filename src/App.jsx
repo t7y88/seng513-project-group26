@@ -3,6 +3,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useParams,
 } from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
 import NavBar from "./components/navbar/NavBar";
@@ -22,7 +23,7 @@ import PageSizeWidget from "./components/PageSizeWidget";
 import { UserDataProvider } from "./contexts/userDataContext";
 import { Outlet } from "react-router-dom";
 import "./index.css";
-import HikePage from "./components/hike/HikePage";
+import HikeInfo from "./components/hike/HikeInfo";
 
 const ProtectedLayout = () => (
   <UserDataProvider>
@@ -58,7 +59,9 @@ function App() {
             />
 
             {/* Supposed to be moved to clicking the cards on home */}
-            <Route path="/hike/:hikeId" element={<HikePage />} />
+            <Route path="/hike/:hikeId" element={
+  <HikeInfo hikeId={useParams().hikeId} />
+} />
             <Route
               path="profile"
               element={
