@@ -90,7 +90,10 @@ function FriendsActivity() {
       <div className="grid grid-cols-2 gap-4">
         {friendsHikes.map(item => (
           <div key={item.completion.id} className="mb-4">
-            <LogCard {...item} />
+            <LogCard 
+              {...item} 
+              hikeId={item.completion?.hikeId} 
+            />
           </div>
         ))}
         
