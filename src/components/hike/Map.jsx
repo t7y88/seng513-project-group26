@@ -4,7 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-const TrailsMap = () => {
+const Map = () => {
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
@@ -45,4 +45,4 @@ const TrailsMap = () => {
   return <div ref={mapContainerRef} className="h-[80vh] w-auto" />;
 };
 
-export default TrailsMap;
+export default Map;

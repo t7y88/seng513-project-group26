@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
 import NavBar from "./components/navbar/NavBar";
 import BottomNavBar from "./components/navbar/BottomNavBar";
@@ -14,6 +19,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PageSizeWidget from "./components/PageSizeWidget";
 import { UserDataProvider } from "./contexts/userDataContext";
 import { Outlet } from "react-router-dom";
+import Map from "./components/hike/Map";
+import "./index.css";
+import HikeInfo from "./pages/hikeInfo";
 
 const ProtectedLayout = () => (
   <UserDataProvider>
@@ -39,16 +47,78 @@ function App() {
 
           {/* Protected routes grouped under UserDataProvider */}
           <Route element={<ProtectedLayout />}>
-            <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
-            <Route path="friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
+            <Route
+              path="home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile/:userId"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile/edit"
+              element={
+                <ProtectedRoute>
+                  <EditProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="friends"
+              element={
+                <ProtectedRoute>
+                  <Friends />
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
           <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
+          <Route path="map" element={<Map />} />
+          <Route path="hikeinfo" element={<HikeInfo />} />
+          <Route
+            path="profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="profile/:userId" element={<Profile />} />
+          <Route
+            path="profile/edit"
+            element={
+              <ProtectedRoute>
+                <EditProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route
+            path="friends"
+            element={
+              <ProtectedRoute>
+                <Friends />
+              </ProtectedRoute>
+            }
+          /> */}
         </Routes>
 
         <BottomNavBar />

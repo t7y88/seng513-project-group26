@@ -1,11 +1,10 @@
 import React from "react";
-
+import TrailsMap from "../components/hike/TrailsMap";
 
 function HikeInfo() {
-
   return (
-    <div className="h-screen flex items-center justify-center">
-
+    <div>
+      <TrailsMap trailName="Tunnel Bench Loop (Hoodoos)" />
     </div>
   );
 }
