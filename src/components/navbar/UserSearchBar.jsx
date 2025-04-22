@@ -6,6 +6,7 @@ import "../../index.css";
 
 /**
  * User search bar component for finding users by name or username
+ *
  * @param {Object} props
  * @param {function(UserProfile[]): void} props.onSearchResults - Callback that receives search results
  * @param {string} props.currentUserId - Current user's ID (to exclude from results)
@@ -18,19 +19,50 @@ export default function UserSearchBar({
   placeholder = "Search users",
   className = "",
 }) {
+  // State management
   const [searchTerm, setSearchTerm] = useState("");
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Refs
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
+  // Determine whether to show the clear button
+  const showClearButton = searchTerm.trim().length > 0 || results.length > 0;
+
+  // Safe callback to parent
   const safelyCallOnSearchResults = (results) => {
     if (typeof onSearchResults === "function") {
       onSearchResults(results);
     }
   };
 
+  /**
+   * Clears the current search state
+   */
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setResults([]);
+    setShowDropdown(false);
+    safelyCallOnSearchResults([]);
+  };
+
+  /**
+   * Navigates to user profile on selection
+   * @param {UserProfile} user
+   */
+  const handleResultClick = (user) => {
+    setShowDropdown(false);
+    setSearchTerm("");
+    safelyCallOnSearchResults([]);
+    navigate(`/profile/${user.id}`);
+  };
+
+  /**
+   * Handle search logic with debounce
+   */
   useEffect(() => {
     if (!searchTerm.trim()) {
       setResults([]);
@@ -57,6 +89,9 @@ export default function UserSearchBar({
     return () => clearTimeout(timer);
   }, [searchTerm, currentUserId, onSearchResults]);
 
+  /**
+   * Hide dropdown when clicking outside the component
+   */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -67,15 +102,9 @@ export default function UserSearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleResultClick = (user) => {
-    setShowDropdown(false);
-    setSearchTerm("");
-    safelyCallOnSearchResults([]);
-    navigate(`/profile/${user.id}`);
-  };
-
   return (
     <div className={`relative w-full ${className}`} ref={dropdownRef}>
+      {/* Search Input */}
       <form
         className="search-bar group flex items-center w-full"
         onSubmit={(e) => e.preventDefault()}
@@ -91,12 +120,27 @@ export default function UserSearchBar({
         />
       </form>
 
+      {/* Clear Selection Button - appears when textfield is non-empty */}
+      {showClearButton && (
+        <div className="mt-2">
+          <button
+            type="button"
+            className="generic-button generic-button-inactive"
+            onClick={handleClearSearch}
+          >
+            Clear Selection
+          </button>
+        </div>
+      )}
+
+      {/* Spinner while searching */}
       {isSearching && (
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
         </div>
       )}
 
+      {/* Dropdown results */}
       {showDropdown && results.length > 0 && (
         <div className="absolute w-full mt-2 bg-white shadow-lg rounded-lg z-50 max-h-64 overflow-y-auto">
           {results.map((user) => (
@@ -114,6 +158,7 @@ export default function UserSearchBar({
         </div>
       )}
 
+      {/* No results found */}
       {showDropdown && !isSearching && results.length === 0 && (
         <div className="absolute w-full mt-2 bg-white shadow-lg rounded-lg z-50 p-4 text-gray-500 text-sm">
           No users found.

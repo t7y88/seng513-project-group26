@@ -14,8 +14,10 @@ import Home from "./pages/home";
 import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import Friends from "./pages/friends";
+import Admin from "./pages/admin";
 import FriendshipTester from "./components/admin/FriendshipTester";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/admin/AdminRoute.jsx"
 import PageSizeWidget from "./components/PageSizeWidget";
 import { UserDataProvider } from "./contexts/userDataContext";
 import { Outlet } from "react-router-dom";
@@ -89,10 +91,29 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            {/* Admin-only routes */}
+            <Route
+              path="admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="admin/friendship"
+              element={
+                <AdminRoute>
+                  <FriendshipTester />
+                </AdminRoute>
+              }
+            />
+
           </Route>
 
-          <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
-          <Route path="admin/friendship" element={<FriendshipTester />} />
+
+          {/*  <Route path="admin/friendship" element={<FriendshipTester />} />   */}
+
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
           <Route
             path="profile"
@@ -111,14 +132,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route
-            path="friends"
-            element={
-              <ProtectedRoute>
-                <Friends />
-              </ProtectedRoute>
-            }
-          /> */}
         </Routes>
 
         <BottomNavBar />
