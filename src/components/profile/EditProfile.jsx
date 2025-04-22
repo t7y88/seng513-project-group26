@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUserCircle } from "react-icons/fa";
-import { updateUser } from '../../firebase/firestore';
+import { updateUser } from '../../firebase/';
 import { uploadFile } from '../../firebase/storage';
 import { useAuth } from '../../contexts/authContext';
 import { useUserData } from '../../contexts/userDataContext/useUserData';
