@@ -57,11 +57,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            {/* Supposed to be moved to clicking the cards on home */}
+  
             <Route path="/hike/:hikeId" element={
-  <HikeInfo hikeId={useParams().hikeId} />
-} />
+              <ProtectedRoute>
+                <HikeInfo />
+              </ProtectedRoute>
+            }/>
             <Route
               path="profile"
               element={
