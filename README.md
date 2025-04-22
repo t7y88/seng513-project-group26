@@ -42,7 +42,7 @@ Now you should have all the local dependencies built you can proceed with the be
 ## Database, Queries, Search Optimization, Insertions and Deletions
 
 - [x] Set up front-end and back-end Firestore
-- [ ] Build functions for friend lookup - can't be only exact match, needs to have partial match as well, with best match at the top
+- [X] Build functions for friend lookup and hike search - can't be only exact match, needs to have partial match as well, with best match at the top
 - [ ] Ensure firestore.rules is set up properly for all neccessary queries and insertions
 - [ ] Ensure any functions needed for the post login User profile creation stage are created (e.g. setUsername, setProfilePic, setName, setAge
 - [ ] Add wishlisted hike attribute to the
