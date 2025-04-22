@@ -1,10 +1,9 @@
-import { createUserInFirestore, createHike, addReview } from "./firestore";
+import { createUserInFirestore, createHike, addReview } from ".";
 import { sampleUsers } from "../stubs/sampleUsers";
 import { hikeEntities } from "../stubs/hikeEntities";
 import { reviewEntities } from "../stubs/reviewEntities";
 import { completedHikes } from "../stubs/completedHikes";
 import { addFieldToDocs, addDocIdToAllDocs } from "./addFieldToDocs";
-
 
 import { db } from "./firebase"; // Adjust the import path as necessary
 import {
@@ -21,7 +20,6 @@ import {
   limit,
   orderBy,
 } from "firebase/firestore";
-
 
 /**
  */
@@ -46,18 +44,12 @@ const populateFirestoreWithCompletedHikeStubs = async (hikeData) => {
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const seedFirestore = async () => {
-
-
   //// Add field to users
   //addFieldToDocs("users", "admin", false);
   //// Add wishlist array of HikeEntity docId's
   //await addFieldToDocs("users", "wishlist", ["mwkZpUFsZbOzgrUbZy3g", "8x6FJjSbJNDkRc8xX543", "po3osv5XEq5kf04kVKz9"]);
-
-
   //// Add docId field to all users
   //addDocIdToAllDocs("users");
-
-
   // //--- Seed Hikes ---
   // try {
   //   console.log("Seeding hikes...");
@@ -70,7 +62,6 @@ const seedFirestore = async () => {
   // } catch (error) {
   //   console.error("Error seeding hikes:", error);
   // }
-
   // //--- Seed Completed Hikes ---
   // try {
   //   console.log("Seeding completed hikes...");
@@ -82,9 +73,6 @@ const seedFirestore = async () => {
   // } catch (error) {
   //   console.error("Error seeding completed hikes:", error);
   // }
-
-  
-
   // --- Seed Users ---
   // try {
   //   console.log("Seeding users...");
@@ -98,7 +86,6 @@ const seedFirestore = async () => {
   // } catch (err) {
   //   console.error("Error seeding users Firestore:", err);
   // }
-
   // --- Seed Reviews ---
   // try {
   //   console.log("Seeding reviews...");
@@ -107,7 +94,6 @@ const seedFirestore = async () => {
   //     console.log(`Added review for hike ${review.hikeId} by ${review.userId}`);
   //     await delay(100);
   //   }
-
   //   // Un-comment this when you're ready to seed completed hikes
   //   // console.log("Seeding completed hikes...");
   //   // for (const hike of completedHikes) {
@@ -115,14 +101,10 @@ const seedFirestore = async () => {
   //   //   console.log(`Added completed hike: ${hike.docId}`);
   //   //   await delay(100);
   //   // }
-
   //   console.log("Firestore reviews seeded successfully!");
   // } catch (err) {
   //   console.error("Error seeding reviews Firestore:", err);
   // }
 };
-
-
-
 
 export { seedFirestore };

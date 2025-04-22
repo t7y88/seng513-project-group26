@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { renderStarRating } from "../../../utils/formatRatingStars";
 import {
   getHikeTitleByHikeId,
-} from "../../firebase/firestore"
+} from "../../firebase/"
 
 
 

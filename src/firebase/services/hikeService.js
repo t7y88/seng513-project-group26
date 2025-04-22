@@ -1,0 +1,232 @@
+// @ts-check
+/// <reference path="../../types/firestoreModels.js" />
+
+import { db } from "../firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  addDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  limit,
+} from "firebase/firestore";
+
+/**
+ * Adds a hike to Firestore using an auto-generated document ID.
+ * The generated ID is also saved as the `id` field inside the document.
+ *
+ * @param {HikeEntity} hike - The hike data to store.
+ * @returns {Promise<string>} The generated document ID.
+ */
+export const createHike = async (hike) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+
+    // Temporarily add the doc without an `id` so we can get one from Firestore
+    const docRef = await addDoc(hikesRef, { ...hike });
+
+    // Add the generated ID to the document itself under `id`
+    await updateDoc(docRef, { id: docRef.id });
+
+    console.log(`Successfully added hike: ${docRef.id}`);
+    return docRef.id;
+  } catch (error) {
+    console.error("Failed to add hike:", error);
+    throw new Error("Failed to add hike. Please try again.");
+  }
+};
+
+/**
+ * Adds a hike to Firestore with an auto-generated document ID,
+ * and stores that ID in the `id` field of the document itself.
+ *
+ * @param {HikeEntity} hikeData - The hike data to store.
+ * @returns {Promise<string>} The Firestore-generated document ID.
+ */
+export const addHike = async (hikeData) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+
+    // Step 1: Add the hike (Firestore generates the ID)
+    const docRef = await addDoc(hikesRef, hikeData);
+
+    // Step 2: Update the same doc with its generated ID in the `id` field
+    await setDoc(docRef, { ...hikeData, id: docRef.id }, { merge: true });
+
+    console.log(`Added hike with Firestore ID: ${docRef.id}`);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding hike:", error);
+    throw new Error("Failed to add hike.");
+  }
+};
+
+/**
+ * Retrieves a single hike from Firestore by its document ID.
+ *
+ * @param {string} id - The Firestore document ID of the hike.
+ * @returns {Promise<HikeEntity|null>} The hike object (with `id` field), or null if not found.
+ */
+export const getHikeById = async (id) => {
+  try {
+    const hikeRef = doc(db, "hikes", id);
+    const hikeSnap = await getDoc(hikeRef);
+
+    if (!hikeSnap.exists()) {
+      console.warn(`No hike found with ID: ${id}`);
+      return null;
+    }
+
+    return /** @type {HikeEntity} */ ({
+      id: hikeSnap.id,
+      ...hikeSnap.data(),
+    });
+  } catch (error) {
+    console.error(`Failed to fetch hike with ID ${id}:`, error);
+    throw new Error("Error retrieving hike");
+  }
+};
+
+/**
+ * Retrieves the full hike document using the custom `hikeId` field (not the Firestore document ID).
+ *
+ * Typically this is used when trying to retrieve a HikeEntity with a CompletedHike.
+ *
+ * @param {string} hikeId - The custom hikeId field inside the hike document.
+ * @returns {Promise<HikeEntity|null>} The full hike object (including `id`), or null if not found.
+ */
+export const getHikeByHikeId = async (hikeId) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+    const q = query(hikesRef, where("hikeId", "==", hikeId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      console.warn(`No hike found with hikeId: ${hikeId}`);
+      return null;
+    }
+
+    const docSnap = snapshot.docs[0];
+    return /** @type {HikeEntity} */ ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    });
+  } catch (error) {
+    console.error(`Failed to fetch hike by hikeId "${hikeId}":`, error);
+    throw new Error("Error retrieving hike by hikeId");
+  }
+};
+
+/**
+ * Retrieves the title of a hike using the custom `hikeId` field (not the Firestore document ID).
+ *
+ * @param {string} hikeId - The custom hikeId field inside the hike document.
+ * @returns {Promise<string|null>} The hike title, or null if not found.
+ */
+export const getHikeTitleByHikeId = async (hikeId) => {
+  try {
+    const hikesRef = collection(db, "hikes");
+    const q = query(hikesRef, where("hikeId", "==", hikeId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      console.warn(`No hike found with hikeId: ${hikeId}`);
+      return null;
+    }
+
+    const hikeDoc = snapshot.docs[0];
+    return hikeDoc.data().title ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch hike title by hikeId ${hikeId}:`, error);
+    throw new Error("Error retrieving hike title by hikeId");
+  }
+};
+
+/**
+ * Retrieves all hikes from Firestore as an array.
+ *
+ * Each returned hike includes its Firestore-generated `id` field along with the rest of the hike data.
+ *
+ * @returns {Promise<HikeEntity[]>} An array of hike objects.
+ */
+export const getAllHikes = async () => {
+  const hikesRef = collection(db, "hikes");
+  const snapshot = await getDocs(hikesRef);
+  return snapshot.docs.map(
+    (doc) => /** @type {HikeEntity} */ ({ id: doc.id, ...doc.data() })
+  );
+};
+
+/**
+ * Retrieves all hikes from Firestore and returns them as an object map,
+ * using each hike's `hikeId` property as the key.
+ *
+ * Useful for fast lookup of hikes by `hikeId` instead of looping through an array.
+ *
+ * @returns Promise<Record<string, HikeEntity>> A map of hikes keyed by `hikeId`.
+ */
+export const getAllHikesAsMap = async () => {
+  const hikesRef = collection(db, "hikes");
+  const snapshot = await getDocs(hikesRef);
+
+  const hikes = {};
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    hikes[data.hikeId] = { id: doc.id, ...data };
+  });
+
+  return hikes;
+};
+
+/**
+ * Updates an existing hike document in Firestore using the provided hikeId (which matches the Firestore doc ID).
+ *
+ * @param {string} hikeId - The Firestore document ID of the hike to update.
+ * @param {Partial<HikeEntity>} updates - The fields to update on the hike.
+ * @returns {Promise<void>}
+ */
+export const updateHike = async (hikeId, updates) => {
+  const hikeRef = doc(db, "hikes", hikeId);
+  await updateDoc(hikeRef, updates);
+};
+
+/**
+ * Deletes a hike from Firestore using the `hikeId` field stored inside the document.
+ *
+ * Firestore document IDs are different from hikeId.
+ * It will search the 'hikes' collection for a document where `hikeId` matches
+ * and delete that document.
+ *
+ * @param {string} hikeId - The hike's unique internal ID (not the Firestore doc ID).
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByHikeId = async (hikeId) => {
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("hikeId", "==", hikeId));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    throw new Error(`No hike found with hikeId: ${hikeId}`);
+  }
+
+  const docToDelete = snapshot.docs[0]; // assuming hikeId is unique
+  await deleteDoc(doc(db, "hikes", docToDelete.id));
+};
+
+/**
+ * Deletes a hike from Firestore using the explicit Firestore document ID (`docId`).
+ *
+ * This is useful when the document ID was auto-generated by Firestore and does not match the hikeId.
+ *
+ * @param {string} docId - The Firestore document ID to delete.
+ * @returns {Promise<void>}
+ */
+export const deleteHikeByDocId = async (docId) => {
+  const hikeRef = doc(db, "hikes", docId);
+  await deleteDoc(hikeRef);
+};

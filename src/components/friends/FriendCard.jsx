@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 
 import FriendHikePreviewList from "./FriendHikePreviewList";
-import { getRecentHikesByFriend, getAllHikesAsMap } from "../../firebase/firestore";
+import { getRecentHikesByFriend, getAllHikesAsMap } from "../../firebase/";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";

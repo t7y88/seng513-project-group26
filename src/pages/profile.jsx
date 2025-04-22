@@ -12,7 +12,7 @@ import { getCompletedHikes,
          acceptFriendship,
          removeFriendship,
          requestFriendship
-                              } from "../firebase/firestore"
+                              } from "../firebase/"
 
 
 

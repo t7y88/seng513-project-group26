@@ -10,7 +10,7 @@ import { useAuth } from "../authContext";
 import {
   getCompletedHikes,
   getFriends,
-} from "../../firebase/firestore";
+} from "../../firebase/";
 import { getUserHikeWishlist } from "../../firebase/firestoreUser";
 import { db } from "../../firebase/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
