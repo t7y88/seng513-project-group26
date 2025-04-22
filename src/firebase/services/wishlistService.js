@@ -22,15 +22,13 @@ import {
  * Adds a hike to the user's wishlist if it doesn't already exist.
  * The document ID is composed of userId and hikeId to enforce uniqueness.
  *
- * @param {WishlistedHike} data - Data for the wishlisted hike.
- * @param {string} data.userId - ID of the user.
- * @param {string} data.username - Username of the user.
- * @param {string} data.hikeId - ID of the hike.
+ * @param {string} userId - ID of the user.
+ * @param {string} username - Username of the user.
+ * @param {string} hikeId - ID of the hike.
  * @throws {Error} If required fields are missing or if the write fails.
  * @returns {Promise<{success: boolean, alreadyExists?: boolean}>}
- * @author noshin
  */
-export const createWishlistedHike = async ({ userId, username, hikeId }) => {
+export const createWishlistedHike = async (userId, username, hikeId) => {
   if (!userId || !username || !hikeId) {
     throw new Error(
       "Missing required wishlist data (userId, username, hikeId)."

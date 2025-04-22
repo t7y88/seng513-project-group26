@@ -1,22 +1,37 @@
 import { useState, useEffect } from "react";
 import { Bookmark } from "lucide-react";
-import { createWishlistedHike, removeWishlistedHike } from "../../firebase/services/wishlistService";
-import { useAuth } from "../../contexts/authContext";
-import { toast } from "react-hot-toast";
+import { 
+  createWishlistedHike, 
+  removeWishlistedHikeById, 
+  getWishlistedHikeById 
+} from "../../firebase/services/wishlistService";
 
-const BookmarkButton = ({ hikeId }) => {
+
+
+
+const BookmarkButton = ({hikeId, userId, username}) => {
   const [bookmarked, setBookmarked] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser } = useAuth();
 
+  // Check if hike is already in wishlist when component mounts
   useEffect(() => {
-    // Optional: Check if this hike is already bookmarked
-    // For now, we'll just assume it's not bookmarked initially
-  }, [hikeId, currentUser]);
+    const checkWishlistStatus = async () => {
+      if (!userId || !hikeId) return;
+      
+      try {
+        const wishlistedHike = await getWishlistedHikeById(userId, hikeId);
+        setBookmarked(!!wishlistedHike);
+      } catch (error) {
+        console.error("Error checking wishlist status:", error);
+      }
+    };
+    
+    checkWishlistStatus();
+  }, [hikeId, userId]);
 
-  const handleClick = async () => {
-    if (!currentUser) {
-      toast.error("Please log in to bookmark hikes");
+  const handleBookmarkClick = async () => {
+    if (!userId || !username) {
+      console.error("Please log in to bookmark hikes");
       return;
     }
 
@@ -24,38 +39,28 @@ const BookmarkButton = ({ hikeId }) => {
     
     try {
       if (!bookmarked) {
-        const data = {
-          userId: currentUser.uid,
-          username: currentUser.username,
-          hikeId: hikeId
-        };
-
         // Add to wishlist
-        const result = await createWishlistedHike(data);
+        const result = await createWishlistedHike(
+          userId,
+          username,
+          hikeId
+        );
         
         if (result.success) {
           setBookmarked(true);
-          toast.success(result.alreadyExists 
+          console.log(result.alreadyExists 
             ? "This hike is already in your wishlist" 
             : "Added to wishlist");
         }
       } else {
         // Remove from wishlist
-        
-        await removeWishlistedHike({
-          id: `${currentUser.uid}-${hikeId}`, // Generate a unique ID
-          userId: currentUser.uid,
-          username: currentUser.displayName || currentUser.email,
-          createdAt: new Date().toISOString(), // Add a timestamp
-          hikeId: hikeId
-        });
-        
+        await removeWishlistedHikeById(userId,  hikeId);
         setBookmarked(false);
-        toast.success("Removed from wishlist");
+        console.log("Removed from wishlist");
       }
     } catch (error) {
       console.error("Bookmark action failed:", error);
-      toast.error(error.message || "Failed to update wishlist");
+      console.error(error.message || "Failed to update wishlist");
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +68,7 @@ const BookmarkButton = ({ hikeId }) => {
 
   return (
     <button
-      onClick={handleClick}
+      onClick={handleBookmarkClick}
       disabled={isLoading}
       className={`p-2 rounded-full transition ${
         isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"
