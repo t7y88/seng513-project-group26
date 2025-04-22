@@ -55,7 +55,12 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="home/hikeinfo" element={<HikeInfo />} />
+
+            {/* Supposed to be moved to clicking the cards on home */}
+            <Route
+              path="home/hikeinfo"
+              element={<HikeInfo trailName="Lake Minnewanka" />}
+            />
             <Route
               path="profile"
               element={
