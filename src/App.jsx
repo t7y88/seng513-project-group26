@@ -11,6 +11,7 @@ import PageSizeWidget from "./components/PageSizeWidget";
 import Profile from "./pages/profile";
 import EditProfilePage from "./pages/editProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Map from "./components/Map";
 import Friends from "./pages/friends";
 import FriendshipTester from "./components/admin/FriendshipTester";
 import "./index.css";
@@ -32,8 +33,15 @@ function App() {
       {/* Add padding for bottom nav */}
       <NavBar />
       <div className="pb-16 md:pb-0">
+      <NavBar />
+      <div className="pb-16 md:pb-0">
         <Routes>
-          <Route path="/" element={userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />} />
+          <Route
+            path="/"
+            element={
+              userLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />
+            }
+          />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
 
@@ -57,6 +65,7 @@ function App() {
           /> */}
 
           <Route path="admin/friendship" element={<FriendshipTester />} />
+          <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
         </Routes>
 
@@ -69,3 +78,4 @@ function App() {
 }
 
 export default App;
+
