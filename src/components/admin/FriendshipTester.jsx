@@ -7,7 +7,7 @@ import {
   addFriendship,
   getFriends,
   getUserFromFirestore
-} from "../../firebase/firestore";
+} from "../../firebase";
 
 export default function FriendshipTester() {
   const [user1, setUser1] = useState("");

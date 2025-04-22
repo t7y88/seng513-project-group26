@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import HikeHistoryCard from "./HikeHistoryCard";
 import WishlistedHikeCard from "./WishlistedHikeCard";
-import { getAllHikesAsMap } from "../../firebase/firestore";
+import { getAllHikesAsMap } from "../../firebase/";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 import { useUserData } from "../../contexts/userDataContext/useUserData";
 

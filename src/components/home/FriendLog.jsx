@@ -1,4 +1,4 @@
-import { getFriendsCompletedHikesWithDetails } from "../../firebase/firestore";
+import { getFriendsCompletedHikesWithDetails } from "../../firebase/";
 import { useAuth } from "../../contexts/authContext";
 import { useState, useEffect, useCallback, useRef } from "react";
 import LogCard from "./LogCard";
