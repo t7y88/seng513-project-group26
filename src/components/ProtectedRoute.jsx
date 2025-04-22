@@ -6,7 +6,7 @@ export default function ProtectedRoute({ children }) {
   const { userLoggedIn, loading } = useAuth();
 
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+    return <div className="flex justify-center items-center min-h-screen">Checking authentication...</div>;
   }
 
   if (!userLoggedIn) {
