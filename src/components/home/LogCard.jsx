@@ -6,6 +6,7 @@ import { FaMapMarkerAlt, FaClock } from "react-icons/fa";
  * 
  * @param {object} reviewData - The data object containing hike details
  * @param {string} reviewData.userId - The ID of the user who wrote the review
+ * @param {string} reviewData.username - The username of the user who wrote the review
  * @param {string} reviewData.hikeId - The ID of the hike being reviewed
  * @param {string} reviewData.title - The title of the hike
  * @param {string} reviewData.image - The image URL of the hike
@@ -26,7 +27,7 @@ export default function LogCard(reviewData) {
 
   return (
     <div className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 max-sm:w-2xs md:w-sm lg:w-sm shrink-0">
-        <h2 className="font-bold text-l px-2 text-gray-800">{reviewData.userId} Hiked {reviewData.title}</h2>
+        <h2 className="font-bold text-l px-2 text-gray-800">{reviewData.username} Hiked {reviewData.title}</h2>
         <div className="aspect-[16/9] w-full rounded-2xl">
             <img 
             className="w-full h-full object-cover rounded-2xl"
