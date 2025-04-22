@@ -16,6 +16,8 @@ import {
   limit,
 } from "firebase/firestore";
 
+import { sluggify } from "../../../utils/slugify"; 
+
 /**
  * Adds a hike to Firestore using an auto-generated document ID.
  * The generated ID is also saved as the `id` field inside the document.
@@ -229,4 +231,37 @@ export const deleteHikeByHikeId = async (hikeId) => {
 export const deleteHikeByDocId = async (docId) => {
   const hikeRef = doc(db, "hikes", docId);
   await deleteDoc(hikeRef);
+};
+
+
+/**
+ * Updates hike information including a new title, and ensures the new hikeId is unique.
+ *
+ * @param {string} docId - The Firestore document ID of the hike to update.
+ * @param {Partial<HikeEntity>} updatedData - The updated hike fields (must include `title`)
+ */
+export const updateHikeWithNewTitle = async (docId, updatedData) => {
+  if (!updatedData.title) {
+    throw new Error("Title is required to update hikeId.");
+  }
+
+  const newHikeId = sluggify(updatedData.title);
+
+  // Check if new hikeId already exists in a different document
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("hikeId", "==", newHikeId));
+  const snapshot = await getDocs(q);
+
+  const isDuplicate = snapshot.docs.some((doc) => doc.id !== docId);
+
+  if (isDuplicate) {
+    throw new Error("Another hike with this title already exists.");
+  }
+
+  // Update the hike with new title and new hikeId
+  const hikeRef = doc(db, "hikes", docId);
+  await updateDoc(hikeRef, {
+    ...updatedData,
+    hikeId: newHikeId,
+  });
 };
