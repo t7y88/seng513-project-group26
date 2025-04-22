@@ -55,6 +55,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="home/hikeinfo" element={<HikeInfo />} />
             <Route
               path="profile"
               element={
@@ -93,7 +94,6 @@ function App() {
           <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
           <Route path="map" element={<Map />} />
-          <Route path="hikeinfo" element={<HikeInfo />} />
           <Route
             path="profile"
             element={
