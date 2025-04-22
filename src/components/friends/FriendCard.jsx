@@ -4,8 +4,6 @@ import FriendHikePreviewList from "./FriendHikePreviewList";
 import { getRecentHikesByFriend, getAllHikesAsMap } from "../../firebase/firestore";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 import { FaUserCircle } from "react-icons/fa";
-// For carousel
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 
@@ -52,7 +50,7 @@ function FriendCard({ friend, onViewProfile }) {
     useEffect(() => {
     const loadFriendHikes = async () => {
       try {
-                const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
+        const friendCompletedHikes = await getRecentHikesByFriend(friend.id);
         const hikeEntities = await getAllHikesAsMap();
         const merged = getMergedRecentHikes(friendCompletedHikes, hikeEntities);
         setMergedHikes(merged);

@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import HikeHistoryCard from "./HikeHistoryCard";
+import WishlistedHikeCard from "./WishlistedHikeCard";
 import { getAllHikesAsMap } from "../../firebase/firestore";
 import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
+import { useUserData } from "../../contexts/userDataContext/useUserData";
+
 
 function HikesList({ completedHikes }) {
   const [activeView, setActiveView] = useState("past");
   const [mergedHikes, setMergedHikes] = useState([]);
+  const { hikeWishlist } = useUserData();
+
 
   useEffect(() => {
     const loadMergedData = async () => {
@@ -43,7 +48,15 @@ function HikesList({ completedHikes }) {
       </div>
 
       <div className="space-y-4">
-        {activeView === "past" ? (
+        {activeView === "wishlist" ? (
+          hikeWishlist.length > 0 ? (
+            hikeWishlist.map((hike) => (
+              <WishlistedHikeCard key={hike.id} hike={hike} />
+            ))
+          ) : (
+            <p className="text-gray-600">You haven't saved any hikes yet.</p>
+          )
+        ) : (
           <>
             {mergedHikes.map((merged, index) => (
               <HikeHistoryCard key={index} hike={merged} />
@@ -52,11 +65,8 @@ function HikesList({ completedHikes }) {
               <p className="text-gray-600">No past hikes recorded yet</p>
             )}
           </>
-        ) : (
-          <div className="space-y-2">
-            <p className="text-gray-600">Your saved hikes will appear here</p>
-          </div>
         )}
+
       </div>
     </div>
   );

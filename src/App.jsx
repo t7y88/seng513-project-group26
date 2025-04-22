@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
 import { UserDataProvider } from "./contexts/userDataContext";
 import NavBar from "./components/navbar/NavBar";
@@ -21,6 +16,13 @@ import Friends from "./pages/friends";
 import FriendshipTester from "./components/admin/FriendshipTester";
 import "./index.css";
 
+// Wrapper for protected routes — wraps them in UserDataProvider
+const ProtectedLayout = () => (
+  <UserDataProvider>
+    <Outlet />
+  </UserDataProvider>
+);
+
 function App() {
   const { userLoggedIn } = useAuth();
   return (
@@ -29,6 +31,8 @@ function App() {
           but it changes depending on the screen size?
           */}
       {/* Add padding for bottom nav */}
+      <NavBar />
+      <div className="pb-16 md:pb-0">
       <NavBar />
       <div className="pb-16 md:pb-0">
         <Routes>
@@ -40,14 +44,16 @@ function App() {
           />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route
-            path="home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
+
+          {/* Protected routes grouped under UserDataProvider */}
+          <Route element={<ProtectedLayout />}>
+            <Route path="home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="profile/:userId" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="profile/edit" element={<ProtectedRoute><EditProfilePage /></ProtectedRoute>} />
+            <Route path="friends" element={<ProtectedRoute><Friends /></ProtectedRoute>} />
+          </Route>
+
           <Route path="admin" element={<div>Admin Page Coming Soon</div>} />
           {/* <Route 
             path="admin/friendship-tester" 
@@ -59,34 +65,10 @@ function App() {
           /> */}
 
           <Route path="admin/friendship" element={<FriendshipTester />} />
+          <Route path="admin/friendship" element={<FriendshipTester />} />
           <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
-          <Route path="map" element={<Map />} />
-          <Route
-            path="profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="profile/:userId" element={<Profile />} />
-          <Route
-            path="profile/edit"
-            element={
-              <ProtectedRoute>
-                <EditProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          {/* <Route
-            path="friends"
-            element={
-              <ProtectedRoute>
-                <Friends />
-              </ProtectedRoute>
-            }
-          /> */}
         </Routes>
+
         <BottomNavBar />
         {/* Widget for debug only. Helps us find the break points we want to set. */}
         <PageSizeWidget />
@@ -96,3 +78,4 @@ function App() {
 }
 
 export default App;
+

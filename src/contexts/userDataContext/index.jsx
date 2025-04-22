@@ -7,34 +7,53 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../authContext";
-import { getUserFromFirestore, getCompletedHikes } from "../../firebase/firestore";
-import { getFriends } from "../../firebase/firestore";
+import {
+  getCompletedHikes,
+  getFriends,
+} from "../../firebase/firestore";
+import { getUserHikeWishlist } from "../../firebase/firestoreUser";
+import { db } from "../../firebase/firebase";
+import { doc, onSnapshot } from "firebase/firestore";
 
-
-// This is the default shape of the context.
-// It is used to initialize the context and acts as a fallback if the context is
-// accessed outside of the provider (not recommended).
+// Default shape for fallback and dev tools
 const defaultContextValue = {
   userData: null,
   completedHikes: [],
+  hikeWishlist: [],
   friends: [],
   loading: true,
 };
 
-// Create the context object that will store and provide user data.
-// This will be consumed using useContext in child components.
+// Create the context object that will be shared across the app
 export const UserDataContext = createContext(defaultContextValue);
+
+/**
+ * Custom hook to access the UserDataContext.
+ * Throws an error if called outside of the UserDataProvider.
+ */
+export function useUserData() {
+  const context = useContext(UserDataContext);
+  if (!context) {
+    throw new Error("useUserData must be used within a UserDataProvider");
+  }
+  return context;
+}
+
+// Could refactor into smaller custom hooks (e.g., useWishlist), but that will require
+// use altering lots of other pages, so I'm gonna backburner that.
 
 
 /**
  * Context provider component that fetches and provides user data to its children.
- * 
+ *
  * This component:
  * - Waits for authentication state to become available via useAuth()
- * - Fetches the user’s Firestore document using their UID
+ * - Uses Firestore `onSnapshot()` to listen for live changes to the user's document
  * - Fetches all completed hikes associated with that UID
+ * - Fetches the hike wishlist (list of hike docIds)
+ * - Fetches the friend list (UIDs of accepted friendships)
  * - Stores and shares this data with any nested components via the context
- * 
+ *
  * It must wrap any components that want to access userData via useUserData().
  */
 export const UserDataProvider = ({ children }) => {
@@ -42,40 +61,62 @@ export const UserDataProvider = ({ children }) => {
 
   const [userData, setUserData] = useState(null);             // User profile document
   const [completedHikes, setCompletedHikes] = useState([]);   // List of completed hikes
+  const [hikeWishlist, setHikeWishlist] = useState([]);       // List of wishlisted hikes (full HikeEntity docs)
   const [friends, setFriends] = useState([]);                 // List of friends (by Firestore document UID)
-  const [loading, setLoading] = useState(true);               // Loading state for both fetches
+  const [loading, setLoading] = useState(true);               // Loading state for all data sources
 
   useEffect(() => {
-    // Only run the fetch once the auth state is resolved and a user is present
+    // Don't proceed until authentication is finished and we have a logged-in user
     if (authLoading || !currentUser) return;
 
-    const fetchData = async () => {
+    // Reference to the user document in Firestore
+    const userRef = doc(db, "users", currentUser.uid);
+
+    // Attach a real-time listener to the user document
+    const unsubscribe = onSnapshot(userRef, async (userSnapshot) => {
+      if (!userSnapshot.exists()) {
+        console.error("User document does not exist");
+        return;
+      }
+
+      // Merge Firestore doc data with its ID
+      const user = { id: userSnapshot.id, ...userSnapshot.data() };
+
       try {
-        // Retrieve user profile and hike data from Firestore
-        const user = await getUserFromFirestore(currentUser.uid);
-        const hikes = await getCompletedHikes(currentUser.uid);
-        const friends = await getFriends(currentUser.uid);
+        // Fetch related data (but not stored inside user doc)
+        const [hikes, wishlist, friendsList] = await Promise.all([
+          getCompletedHikes(currentUser.uid),
+          getUserHikeWishlist(currentUser.uid),
+          getFriends(currentUser.uid),
+        ]);
 
-        console.log("Fetched user:", user);
+        // Logging for dev/debug purposes
+        console.log("Realtime fetched user:", user);
         console.log("Fetched hikes:", hikes);
-        console.log("Fetched friends:", friends);
+        console.log("Fetched wishlisted hikes:", wishlist);
+        console.log("Fetched friends:", friendsList);
 
+        // Update state
         setUserData(user);
         setCompletedHikes(hikes);
-        setFriends(friends);
+        setHikeWishlist(wishlist);
+        setFriends(friendsList);
       } catch (err) {
-        console.error("Failed to fetch user data", err);
+        console.error("Failed to fetch related user data", err);
       } finally {
         setLoading(false);
       }
-    };
+    });
 
-    fetchData();
+    // Cleanup the listener when the user changes or component unmounts
+    return () => unsubscribe();
   }, [currentUser, authLoading]);
 
-  // Provide the fetched data and loading state to any child components
+  // Context provider wraps all children in the app
   return (
-    <UserDataContext.Provider value={{ userData, completedHikes, friends, loading }}>
+    <UserDataContext.Provider
+      value={{ userData, completedHikes, hikeWishlist, friends, loading }}
+    >
       {children}
     </UserDataContext.Provider>
   );
