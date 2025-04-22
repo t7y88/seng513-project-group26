@@ -12,12 +12,14 @@ import {
   getDocs,
   orderBy,
   limit,
+  Timestamp,
 } from "firebase/firestore";
 import {
   generateHikeDocId,
   normalizeDate,
 } from "../../../utils/hikeCompletionUtils.js";
-
+import { getFriends, getRecentHikesByFriend } from "./friendshipService";
+import { getHikeByHikeId } from "./hikeService";
 /**
  * Logs a completed hike to Firestore.
  *
@@ -187,4 +189,128 @@ export const getMostRecentCompletedHikes = async (userId, numOfHikes) => {
         ...doc.data(),
       })
   );
+};
+
+/**
+ * Retrieves completed hikes from user's friends with additional details
+ * needed for display in the FriendLog component.
+ *
+ * @param {string} userId - Current user ID whose friends to check
+ * @param {number} [batchSize=10] - Number of hikes to retrieve per batch
+ * @param {Object} [startAfterDoc=null] - Firestore document to start after (for pagination)
+ * @returns {Promise<{hikeData: Array, lastDoc: Object|null, hasMore: boolean}>}
+ */
+export const getFriendsCompletedHikesWithDetails = async (
+  userId,
+  batchSize = 10,
+  startAfterDoc = null
+) => {
+  try {
+    // 1. Get the user's friends
+    const friends = await getFriends(userId);
+
+    if (!friends.length) {
+      return { hikeData: [], lastDoc: null, hasMore: false };
+    }
+
+    // 2. Collect all completed hikes from all friends
+    const hikePromises = friends.map((friend) =>
+      getRecentHikesByFriend(friend.id)
+    );
+
+    // Wait for all completed hike data to be retrieved
+    const friendsHikesArray = await Promise.all(hikePromises);
+
+    // 3. For each completed hike, fetch the corresponding hike details
+    let allHikes = [];
+
+    for (let i = 0; i < friendsHikesArray.length; i++) {
+      const friendData = friends[i];
+      const completedHikes = friendsHikesArray[i];
+
+      for (const completedHike of completedHikes) {
+        try {
+          // Fetch the full hike details using the hikeId from completedHike
+          const hikeDetails = await getHikeByHikeId(completedHike.hikeId);
+
+          if (hikeDetails) {
+            // Store the original timestamp/date object without conversion
+            allHikes.push({
+              completion: completedHike,
+              userId: friendData.id,
+              username: friendData.username,
+              title: hikeDetails.title,
+              image:
+                hikeDetails.image ||
+                "https://placehold.co/600x400?text=No+Image",
+              location: hikeDetails.location || "Unknown Location",
+              province: hikeDetails.province || "",
+              distance: hikeDetails.distance || "0",
+              distanceUnit: hikeDetails.distanceUnit || "km",
+              elevation: hikeDetails.elevation || "0",
+              elevationUnit: hikeDetails.elevationUnit || "m",
+              dateCompleted: completedHike.dateCompleted,
+              rating: completedHike.rating || 0,
+              notes: completedHike.notes || "",
+            });
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching details for hike ${completedHike.hikeId}:`,
+            error
+          );
+        }
+      }
+    }
+
+    // 4. Sort all hikes by date (most recent first)
+    allHikes.sort((a, b) => {
+      // Safely convert any timestamp format to milliseconds for comparison
+      const getTimeMillis = (dateField) => {
+        if (!dateField) return 0;
+
+        // Firestore Timestamp with toDate() method
+        if (typeof dateField.toDate === "function") {
+          return dateField.toDate().getTime();
+        }
+        // JavaScript Date object
+        else if (dateField instanceof Date) {
+          return dateField.getTime();
+        }
+        // Try as string/number timestamp
+        else {
+          try {
+            return new Date(dateField).getTime();
+          } catch {
+            return 0;
+          }
+        }
+      };
+
+      return (
+        getTimeMillis(b.completion.dateCompleted) -
+        getTimeMillis(a.completion.dateCompleted)
+      );
+    });
+
+    // 5. Implement pagination
+    const totalHikes = allHikes.length;
+    const startIndex = startAfterDoc
+      ? parseInt(startAfterDoc.toString(), 10)
+      : 0;
+    const endIndex = Math.min(startIndex + batchSize, totalHikes);
+
+    const hikesBatch = allHikes.slice(startIndex, endIndex);
+    const newLastDoc = endIndex < totalHikes ? endIndex : null;
+    const hasMore = endIndex < totalHikes;
+
+    return {
+      hikeData: hikesBatch,
+      lastDoc: newLastDoc,
+      hasMore: hasMore,
+    };
+  } catch (error) {
+    console.error("Error in getFriendsCompletedHikesWithDetails:", error);
+    return { hikeData: [], lastDoc: null, hasMore: false };
+  }
 };
