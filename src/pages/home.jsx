@@ -5,7 +5,7 @@ function Home() {
   return (
     // The default home page for logged in users.
 
-    <div className="w-full h-fit py-6 relative rounded-2xl shadow-inner min-h-screen flex flex-col overflow-y-auto">
+    <div className="w-full h-fit relative rounded-2xl shadow-inner min-h-screen flex flex-col overflow-y-auto">
       <SuggestedHikes />
       <FriendLog />
     </div>

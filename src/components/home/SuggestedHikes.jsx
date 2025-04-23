@@ -202,7 +202,7 @@ export default function SuggestedHikes() {
 
   return (
     <div className="w-full h-fit relative bg-gray-red-100 p-2">
-      <h1 className="px-8 max-sm:px-2 text-3xl font-stretch-ultra-expanded text-left pb-4">
+      <h1 className="px-8 max-sm:px-2 text-3xl font-stretch-ultra-expanded text-left">
         Suggested Hikes
       </h1>
       <button
