@@ -1,13 +1,15 @@
 import { Plus } from "lucide-react";
 
+
+
 const PlusButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="p-2 rounded-full hover:bg-gray-100 transition"
+      className="px-3 py-1 rounded-xl hover:bg-black hover:text-white transition w-fit h-fit "
       aria-label="Add item"
     >
-      <Plus className="w-6 h-6 stroke-gray-600" />
+      <span className="text-xl">Log Hike</span>
     </button>
   );
 };
