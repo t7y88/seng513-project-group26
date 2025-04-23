@@ -8,7 +8,7 @@
  * @property {string} dateCompleted - The date the hike occurred (YYYY-MM-DD). If omitted, today's date will be used.
  * @property {number} timeToComplete - Actual time taken to complete the hike (in minutes)
  * @property {string} timeUnit - The unit of time for 'timeToComplete'
- * @property {string} [notes] - Optional notes or comments about the hike. 
+ * @property {string} [notes] - Optional notes or comments about the hike.
  * @property {Date} createdAt
  */
 
@@ -51,6 +51,7 @@
  * @property {number} timeEstimateMinutes - Estimated time in minutes.
  * @property {number} elevation - Elevation gain (e.g. 763).
  * @property {string} elevationUnit - Unit of elevation gain (e.g. "m").
+ * @property {string} [description] - Description of the hike.
  * @property {string} [status] - (Optional) Trail status.
  */
 
