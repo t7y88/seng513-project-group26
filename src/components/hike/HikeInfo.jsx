@@ -6,10 +6,9 @@ import mapboxgl from 'mapbox-gl';
 import { useAuth } from '../../contexts/authContext';
 import { useUserData } from '../../contexts/userDataContext/useUserData';
 import { useParams } from 'react-router-dom';
+import HikeCompletionModal from './HikeCompletionModal'; // Import the modal
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
-
-// Ensure mapbox-gl CSS is imported
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 const HikeInfo = () => {
@@ -20,11 +19,11 @@ const HikeInfo = () => {
   const [hikeData, setHikeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // To control modal visibility
   
   const mapContainerRef = useRef(null);
   const mapRef = useRef(null);
 
-  // Fetch hike data
   useEffect(() => {
     const fetchHikeData = async () => {
       try {
@@ -45,10 +44,8 @@ const HikeInfo = () => {
 
     if (hikeId) {
       fetchHikeData();
-      console.log('Hike ID:', hikeId);
     }
   }, [hikeId]);
-
 
   useEffect(() => {
     if (!hikeData || !mapContainerRef.current) return;
@@ -58,27 +55,14 @@ const HikeInfo = () => {
       style: "mapbox://styles/mapbox/outdoors-v12",
       center: [-106.3468, 56.1304],
       zoom: 6,
-      transformRequest: (url, resourceType) => {
-        // Disable y-flip for images to prevent warning
-        if (resourceType === 'Image' && !url.includes('mapbox.com')) {
-          return {
-            url,
-            credentials: 'same-origin',
-            headers: {
-              'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8'
-            }
-          };
-        }
-      }
     });
-  
+
     mapRef.current = map;
 
     map.on("load", async () => {
       const res = await fetch("/data/trails.json");
       const geojson = await res.json();
-
-      // Trail name might be under 'Label_e_5k_less' or 'Name_Official_e'
+      
       const filteredFeatures = geojson.features.filter((feature) => {
         return (
           feature.properties["Name_Official_e"]?.toLowerCase() ===
@@ -113,14 +97,36 @@ const HikeInfo = () => {
       if (filteredFeatures.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
         filteredFeatures[0].geometry.coordinates.forEach((coord) => {
-          bounds.extend(coord);
+          if (Array.isArray(coord) && coord.length === 2) {
+            bounds.extend([coord[0], coord[1]]);
+          }
         });
         map.fitBounds(bounds, { padding: 40 });
+      }
+
+      const firstFeature = filteredFeatures[0];
+      if (firstFeature && firstFeature.geometry.type === 'Point') {
+        const coordinates = firstFeature.geometry.coordinates;
+        if (Array.isArray(coordinates) && coordinates.length === 2) {
+          const [longitude, latitude] = coordinates;
+
+          new mapboxgl.Marker({ color: 'green' })
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        }
       }
     });
 
     return () => map?.remove();
   }, [hikeData]);
+
+  const handlePlusButtonClick = () => {
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false); // Close the modal
+  };
 
   if (loading) return <div className="text-center p-8">Loading hike information...</div>;
   if (error) return <div className="text-center p-8 text-red-500">{error}</div>;
@@ -133,14 +139,13 @@ const HikeInfo = () => {
           {hikeData.title}
         </h1>
         <BookmarkButton 
-    hikeId={hikeData.hikeId} 
-    userId={currentUser?.uid}
-    username={userData?.username}
-  />
-        <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+          hikeId={hikeData.hikeId} 
+          userId={currentUser?.uid}
+          username={userData?.username}
+        />
+        <PlusButton onClick={handlePlusButtonClick} />
       </div>
       
-      {/* Display difficulty, distance, elevation */}
       <div className="flex justify-center mb-6">
         <div className="text-lg text-gray-700 flex gap-4">
           <span>{hikeData.difficulty}</span>
@@ -149,13 +154,21 @@ const HikeInfo = () => {
         </div>
       </div>
 
-      {/* Map container */}
       <div className="flex justify-center items-center py-4">
         <div
           ref={mapContainerRef}
           className="w-full max-w-4xl h-[500px] rounded-lg shadow-md border border-gray-300"
         />
       </div>
+
+      {/* Modal for Hike Completion */}
+      {isModalOpen && (
+        <HikeCompletionModal 
+          hikeId={hikeData.hikeId} 
+          userId={currentUser?.uid} 
+          onClose={handleCloseModal} 
+        />
+      )}
     </>
   );
 };
