@@ -18,17 +18,13 @@ function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   
-  // Username validation states
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameValid, setIsUsernameValid] = useState(null);
   const [usernameError, setUsernameError] = useState("");
   
-  // Debounce timer
   const [usernameTimer, setUsernameTimer] = useState(null);
 
-  // Check username availability with debounce
   const checkUsernameAvailability = async (usernameToCheck) => {
-    // Clear validation state
     setIsUsernameValid(null);
     setUsernameError("");
     
@@ -38,12 +34,10 @@ function Signup() {
       return;
     }
     
-    // Clear any existing timer
     if (usernameTimer) {
       clearTimeout(usernameTimer);
     }
     
-    // Set a new timer to delay the check
     setIsCheckingUsername(true);
     const timer = setTimeout(async () => {
       try {
@@ -61,26 +55,23 @@ function Signup() {
       } finally {
         setIsCheckingUsername(false);
       }
-    }, 500); // 500ms debounce
+    }, 500);
     
     setUsernameTimer(timer);
   };
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (usernameTimer) clearTimeout(usernameTimer);
     };
   }, [usernameTimer]);
 
-  // Handle username change
   const handleUsernameChange = (e) => {
     const newUsername = e.target.value;
     setUsername(newUsername);
     checkUsernameAvailability(newUsername);
   };
 
-  // Form validation
   const isFormValid = () => {
     return (
       email.trim() !== "" &&
@@ -106,26 +97,16 @@ function Signup() {
           age: 0,
           location: "Unknown",
           friends: [],
-          memberSince: new Date().toLocaleDateString(),
-          about: "",
-          description: "",
-          profileImage: "",
-          admin: false
+          memberSince: new Date().toISOString(),
+          about: "",          
+          description: "",    
+          profileImage: "",   
+          admin: false        
         });
 
-        navigate("/home");
+        navigate("/profile-setup");
       } catch (err) {
-        let errorMessage = "Failed to create account. Please try again.";
-        if (err.code === "auth/email-already-in-use") {
-          errorMessage = "An account with this email already exists";
-        } else if (err.code === "auth/invalid-email") {
-          errorMessage = "Invalid email address";
-        } else if (err.code === "auth/weak-password") {
-          errorMessage = "Password should be at least 6 characters";
-        } else if (err.code === "auth/network-request-failed") {
-          errorMessage = "Network error. Please check your connection.";
-        }
-        setError(errorMessage);
+        setError("Failed to create an account. Please try again.");
         setIsRegistering(false);
       }
     }
@@ -135,79 +116,53 @@ function Signup() {
     <>
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="bg-white p-8 rounded-xl shadow-lg w-96">
-          <h1 className="text-4xl font-bold text-center mb-6">Create Account</h1>
-          <form onSubmit={onSubmit}>
+        <div className="flex flex-col justify-center bg-white p-8 rounded-xl shadow-lg w-96">
+          <h1 className="text-4xl font-bold text-center mb-6">Sign Up</h1>
+          <form onSubmit={onSubmit} className="space-y-4">
             {error && (
               <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
                 {error}
               </div>
             )}
-            {/* Email */}
+
             <div className="mb-4">
-              <label className="block text-gray-700" htmlFor="email">
-                Email
-              </label>
+              <label className="block text-gray-700">Email</label>
               <input
-                required
-                disabled={isRegistering}
                 type="email"
-                id="email"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="w-full px-4 py-2 border rounded-lg"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
-            {/* Username - NEW FIELD */}
             <div className="mb-4">
-              <label className="block text-gray-700" htmlFor="username">
-                Username
-              </label>
+              <label className="block text-gray-700">Username</label>
               <div className="relative">
                 <input
-                  required
-                  disabled={isRegistering}
                   type="text"
-                  id="username"
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                    ${isUsernameValid === true ? 'border-green-500 focus:ring-green-500' : ''} 
-                    ${isUsernameValid === false ? 'border-red-500 focus:ring-red-500' : ''}
-                    ${isCheckingUsername ? 'border-yellow-500 focus:ring-yellow-500' : ''}
-                    focus:ring-gray-500`}
+                  className="w-full px-4 py-2 border rounded-lg"
                   placeholder="Choose a username"
                   value={username}
                   onChange={handleUsernameChange}
                 />
-                <span className="absolute inset-y-0 right-3 flex items-center">
+                <div className="absolute inset-y-0 right-3 flex items-center">
                   {isCheckingUsername && (
                     <span className="w-5 h-5 border-t-2 border-b-2 border-gray-500 rounded-full animate-spin"></span>
                   )}
                   {isUsernameValid === true && <Check className="text-green-500" size={20} />}
                   {isUsernameValid === false && <AlertCircle className="text-red-500" size={20} />}
-                </span>
+                </div>
               </div>
-              {usernameError && (
-                <p className="mt-1 text-sm text-red-600">{usernameError}</p>
-              )}
-              {isUsernameValid === true && (
-                <p className="mt-1 text-sm text-green-600">Username is available!</p>
-              )}
+              {usernameError && <p className="text-sm text-red-500">{usernameError}</p>}
             </div>
 
-            {/* Password */}
             <div className="mb-4">
-              <label className="block text-gray-700" htmlFor="password">
-                Password
-              </label>
+              <label className="block text-gray-700">Password</label>
               <div className="relative">
                 <input
-                  required
-                  disabled={isRegistering}
                   type={showPassword ? "text" : "password"}
-                  id="password"
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
+                  className="w-full px-4 py-2 border rounded-lg"
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -222,21 +177,12 @@ function Signup() {
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div className="mb-4">
-              <label className="block text-gray-700" htmlFor="confirm-password">
-                Confirm Password
-              </label>
+              <label className="block text-gray-700">Confirm Password</label>
               <div className="relative">
                 <input
-                  required
-                  disabled={isRegistering}
                   type={showConfirmPassword ? "text" : "password"}
-                  id="confirm-password"
-                  className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 
-                    ${confirmPassword && password === confirmPassword ? 'border-green-500' : ''}
-                    ${confirmPassword && password !== confirmPassword ? 'border-red-500' : ''}
-                    focus:ring-gray-500`}
+                  className="w-full px-4 py-2 border rounded-lg"
                   placeholder="Confirm your password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -249,24 +195,23 @@ function Signup() {
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {confirmPassword && password !== confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">Passwords do not match</p>
-              )}
             </div>
 
-            <button 
-              disabled={isRegistering || !isFormValid()} 
-              type="submit" 
-              className={`w-full py-2 px-4 rounded-lg ${isFormValid() ? 'generic-button-active' : 'generic-button-inactive'}`}
+            <button
+              type="submit"
+              className="generic-button-active w-full"
+              disabled={isRegistering || !isFormValid()}
             >
-              {isRegistering ? "Creating Account..." : "Sign Up"}
+              {isRegistering ? "Registering..." : "Sign Up"}
             </button>
           </form>
-          <div className="text-center mt-4 mb-4">
-            <button onClick={() => navigate("/login")} className="generic-button-inactive w-full">
-              Log In
-            </button>
-          </div>
+
+          <button
+            onClick={() => navigate("/login")}
+            className="generic-button-inactive"
+          >
+            Already have an account? Log In
+          </button>
         </div>
       </div>
     </>
