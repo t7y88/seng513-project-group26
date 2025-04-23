@@ -4,7 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
-  useParams,
+  Outlet,
 } from "react-router-dom";
 import { useAuth } from "./contexts/authContext";
 import { GoogleOAuthProvider } from "@react-oauth/google"; // Import this
@@ -23,10 +23,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/admin/AdminRoute.jsx";
 import PageSizeWidget from "./components/PageSizeWidget";
 import { UserDataProvider } from "./contexts/userDataContext";
-import { Outlet } from "react-router-dom";
-import "./index.css";
 import HikeInfo from "./components/hike/HikeInfo";
-import { seedFirestore } from "./firebase/seedFirestore";
+import "./index.css";
 
 const ProtectedLayout = () => (
   <UserDataProvider>
@@ -39,7 +37,7 @@ function App() {
   const { userLoggedIn } = useAuth();
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID; 
   return (
-    <GoogleOAuthProvider clientId = {clientId}> 
+    <GoogleOAuthProvider clientId={clientId}> 
       <Router>
         <NavBar />
         <div className="pb-16 md:pb-0">
@@ -53,73 +51,6 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />
 
-          {/* Protected routes grouped under UserDataProvider */}
-          <Route element={<ProtectedLayout />}>
-            <Route
-              path="home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-  
-            <Route path="/hike/:hikeId" element={
-              <ProtectedRoute>
-                <HikeInfo />
-              </ProtectedRoute>
-            }/>
-            <Route
-              path="profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="profile/:userId"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="profile/edit"
-              element={
-                <ProtectedRoute>
-                  <EditProfilePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="friends"
-              element={
-                <ProtectedRoute>
-                  <Friends />
-                </ProtectedRoute>
-              }
-            />
-            {/* Admin-only routes */}
-            <Route
-              path="admin"
-              element={
-                <AdminRoute>
-                  <Admin />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="admin/friendship"
-              element={
-                <AdminRoute>
-                  <FriendshipTester />
-                </AdminRoute>
-              }
-            />
-
-          </Route>
             {/* Protected routes grouped under UserDataProvider */}
             <Route element={<ProtectedLayout />}>
               <Route
@@ -129,12 +60,6 @@ function App() {
                     <Home />
                   </ProtectedRoute>
                 }
-              />
-
-              {/* Supposed to be moved to clicking the cards on home */}
-              <Route
-                path="/hike/:hikeId"
-                element={<HikeInfo hikeId={useParams().hikeId} />}
               />
               <Route
                 path="profile"
@@ -185,6 +110,15 @@ function App() {
                   </AdminRoute>
                 }
               />
+              {/* Hike info page */}
+              <Route
+                path="/hike/:hikeId"
+                element={
+
+                    <HikeInfo />
+
+                }
+              />
             </Route>
 
             <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
@@ -194,7 +128,7 @@ function App() {
           <PageSizeWidget />
         </div>
       </Router>
-    </GoogleOAuthProvider> // Closing the provider here
+    </GoogleOAuthProvider>
   );
 }
 

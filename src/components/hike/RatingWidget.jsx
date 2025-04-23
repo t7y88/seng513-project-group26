@@ -66,12 +66,12 @@ const RatingWidget = ({ hikeId }) => {
   }
 
   return (
-    <div className="flex items-center">
+    <div className="flex flex-col items-center">
       <div className="flex gap-1">
         {renderStars()}
       </div>
       {ratingStats.count > 0 && (
-        <span className="text-sm text-gray-600 ml-2">
+        <span className="text-sm text-gray-600 mt-1">
           ({ratingStats.count} {ratingStats.count === 1 ? 'review' : 'reviews'})
         </span>
       )}
