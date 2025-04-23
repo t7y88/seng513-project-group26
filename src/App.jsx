@@ -26,6 +26,7 @@ import { UserDataProvider } from "./contexts/userDataContext";
 import { Outlet } from "react-router-dom";
 import "./index.css";
 import HikeInfo from "./components/hike/HikeInfo";
+import { seedFirestore } from "./firebase/seedFirestore";
 
 const ProtectedLayout = () => (
   <UserDataProvider>
@@ -34,6 +35,7 @@ const ProtectedLayout = () => (
 );
 
 function App() {
+  seedFirestore();
   const { userLoggedIn } = useAuth();
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID; 
   return (

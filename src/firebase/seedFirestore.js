@@ -50,7 +50,7 @@ const seedFirestore = async () => {
   //await addFieldToDocs("users", "wishlist", ["mwkZpUFsZbOzgrUbZy3g", "8x6FJjSbJNDkRc8xX543", "po3osv5XEq5kf04kVKz9"]);
   //// Add docId field to all users
   //addDocIdToAllDocs("users");
-  // //--- Seed Hikes ---
+  //--- Seed Hikes ---
   // try {
   //   console.log("Seeding hikes...");
   //   for (const hikeId in hikeEntities) {
@@ -62,6 +62,25 @@ const seedFirestore = async () => {
   // } catch (error) {
   //   console.error("Error seeding hikes:", error);
   // }
+
+  const res = await fetch("/data/hike_entity_stubs.json");
+  const jsonHikeEntities = await res.json();
+
+
+  // ---- Seed Hikes from JSON -----
+  try {
+    console.log("Seeding hikes...");
+    for (const hikeData of jsonHikeEntities) {
+      await createHike(hikeData);
+      console.log(`Added hike: ${hikeData.title}`);
+    }
+    console.log("Hikes seeded successfully!");
+  } catch (error) {
+    console.error("Error seeding hikes:", error);
+  }
+  
+
+
   // //--- Seed Completed Hikes ---
   // try {
   //   console.log("Seeding completed hikes...");
