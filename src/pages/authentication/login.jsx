@@ -5,6 +5,10 @@ import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../firebase/firebase.js"; 
+import { GoogleLogin } from "@react-oauth/google"; 
+import { signInWithCredential, GoogleAuthProvider } from "firebase/auth"; 
+import { db } from "../../firebase/firebase"; 
+import { getDoc, doc } from "firebase/firestore"; 
 import "../../index.css";
 
 function Login() {
@@ -16,7 +20,7 @@ function Login() {
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [resetEmailSent, setResetEmailSent] = useState(false); 
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -51,13 +55,50 @@ function Login() {
     }
   };
 
+  // Google login handler
+  const handleGoogleLogin = async (response) => {
+    try {
+      const googleCredential = GoogleAuthProvider.credential(response.credential);
+      const userCredential = await signInWithCredential(auth, googleCredential);
+
+      if (userCredential.user) {
+        const user = userCredential.user;
+
+        // Check if user exists in Firestore
+        const userDoc = doc(db, "users", user.uid); // Assuming "users" collection
+        const userSnap = await getDoc(userDoc);
+
+        if (!userSnap.exists()) {
+          // New user - handle account creation
+          console.log("New user. Prompt for additional info.");
+          // Redirect or show modal to create a profile
+        } else {
+          // Existing user - navigate to home page
+          console.log("Existing user.");
+          navigate("/home"); // Go to home page or dashboard
+        }
+      }
+    } catch (error) {
+      console.error("Error during Google login:", error.message);
+    }
+  };
+
   return (
     <>
       {userLoggedIn && <Navigate to={"/home"} replace={true} />}
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col justify-center bg-white p-8 rounded-xl shadow-lg w-96">
           <h1 className="text-4xl font-bold text-center mb-6">Welcome Back!</h1>
-          <form onSubmit={onSubmit}>
+          
+          {/* Google Login Button */}
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => console.error("Login Failed")}
+            useOneTap={true} // Optional for one-tap login
+            theme="filled_black" // Optional for dark theme
+          />
+
+          <form onSubmit={onSubmit} className="mt-4">
             {error && (
               <div className="mb-4 p-3 text-sm text-red-500 bg-red-100 rounded-lg">
                 {error}
