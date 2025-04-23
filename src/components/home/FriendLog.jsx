@@ -89,7 +89,7 @@ function FriendsActivity() {
       <h1 className="px-8 max-sm:px-2 text-2xl font-stretch-ultra-expanded text-left">
         Friends Hikes
       </h1>
-      <div className="max-w-7xl mx-auto grid grid-cols-3 gap-2 justify-items-center max-sm:grid-cols-1 max-sm:gap-2">
+      <div className="max-w-7xl mx-auto grid grid-cols-3 max-lg:grid-cols-2 gap-2 justify-items-center max-sm:grid-cols-1 max-sm:gap-2">
         {friendsHikes.map((item) => (
           <div key={item.completion.id} className="mb-4">
             <LogCard {...item} hikeId={item.completion?.hikeId} />

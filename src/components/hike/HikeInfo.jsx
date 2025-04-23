@@ -239,7 +239,7 @@ const HikeInfo = () => {
                   <div className="flex md:justify-left items-center mt-2">
                     <HikeStatusField 
                       hikeId={hikeData.hikeId} 
-                      initialStatus={hikeData.status || 'Open'} 
+                      initialStatus={hikeData.status} 
                       isAdmin={isAdmin} 
                     />
                   </div>
