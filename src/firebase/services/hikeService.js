@@ -14,7 +14,10 @@ import {
   query,
   where,
   limit,
+  writeBatch,
 } from "firebase/firestore";
+
+import { sluggify } from "../../../utils/slugify";
 
 /**
  * Adds a hike to Firestore using an auto-generated document ID.
@@ -229,4 +232,94 @@ export const deleteHikeByHikeId = async (hikeId) => {
 export const deleteHikeByDocId = async (docId) => {
   const hikeRef = doc(db, "hikes", docId);
   await deleteDoc(hikeRef);
+};
+
+/**
+ * Updates hike information including a new title, and ensures the new hikeId is unique.
+ *
+ * @param {string} docId - The Firestore document ID of the hike to update.
+ * @param {Partial<HikeEntity>} updatedData - The updated hike fields (must include `title`)
+ */
+export const updateHikeWithNewTitle = async (docId, updatedData) => {
+  if (!updatedData.title) {
+    throw new Error("Title is required to update hikeId.");
+  }
+
+  const newHikeId = sluggify(updatedData.title);
+
+  // Check if new hikeId already exists in a different document
+  const hikesRef = collection(db, "hikes");
+  const q = query(hikesRef, where("hikeId", "==", newHikeId));
+  const snapshot = await getDocs(q);
+
+  const isDuplicate = snapshot.docs.some((doc) => doc.id !== docId);
+
+  if (isDuplicate) {
+    throw new Error("Another hike with this title already exists.");
+  }
+
+  // Update the hike with new title and new hikeId
+  const hikeRef = doc(db, "hikes", docId);
+  await updateDoc(hikeRef, {
+    ...updatedData,
+    hikeId: newHikeId,
+  });
+};
+
+/**
+ * Updates all hikes in the collection to add a description field with Lorem Ipsum text.
+ * @returns {Promise<number>} The number of documents updated
+ */
+export const addDescriptionFieldToAllHikes = async () => {
+  try {
+    // Get all hikes
+    const hikes = await getAllHikes();
+    console.log(`Found ${hikes.length} hikes to update`);
+
+    let batch = writeBatch(db);
+    let count = 0;
+    let totalUpdated = 0;
+
+    const loremIpsumText =
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Vivamus at turpis nec dui gravida facilisis. Nulla facilisi. Maecenas et metus semper, feugiat urna nec, pharetra nulla.";
+
+    for (const hike of hikes) {
+      // Skip if description already exists
+      if (hike.description) {
+        console.log(`Skipping hike ${hike.id}: description already exists`);
+        continue;
+      }
+
+      // Get reference to the hike document
+      const hikeRef = doc(db, "hikes", hike.id);
+
+      // Add the description field
+      batch.update(hikeRef, { description: loremIpsumText });
+
+      count++;
+      totalUpdated++;
+
+      // Firestore has a limit of 500 operations per batch
+      if (count >= 400) {
+        await batch.commit();
+        console.log(`Committed batch of ${count} updates`);
+        batch = writeBatch(db);
+        count = 0;
+      }
+    }
+
+    // Commit any remaining updates
+    if (count > 0) {
+      await batch.commit();
+      console.log(`Committed final batch of ${count} updates`);
+    }
+
+    console.log(
+      `Successfully updated ${totalUpdated} hikes with description field`
+    );
+    return totalUpdated;
+  } catch (error) {
+    console.error("Failed to update hikes with description field:", error);
+    throw new Error("Failed to add description field to hikes");
+  }
 };

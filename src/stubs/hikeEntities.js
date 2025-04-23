@@ -1,6 +1,21 @@
 // NOTE: This structure is intended to match the backend hike entity schema in Firebase.
 
 export const hikeEntities = {
+  "tunnel-bench-loop": {
+    hikeId: "tunnel-bench-loop",
+    title: "Tunnel Bench Loop (Hoodoos)",
+    image:
+      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.tripadvisor.ca%2FShowUserReviews-g154911-d10820346-r599541775-Hoodoos_Trail-Banff_Banff_National_Park_Alberta.html&psig=AOvVaw2J0raeSM3G6dlveanVnrZv&ust=1745397958535000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPjkm56g64wDFQAAAAAdAAAAABAE",
+    location: "Banff",
+    province: "AB",
+    difficulty: "Moderate",
+    distance: 5,
+    distanceUnit: "km",
+    timeEstimateMinutes: 108,
+    elevation: 66,
+    elevationUnit: "m",
+    status: "open",
+  },
   "valley-of-five-lakes": {
     hikeId: "valley-of-five-lakes",
     title: "Valley of Five Lakes",
@@ -199,17 +214,15 @@ export const hikeEntities = {
   "throat-of-the-world": {
     hikeId: "throat-of-the-world",
     title: "Throat of the World",
-    image:
-      "https://images.uesp.net/5/55/SR-place-Throat_of_the_World.jpg",
+    image: "https://images.uesp.net/5/55/SR-place-Throat_of_the_World.jpg",
     location: "The Pale",
-    province: "Skyrim", 
+    province: "Skyrim",
     difficulty: "Hard",
     distance: 120,
     distanceUnit: "m",
     timeEstimateMinutes: 360,
-    elevation: 1430, 
+    elevation: 1430,
     elevationUnit: "m",
     status: "open",
-  }
+  },
 };
-

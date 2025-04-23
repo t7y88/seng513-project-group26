@@ -45,11 +45,11 @@ Now you should have all the local dependencies built you can proceed with the be
 - [X] Build functions for friend lookup and hike search - can't be only exact match, needs to have partial match as well, with best match at the top
 - [ ] Ensure firestore.rules is set up properly for all neccessary queries and insertions
 - [ ] Ensure any functions needed for the post login User profile creation stage are created (e.g. setUsername, setProfilePic, setName, setAge
-- [ ] Add wishlisted hike attribute to the
+- [X] Add wishlisted hike attribute to the UserProfile collection
 
 ## Typedefs / Collection Definitions
 
-- [ ] Add wishlist array attribute to User for storing hikeId's
+- [X] Add wishlist array attribute to User for storing hikeId's
 
 ## Hike Page
 
@@ -65,18 +65,18 @@ Now you should have all the local dependencies built you can proceed with the be
 
 ## Login Page
 
-- [ ] Complete 'forgot password' logic
+- [x] Complete 'forgot password' logic
 - [x] Include "No such email exists with our registered accounts" for any emails that aren't linked to an account
 - [ ] Complete 'login with google' logic
-- [ ] Add user detail entry form for new users (DOB, age, location, etc)
+- [X] Add user detail entry form for new users (DOB, age, location, etc) - this is done in the User's profile
 - [x] Ensure error handling for each case
 
 ## User Settings Page
 
-- [ ] delete user.
-  - [ ] deletes all Friendships associated with user.
-  - [ ] deletes all wishlisted hikes by user
-  - [ ] deletes all completed hikes by a user
+- [x] delete user.
+- [x] deletes all Friendships associated with user.
+- [x] deletes all wishlisted hikes by user
+- [x] deletes all completed hikes by a user
 - [ ] Change username
 
 ## Admin Page - reachable via user settings.
@@ -86,4 +86,4 @@ Now you should have all the local dependencies built you can proceed with the be
 - [ ] Blacklist user email.
 - [ ] Hikes modifiable via admin.
 - [ ] Status field for hikes.
-  - [ ] Allow Admins to change status via page button.
+- [ ] Allow Admins to change status via page button.
