@@ -113,9 +113,9 @@ function App() {
               <Route
                 path="/hike/:hikeId"
                 element={
-                  <ProtectedRoute>
+
                     <HikeInfo />
-                  </ProtectedRoute>
+
                 }
               />
             </Route>
