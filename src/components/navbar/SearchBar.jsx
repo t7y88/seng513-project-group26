@@ -73,9 +73,8 @@ export default function HikeSearchBar({
     setShowDropdown(false);
     setSearchTerm("");
     safelyCallOnSearchResults([]);
-    // Navigate to hike details page (if you have one), or do something else
-    navigate(`/hike/${hike.id}`);
-  };
+    navigate(`/hike/${hike.hikeId}`);
+  };  
 
   return (
     <div className={`relative w-full ${className}`} ref={dropdownRef}>
