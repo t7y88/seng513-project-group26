@@ -230,13 +230,13 @@ const HikeInfo = () => {
                 {/* Right side: ratings */}
                 <div className="md:w-1/2 flex flex-col">
                   {/* Rating field */}
-                  <div className="flex md:justify-end items-center">
+                  <div className="flex md:justify-left items-center">
                     <span className="text-lg font-bold pr-2">Rating: </span>
                     <RatingWidget hikeId={hikeData.hikeId} />
                   </div>
                   
                   {/* Status field - positioned under rating */}
-                  <div className="flex md:justify-end items-center mt-2">
+                  <div className="flex md:justify-left items-center mt-2">
                     <HikeStatusField 
                       hikeId={hikeData.hikeId} 
                       initialStatus={hikeData.status || 'Open'} 
