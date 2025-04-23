@@ -6,7 +6,8 @@ import mapboxgl from 'mapbox-gl';
 import { useAuth } from '../../contexts/authContext';
 import { useUserData } from '../../contexts/userDataContext/useUserData';
 import { useParams } from 'react-router-dom';
-import HikeCompletionModal from './HikeCompletionModal'; // Import the modal
+import HikeCompletionModal from './HikeCompletionModal';
+import RatingWidget from './RatingWidget';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -225,6 +226,9 @@ const HikeInfo = () => {
       <div className="flex flex-col w-full mt-2 bg-gray-300 p-2 rounded-lg shadow-md">
         <h1 className="text-2xl italic mr-4">About:</h1>
         <div className="text-lg">{hikeData.description}</div>
+        <div className="mt-3">
+          <RatingWidget hikeId={hikeData.hikeId} />
+        </div>
       </div>
 
       {/* Modal for Hike Completion */}
