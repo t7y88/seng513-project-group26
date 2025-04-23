@@ -36,7 +36,7 @@ const formatTimeToHours = (timeInMinutes) => {
  * @param {string} hikeData.difficulty - The difficulty level of the hike
  * @param {string} hikeData.distance - The distance of the hike
  * @param {string} hikeData.distanceUnit - The unit of distance (e.g., km, miles)
- * @param {string} hikeData.time - The estimated time to complete the hike
+ * @param {string} hikeData.timeEstimateMinutes - The estimated time to complete the hike
  * @param {string} hikeData.elevation - The elevation gain of the hike
  * @param {string} hikeData.elevationUnit - The unit of elevation (e.g., m, ft)
  * @returns 
@@ -47,7 +47,7 @@ export default function HikeCard(hikeData) {
     <Link 
       to={`/hike/${hikeData.hikeId}`}
        className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 shrink-0 max-sm:w-xs max-md:w-1/4 min-md:w-1/3 snap-center scroll-smooth cursor-pointer">
-        <h2 className="font-bold text-l px-2 text-gray-800">{hikeData.title}, {hikeData.province}</h2>
+        <h2 className="font-bold text-l px-2 text-gray-800 truncate">{hikeData.title}, {hikeData.province}</h2>
         <div className="aspect-[16/9] w-full rounded-2xl">
             <img 
             className="w-full h-full object-cover rounded-2xl"
@@ -73,7 +73,7 @@ export default function HikeCard(hikeData) {
                 </span>
                 <span className="inline-flex items-center bg-grey-300 rounded-full px-2 text-sm font-semibold text-black">
                     <FaClock className="mr-1" />
-                    {formatTimeToHours(hikeData.time)}
+                    {formatTimeToHours(hikeData.timeEstimateMinutes)}
                 </span>
             </div>
 

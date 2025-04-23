@@ -9,7 +9,31 @@ import { useParams } from 'react-router-dom';
 import HikeCompletionModal from './HikeCompletionModal'; // Import the modal
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
+const formatTimeToHours = (timeInMinutes) => {
+  if (!timeInMinutes) return '';
+  
+  // Convert to number if it's a string
+  const minutes = Number(timeInMinutes);
+  
+  if (isNaN(minutes)) return timeInMinutes; // Return original if not a valid number
+  
+  // Convert minutes to hours with half-hour precision
+  const hours = minutes / 60;
+  const roundedHours = Math.round(hours * 2) / 2; // Round to nearest 0.5
+  
+  // Format the output
+  if (roundedHours === 1) return '1 hr';
+  if (roundedHours % 1 === 0) return `${roundedHours} hrs`;
+  
+  // For half hours, format as "X.5 hrs"
+  const wholeHours = Math.floor(roundedHours);
+  return wholeHours === 0 ? '0.5 hrs' : `${wholeHours}.5 hrs`;
+};
+
+// Ensure mapbox-gl CSS is imported
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { FaClock } from 'react-icons/fa';
 
 const HikeInfo = () => {
   const { hikeId } = useParams();
@@ -133,32 +157,74 @@ const HikeInfo = () => {
   if (!hikeData) return <div className="text-center p-8">No hike found</div>;
 
   return (
-    <>
-      <div className="flex justify-center">
-        <h1 className="text-3xl md:text-4xl italic mb-4 pr-10 pt-5">
-          {hikeData.title}
-        </h1>
-        <BookmarkButton 
-          hikeId={hikeData.hikeId} 
-          userId={currentUser?.uid}
-          username={userData?.username}
-        />
-        <PlusButton onClick={handlePlusButtonClick} />
-      </div>
-      
-      <div className="flex justify-center mb-6">
-        <div className="text-lg text-gray-700 flex gap-4">
-          <span>{hikeData.difficulty}</span>
-          <span>{hikeData.distance} {hikeData.distanceUnit}</span>
-          <span>Elev. {hikeData.elevation} {hikeData.elevationUnit}</span>
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
+      {/* Main row */}
+      <div className="flex flex-row w-full justify-center gap-2 md:flex-nowrap flex-wrap max-md:truncate">
+        {/* Container 1: Title and Map */}
+        <div className="md:w-2/3 w-full flex flex-col">
+        <div className='flex justify-between items-center w-full'>
+          {/* Title on the left */}
+          <h1 className="text-2xl italic pb-0.5">
+            {hikeData.title},
+            <span className="text-lg font-normal"> {hikeData.location}</span>
+          </h1>
+          
+          {/* Buttons on the right */}
+          {currentUser && (
+            <div className="flex md:hidden space-x-2">
+              <BookmarkButton 
+                hikeId={hikeData.hikeId} 
+                userId={currentUser.uid}
+                username={userData?.username}
+              />
+              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+            </div>
+          )}
+        </div>
+          <div
+            ref={mapContainerRef}
+            className="w-full flex-grow h-[500px] rounded-lg shadow-md border border-gray-300"
+          />
+        </div>
+  
+        {/* Container 2: Bookmark, Image, Details */}
+        <div className="md:w-2/5 w-full flex flex-col">
+        {currentUser && (
+            <div className="hidden md:flex justify-end">
+              <BookmarkButton 
+                hikeId={hikeData.hikeId} 
+                userId={currentUser.uid}
+                username={userData?.username}
+              />
+              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+            </div>
+          )}
+          <img
+            src={hikeData.image}
+            alt={hikeData.title}
+            className="w-full h-128 object-cover rounded-lg shadow-md"
+          />
+          {/* Details container*/}
+          <div className="rounded-lg p-3 max-md:mt-2 mt-2 flex-grow bg-gray-300 text-black">
+            <div className="text-lg">
+              <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
+            </div>
+            <div className="text-lg">
+              <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
+            </div>
+            <div className="text-lg">
+              <span className="font-bold">Estimated Time: ~</span>{formatTimeToHours(hikeData.timeEstimateMinutes)}
+            </div>
+
+              <div><span className="font-bold">Difficulty: </span>{hikeData.difficulty}</div>
+          </div>
         </div>
       </div>
-
-      <div className="flex justify-center items-center py-4">
-        <div
-          ref={mapContainerRef}
-          className="w-full max-w-4xl h-[500px] rounded-lg shadow-md border border-gray-300"
-        />
+  
+      {/* About section - */}
+      <div className="flex flex-col w-full mt-2 bg-gray-300 p-2 rounded-lg shadow-md">
+        <h1 className="text-2xl italic mr-4">About:</h1>
+        <div className="text-lg">{hikeData.description}</div>
       </div>
 
       {/* Modal for Hike Completion */}
@@ -169,7 +235,7 @@ const HikeInfo = () => {
           onClose={handleCloseModal} 
         />
       )}
-    </>
+    </div>
   );
 };
 
