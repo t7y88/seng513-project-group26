@@ -5,13 +5,11 @@ import { FaClock } from 'react-icons/fa';
 
 import { getHikeByHikeId } from '../../firebase/services/hikeService';
 import { useAuth } from '../../contexts/authContext';
-import { useUserData } from '../../contexts/userDataContext/useUserData';
-
+import { useUserData } from '../../contexts/userDataContext/useUserData';;
+import HikeCompletionModal from './HikeCompletionModal';
+import RatingWidget from './RatingWidget';
 import BookmarkButton from './Bookmark';
 import PlusButton from './AddHike';
-import HikeCompletionModal from './HikeCompletionModal';
-
-import 'mapbox-gl/dist/mapbox-gl.css';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -172,14 +170,57 @@ const HikeInfo = () => {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span><strong>Elevation Gain:</strong> {hikeData.elevation} {hikeData.elevationUnit}</span>
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <FaClock />
-          <span><strong>Est. Completion Time:</strong> {formatTimeToHours(hikeData.timeEstimateMinutes)}</span>
+  
+        {/* Container 2: Bookmark, Image, Details */}
+        <div className="md:w-2/5 w-full flex flex-col">
+        {currentUser && (
+            <div className="hidden md:flex justify-end">
+              <BookmarkButton 
+                hikeId={hikeData.hikeId} 
+                userId={currentUser.uid}
+                username={userData?.username}
+              />
+              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+            </div>
+          )}
+          <img
+            src={hikeData.image}
+            alt={hikeData.title}
+            className="w-full h-128 object-cover rounded-lg shadow-md"
+          />
+          {/* Details container*/}
+          <div className="rounded-lg p-3 max-md:mt-2 mt-2 flex-grow bg-gray-300 text-black">
+              <div className="flex md:flex-row flex-col justify-between">
+                {/* Left side: details */}
+                <div className="md:w-1/2">
+                  <div className="text-lg">
+                    <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
+                  </div>
+                  <div className="text-lg">
+                    <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
+                  </div>
+                  <div className="text-lg">
+                    <span className="font-bold">Estimated Time: ~</span>{formatTimeToHours(hikeData.timeEstimateMinutes)}
+                  </div>
+                  <div>
+                    <span className="font-bold">Difficulty: </span>{hikeData.difficulty}
+                  </div>
+                </div>
+                
+                {/* Right side: ratings */}
+                <div className="md:w-1/2 flex md:justify-end items-center md:items-start md:mt-0">
+                  <span className="text-lg font-bold pr-2">Rating:  </span><RatingWidget hikeId={hikeData.hikeId} />
+                </div>
+              </div>
+            </div>
         </div>
       </div>
+  
+      {/* About section - */}
+      <div className="flex flex-col w-full mt-2 bg-gray-300 p-2 rounded-lg shadow-md">
+        <h1 className="text-2xl italic mr-4">About:</h1>
+        <div className="text-lg">{hikeData.description}</div>
 
-      <div className="pt-4">
-        <PlusButton onClick={handlePlusButtonClick} />
       </div>
 
       {isModalOpen && (
