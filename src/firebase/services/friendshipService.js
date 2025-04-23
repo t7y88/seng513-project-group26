@@ -119,6 +119,41 @@ export const requestFriendship = async (user1, user2) => {
   console.log(`Friendship request created between ${user1} and ${user2}`);
 };
 
+export const getPendingFriendRequests = async (userId) => {
+  const friendshipsRef = collection(db, "friendships");
+
+  const q = query(
+    friendshipsRef,
+    where("user2", "==", userId), // Only show incoming requests
+    where("status", "==", "pending")
+  );
+
+  const snapshot = await getDocs(q);
+  const pendingIds = snapshot.docs.map((doc) => doc.data().user1); // Get request sender
+
+  const usersRef = collection(db, "users");
+  const pendingProfiles = [];
+
+  const idBatches = Array.from(pendingIds).reduce((batches, id, index) => {
+    const batchIndex = Math.floor(index / 10);
+    if (!batches[batchIndex]) batches[batchIndex] = [];
+    batches[batchIndex].push(id);
+    return batches;
+  }, []);
+
+  for (const batch of idBatches) {
+    const batchQuery = query(usersRef, where(documentId(), "in", batch));
+    const batchSnapshot = await getDocs(batchQuery);
+    batchSnapshot.docs.forEach((doc) => {
+      pendingProfiles.push({ id: doc.id, ...doc.data(), status: "pending" });
+    });
+  }
+
+  return pendingProfiles;
+};
+
+
+
 /**
  * Retrieves all pending friendship requests for a specific user.
  * This function queries the `friendships` collection for documents

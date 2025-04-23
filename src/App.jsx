@@ -10,7 +10,7 @@ import { useAuth } from "./contexts/authContext";
 import { GoogleOAuthProvider } from "@react-oauth/google"; // Import this
 import NavBar from "./components/navbar/NavBar";
 import BottomNavBar from "./components/navbar/BottomNavBar";
-
+import { seedFirestore  } from "./firebase/seedFirestore";
 import Login from "./pages/authentication/login";
 import Signup from "./pages/authentication/signup";
 import Home from "./pages/home";
@@ -120,8 +120,6 @@ function App() {
                 }
               />
             </Route>
-
-            <Route path="explore" element={<div>Explore Page Coming Soon</div>} />
           </Routes>
 
           <BottomNavBar />
