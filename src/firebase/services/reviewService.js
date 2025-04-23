@@ -63,7 +63,7 @@ export const deleteReview = async (reviewId) => {
  * @returns {Promise<{average: number, count: number}>} Object containing average rating and review count
  */
 export const getHikeRatingStats = async (hikeId) => {
-  const reviewsRef = collection(db, "reviews");
+  const reviewsRef = collection(db, "completedHikes");
   const q = query(reviewsRef, where("hikeId", "==", hikeId));
   const snapshot = await getDocs(q);
 
