@@ -13,6 +13,7 @@ import { getCompletedHikes,
          removeFriendship,
          requestFriendship
                               } from "../firebase/"
+import { getUserHikeWishlist } from "../firebase/firestoreUser";
 
 
 
@@ -25,9 +26,17 @@ function Profile() {
   // State for viewed profile data
   const [profileData, setProfileData] = useState(null);
   const [profileHikes, setProfileHikes] = useState([]);
+  const [wishlistHikes, setWishlistHikes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [friendshipStatus, setFriendshipStatus] = useState(null);
-  
+
+  // Reset state when userId changes
+  useEffect(() => {
+    setProfileData(null);
+    setProfileHikes([]);
+    setFriendshipStatus(null);
+  }, [userId]);
+
   useEffect(() => {
     const loadProfileData = async () => {
       try {
@@ -36,18 +45,21 @@ function Profile() {
         if (!userId || userId === currentUser?.uid) {
           setProfileData(currentUserData);
           setProfileHikes(currentUserHikes);
+          setWishlistHikes(await getUserHikeWishlist(currentUserData.id));
         } else {
           // Load other user's profile
           const userData = await getUserFromFirestore(userId);
           const userHikes = await getCompletedHikes(userId);
           setProfileData(userData);
           setProfileHikes(userHikes);
+          setWishlistHikes(await getUserHikeWishlist(userData.id));
           
           // Check friendship status
           const friendship = await getFriendship(currentUser.uid, userId);
           setFriendshipStatus(friendship.length > 0 ? friendship[0] : null);
           console.log(friendship.length)
         }
+        // setWishlistHikes(profileData.wishlist)
       } catch (error) {
         console.error("Error loading profile:", error);
       } finally {
@@ -110,7 +122,11 @@ function Profile() {
           friendshipStatus={friendshipStatus}
           onFriendshipAction={handleFriendshipAction}
         />
-        <HikesList completedHikes={profileHikes} /> 
+        <HikesList 
+          completedHikes={profileHikes} 
+          hikeWishlist={wishlistHikes}
+          isOwnProfile={isOwnProfile}
+        /> 
 
         {isOwnProfile && (
           <div className="flex justify-center">
