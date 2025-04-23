@@ -24,5 +24,6 @@ dist-ssr
 .env
 /node_modules
 /package-lock.json
+/firebaseServiceAccountKey.json
 
 ./firebaseServiceAccountKey.json
