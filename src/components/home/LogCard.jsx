@@ -28,7 +28,9 @@ export default function LogCard(reviewData) {
 
   return (
     <div className="p-1.5 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 max-sm:w-2xs md:w-sm lg:w-sm shrink-0">
-        <h2 className="font-bold text-l px-2 text-gray-800">{reviewData.username} Hiked {reviewData.title}</h2>
+        <h2 className="font-bold text-l px-2 text-gray-800 truncate ">
+  <Link to={`/profile/${reviewData.userId}`} className='hover:underline transition-all duration-300'> {reviewData.username} </Link> Hiked {reviewData.title}
+</h2>
         <Link className="aspect-[16/9] w-full rounded-2xl" to={`/hike/${reviewData.hikeId}`}>
             <img 
             className="w-full h-full object-cover rounded-2xl"
