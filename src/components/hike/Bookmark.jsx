@@ -70,8 +70,8 @@ const BookmarkButton = ({hikeId, userId, username}) => {
     <button
       onClick={handleBookmarkClick}
       disabled={isLoading}
-      className={`p-2 rounded-full transition ${
-        isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-200"
+      className={`px-2 py-1 rounded-xl  w-fit h-fit transition ${
+        isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-white"
       }`}
       aria-label={bookmarked ? "Remove from wishlist" : "Add to wishlist"}
     >
