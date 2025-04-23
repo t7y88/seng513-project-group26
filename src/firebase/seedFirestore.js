@@ -4,8 +4,9 @@ import { hikeEntities } from "../stubs/hikeEntities";
 import { reviewEntities } from "../stubs/reviewEntities";
 import { completedHikes } from "../stubs/completedHikes";
 import { addFieldToDocs, addDocIdToAllDocs } from "./addFieldToDocs";
+import { deleteSeededHikes, deletePexelsHikes, createJSONHike } from "./deleteSeededHikes";
 
-import { db } from "./firebase"; // Adjust the import path as necessary
+import { db } from "./firebase"; 
 import {
   collection,
   doc,
@@ -68,16 +69,17 @@ const seedFirestore = async () => {
 
 
   // ---- Seed Hikes from JSON -----
-  try {
-    console.log("Seeding hikes...");
-    for (const hikeData of jsonHikeEntities) {
-      await createHike(hikeData);
-      console.log(`Added hike: ${hikeData.title}`);
-    }
-    console.log("Hikes seeded successfully!");
-  } catch (error) {
-    console.error("Error seeding hikes:", error);
-  }
+  // try {
+  //   console.log("Seeding hikes...");
+  //   for (const hikeData of jsonHikeEntities) {
+  //     await createJSONHike(hikeData);
+  //     console.log(`Added hike: ${hikeData.title}`);
+  //   }
+  //   console.log("Hikes seeded successfully!");
+  // } catch (error) {
+  //   console.error("Error seeding hikes:", error);
+  // }
+  deletePexelsHikes();
   
 
 
