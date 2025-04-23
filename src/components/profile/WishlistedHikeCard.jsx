@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useUserData } from "../../contexts/userDataContext/useUserData";
 import { removeHikeFromWishlist } from "../../firebase/firestoreUser";
 
-export default function WishlistedHikeCard({ hike }) {
+export default function WishlistedHikeCard({ hike, isOwnProfile }) {
   const { userData } = useUserData();
   const [confirming, setConfirming] = useState(false);
 
@@ -38,6 +38,7 @@ export default function WishlistedHikeCard({ hike }) {
         </div>
 
         {/* Right section: Remove Button or Confirm/Cancel */}
+        {isOwnProfile && (
         <div className="flex flex-col gap-2 justify-center sm:h-[6rem]">
           {!confirming ? (
             <button
@@ -66,6 +67,7 @@ export default function WishlistedHikeCard({ hike }) {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   );

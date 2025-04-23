@@ -6,13 +6,12 @@ import { getMergedRecentHikes } from "../../stubs/helpers/recentHikeMerger";
 import { useUserData } from "../../contexts/userDataContext/useUserData";
 
 
-function HikesList({ completedHikes }) {
+function HikesList({ completedHikes, hikeWishlist, isOwnProfile }) {
   const [activeView, setActiveView] = useState("past");
   const [mergedHikes, setMergedHikes] = useState([]);
-  const { hikeWishlist } = useUserData();
-
 
   useEffect(() => {
+    setMergedHikes([]);
     const loadMergedData = async () => {
       try {
         const hikeEntities = await getAllHikesAsMap(); // returns a map: { [hikeId]: HikeEntity }
@@ -26,7 +25,7 @@ function HikesList({ completedHikes }) {
     if (activeView === "past" && completedHikes.length > 0) {
       loadMergedData();
     }
-  }, [completedHikes, activeView]);
+  }, [completedHikes, hikeWishlist, activeView]);
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -51,10 +50,10 @@ function HikesList({ completedHikes }) {
         {activeView === "wishlist" ? (
           hikeWishlist.length > 0 ? (
             hikeWishlist.map((hike) => (
-              <WishlistedHikeCard key={hike.id} hike={hike} />
+              <WishlistedHikeCard key={hike.id} hike={hike} isOwnProfile={isOwnProfile} />
             ))
           ) : (
-            <p className="text-gray-600">You haven't saved any hikes yet.</p>
+            <p className="text-gray-600">No wishlisted hikes yet.</p>
           )
         ) : (
           <>
@@ -66,7 +65,6 @@ function HikesList({ completedHikes }) {
             )}
           </>
         )}
-
       </div>
     </div>
   );
