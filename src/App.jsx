@@ -124,7 +124,7 @@ function App() {
           </Routes>
 
           <BottomNavBar />
-          <PageSizeWidget />
+          {/* <PageSizeWidget /> */}
         </div>
       </Router>
     </GoogleOAuthProvider>
