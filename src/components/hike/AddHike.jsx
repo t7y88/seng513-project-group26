@@ -1,5 +1,7 @@
 import { Plus } from "lucide-react";
 
+
+
 const PlusButton = ({ onClick }) => {
   return (
     <button
@@ -7,7 +9,7 @@ const PlusButton = ({ onClick }) => {
       className="p-2 rounded-full hover:bg-gray-100 transition"
       aria-label="Add hike"
     >
-      <Plus className="w-6 h-6 stroke-gray-600" />
+      <span className="text-xl">Log Hike</span>
     </button>
   );
 };
