@@ -149,74 +149,76 @@ const HikeInfo = () => {
   if (!hikeData) return <div className="text-center p-8">No hike found</div>;
 
   return (
-    <div className='justify-center flex flex-row'>
-      <div className="flex flex-col justify-center">
-
-
-        <div className="flex justify-center w-6xl bg-amber-300 h-4/5">
-          {/* ========================== Tile and Map container =================*/}
-          <div className="w-2/3 flex flex-col h-full bg-green-400 p-2">
-            <h1 className="text-2xl italic pb-0.5 text-nowrap">
-              {hikeData.title},
-              <span className="text-lg font-normal "> {hikeData.location}</span>
-            </h1>
-            <div
-              ref={mapContainerRef}
-              className="w-full h-full rounded-lg shadow-md border border-gray-300 flex-grow"
-            />
-          </div>
-
-          {/*================= Bookmark, Log hike, Image, and ratings/info =======*/}
-          <div className="w-1/2 flex flex-col h-full p-2">
-            {currentUser && (
-              <div className="flex justify-end ">
-                <BookmarkButton 
-                  hikeId={hikeData.hikeId} 
-                  userId={currentUser.uid}
-                  username={userData?.username}
-                />
-                <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
-              </div>
-            )}
-
-            <img
-              src={hikeData.image}
-              alt={hikeData.title}
-              className="w-full h-1/2 object-cover rounded-lg shadow-md border border-gray-300"
-            />
-            <div className="rounded-lg p-4 mt-4 flex-grow bg-blue-500">
-              <div className="text-lg text-gray-700 mb-2">
-                <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
-              </div>
-              <div className="text-lg text-gray-700 mb-2">
-                <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
-              </div>
-              <div className="text-lg text-gray-700 mb-2">
-                <div className='inline-flex'> <FaClock className="mr-1" />{formatTimeToHours(hikeData.timeEstimateMinutes)}</div>
-                
-                <div>{hikeData.difficulty}</div>
-                <span>{hikeData.distance} {hikeData.distanceUnit}</span>
-                <span>Elev. {hikeData.elevation} {hikeData.elevationUnit}</span>
-              </div>
-          </div>
-
-
-        </div>
-            {/* Display difficulty, distance, elevation */}
-            <div className="flex justify-center mb-6">
-
-            </div>
-        </div>
-        <div className='flex px-2 text-align-left w-full bg-red-600'> 
-          <h1 className="text-3xl md:text-4xl italic mb-4 pr-10 pt-5">
-            About:
+    <div className="flex flex-col items-center w-full max-w-7xl mx-auto px-4">
+      {/* Main row */}
+      <div className="flex flex-row w-full justify-center gap-2 md:flex-nowrap flex-wrap max-md:truncate">
+        {/* Container 1: Title and Map */}
+        <div className="md:w-2/3 w-full flex flex-col">
+        <div className='flex justify-between items-center w-full'>
+          {/* Title on the left */}
+          <h1 className="text-2xl italic pb-0.5">
+            {hikeData.title},
+            <span className="text-lg font-normal"> {hikeData.location}</span>
           </h1>
-          <span className="text-lg text-gray-700 mb-2">
-            {hikeData.description}
-          </span>
+          
+          {/* Buttons on the right */}
+          {currentUser && (
+            <div className="flex md:hidden space-x-2">
+              <BookmarkButton 
+                hikeId={hikeData.hikeId} 
+                userId={currentUser.uid}
+                username={userData?.username}
+              />
+              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+            </div>
+          )}
+        </div>
+          <div
+            ref={mapContainerRef}
+            className="w-full flex-grow h-[500px] rounded-lg shadow-md border border-gray-300"
+          />
+        </div>
+  
+        {/* Container 2: Bookmark, Image, Details */}
+        <div className="md:w-2/5 w-full flex flex-col">
+        {currentUser && (
+            <div className="hidden md:flex justify-end">
+              <BookmarkButton 
+                hikeId={hikeData.hikeId} 
+                userId={currentUser.uid}
+                username={userData?.username}
+              />
+              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+            </div>
+          )}
+          <img
+            src={hikeData.image}
+            alt={hikeData.title}
+            className="w-full h-128 object-cover rounded-lg shadow-md"
+          />
+          {/* Details container*/}
+          <div className="rounded-lg p-3 max-md:mt-2 mt-2 flex-grow bg-gray-300 text-black">
+            <div className="text-lg">
+              <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
+            </div>
+            <div className="text-lg">
+              <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
+            </div>
+            <div className="text-lg">
+              <span className="font-bold">Estimated Time: ~</span>{formatTimeToHours(hikeData.timeEstimateMinutes)}
+            </div>
+
+              <div><span className="font-bold">Difficulty: </span>{hikeData.difficulty}</div>
+          </div>
         </div>
       </div>
-  </div>
+  
+      {/* About section - */}
+      <div className="flex flex-col w-full mt-2 bg-gray-300 p-2 rounded-lg shadow-md">
+        <h1 className="text-2xl italic mr-4">About:</h1>
+        <div className="text-lg">{hikeData.description}</div>
+      </div>
+    </div>
   );
 };
 
