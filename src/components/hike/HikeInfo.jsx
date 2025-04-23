@@ -207,18 +207,29 @@ const HikeInfo = () => {
           />
           {/* Details container*/}
           <div className="rounded-lg p-3 max-md:mt-2 mt-2 flex-grow bg-gray-300 text-black">
-            <div className="text-lg">
-              <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
+              <div className="flex md:flex-row flex-col justify-between">
+                {/* Left side: details */}
+                <div className="md:w-1/2">
+                  <div className="text-lg">
+                    <span className="font-bold">Distance:</span> {hikeData.distance} {hikeData.distanceUnit}
+                  </div>
+                  <div className="text-lg">
+                    <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
+                  </div>
+                  <div className="text-lg">
+                    <span className="font-bold">Estimated Time: ~</span>{formatTimeToHours(hikeData.timeEstimateMinutes)}
+                  </div>
+                  <div>
+                    <span className="font-bold">Difficulty: </span>{hikeData.difficulty}
+                  </div>
+                </div>
+                
+                {/* Right side: ratings */}
+                <div className="md:w-1/2 flex md:justify-end items-center md:items-start md:mt-0">
+                  <span className="text-lg font-bold pr-2">Rating:  </span><RatingWidget hikeId={hikeData.hikeId} />
+                </div>
+              </div>
             </div>
-            <div className="text-lg">
-              <span className="font-bold">Elevation:</span> {hikeData.elevation} {hikeData.elevationUnit}
-            </div>
-            <div className="text-lg">
-              <span className="font-bold">Estimated Time: ~</span>{formatTimeToHours(hikeData.timeEstimateMinutes)}
-            </div>
-
-              <div><span className="font-bold">Difficulty: </span>{hikeData.difficulty}</div>
-          </div>
         </div>
       </div>
   
@@ -226,9 +237,7 @@ const HikeInfo = () => {
       <div className="flex flex-col w-full mt-2 bg-gray-300 p-2 rounded-lg shadow-md">
         <h1 className="text-2xl italic mr-4">About:</h1>
         <div className="text-lg">{hikeData.description}</div>
-        <div className="mt-3">
-          <RatingWidget hikeId={hikeData.hikeId} />
-        </div>
+
       </div>
 
       {/* Modal for Hike Completion */}
