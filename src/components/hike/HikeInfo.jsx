@@ -8,6 +8,7 @@ import { useUserData } from '../../contexts/userDataContext/useUserData';
 import { useParams } from 'react-router-dom';
 import HikeCompletionModal from './HikeCompletionModal';
 import RatingWidget from './RatingWidget';
+import HikeStatusField from './HikeStatusField';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -37,9 +38,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { FaClock } from 'react-icons/fa';
 
 const HikeInfo = () => {
+  
   const { hikeId } = useParams();
   const { currentUser } = useAuth();
   const { userData } = useUserData();
+  const isAdmin = userData?.admin === true;
 
   const [hikeData, setHikeData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -225,8 +228,21 @@ const HikeInfo = () => {
                 </div>
                 
                 {/* Right side: ratings */}
-                <div className="md:w-1/2 flex md:justify-end items-center md:items-start md:mt-0">
-                  <span className="text-lg font-bold pr-2">Rating:  </span><RatingWidget hikeId={hikeData.hikeId} />
+                <div className="md:w-1/2 flex flex-col">
+                  {/* Rating field */}
+                  <div className="flex md:justify-end items-center">
+                    <span className="text-lg font-bold pr-2">Rating: </span>
+                    <RatingWidget hikeId={hikeData.hikeId} />
+                  </div>
+                  
+                  {/* Status field - positioned under rating */}
+                  <div className="flex md:justify-end items-center mt-2">
+                    <HikeStatusField 
+                      hikeId={hikeData.hikeId} 
+                      initialStatus={hikeData.status || 'Open'} 
+                      isAdmin={isAdmin} 
+                    />
+                  </div>
                 </div>
               </div>
             </div>

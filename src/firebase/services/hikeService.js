@@ -323,3 +323,23 @@ export const addDescriptionFieldToAllHikes = async () => {
     throw new Error("Failed to add description field to hikes");
   }
 };
+
+/**
+ * Updates the status of a hike.
+ *
+ * @param {string} hikeId - The Firestore document ID of the hike.
+ * @param {string} newStatus - The new status to set (e.g., "Open", "Closed").
+ * @returns {Promise<boolean>} True if the update was successful, false otherwise.
+ */
+export const updateHikeStatus = async (hikeId, newStatus) => {
+  try {
+    const hikeRef = doc(db, "hikes", hikeId);
+    await updateDoc(hikeRef, {
+      status: newStatus,
+    });
+    return true;
+  } catch (error) {
+    console.error("Error updating hike status:", error);
+    throw error;
+  }
+};
