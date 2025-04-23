@@ -11,7 +11,7 @@ function FriendsActivity() {
   const [hasMore, setHasMore] = useState(true);
   const observerRef = useRef(null);
   const loaderRef = useRef(null);
-  
+
   const loadInitialHikes = useCallback(async () => {
     setLoading(true);
     try {
@@ -26,10 +26,10 @@ function FriendsActivity() {
       setLoading(false);
     }
   }, [currentUser]);
-  
+
   const loadMoreHikes = useCallback(async () => {
     if (!hasMore || loading || !lastDoc) return;
-    
+
     setLoading(true);
     try {
       const result = await getFriendsCompletedHikesWithDetails(
@@ -37,8 +37,8 @@ function FriendsActivity() {
         10, // batch size
         lastDoc
       );
-      
-      setFriendsHikes(prevHikes => [...prevHikes, ...result.hikeData]);
+
+      setFriendsHikes((prevHikes) => [...prevHikes, ...result.hikeData]);
       setLastDoc(result.lastDoc);
       setHasMore(result.hasMore);
     } catch (error) {
@@ -47,14 +47,14 @@ function FriendsActivity() {
       setLoading(false);
     }
   }, [currentUser, hasMore, loading, lastDoc]);
-  
+
   // Setup Intersection Observer for infinite scroll
   useEffect(() => {
     // Disconnect previous observer if it exists
     if (observerRef.current) {
       observerRef.current.disconnect();
     }
-    
+
     // Create new observer
     observerRef.current = new IntersectionObserver(
       (entries) => {
@@ -64,12 +64,12 @@ function FriendsActivity() {
       },
       { threshold: 0.1 } // Trigger when 10% of the target is visible
     );
-    
+
     // Observe the loader element if it exists
     if (loaderRef.current) {
       observerRef.current.observe(loaderRef.current);
     }
-    
+
     // Cleanup
     return () => {
       if (observerRef.current) {
@@ -77,26 +77,28 @@ function FriendsActivity() {
       }
     };
   }, [hasMore, loading, loadMoreHikes]);
-  
+
   useEffect(() => {
     if (currentUser) {
       loadInitialHikes();
     }
   }, [currentUser, loadInitialHikes]);
-  
+
   return (
-    <div className="w-full h-full  bg-red-500">
-      <h1 className="px-8 max-sm:px-2 text-2xl font-stretch-ultra-expanded text-left">Friends Hikes</h1>
-      <div className="grid grid-cols-2 gap-4">
-        {friendsHikes.map(item => (
+    <div className="w-full h-full p-2">
+      <h1 className="px-8 max-sm:px-2 text-2xl font-stretch-ultra-expanded text-left">
+        Friends Hikes
+      </h1>
+      <div className="max-w-7xl mx-auto grid grid-cols-3 gap-2 justify-items-center max-sm:grid-cols-1 max-sm:gap-2">
+        {friendsHikes.map((item) => (
           <div key={item.completion.id} className="mb-4">
-            <LogCard {...item} />
+            <LogCard {...item} hikeId={item.completion?.hikeId} />
           </div>
         ))}
-        
+
         {/* This invisible element serves as our observer target */}
-        <div 
-          ref={loaderRef} 
+        <div
+          ref={loaderRef}
           className="h-10 w-full flex items-center justify-center"
         >
           {loading && hasMore && <p>Loading more hikes...</p>}

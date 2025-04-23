@@ -55,3 +55,33 @@ export const deleteReview = async (reviewId) => {
   const reviewRef = doc(db, "reviews", reviewId);
   await deleteDoc(reviewRef);
 };
+
+/**
+ * Get the average rating and total number of reviews for a specific hike
+ *
+ * @param {string} hikeId - ID of the hike
+ * @returns {Promise<{average: number, count: number}>} Object containing average rating and review count
+ */
+export const getHikeRatingStats = async (hikeId) => {
+  const reviewsRef = collection(db, "reviews");
+  const q = query(reviewsRef, where("hikeId", "==", hikeId));
+  const snapshot = await getDocs(q);
+
+  const reviews = snapshot.docs.map((doc) => doc.data());
+  const count = reviews.length;
+
+  if (count === 0) {
+    return { average: 0, count: 0 };
+  }
+
+  // Calculate average rating
+  const sum = reviews.reduce((total, review) => {
+    const rating = parseFloat(review.rating);
+    return isNaN(rating) ? total : total + rating;
+  }, 0);
+
+  const average = sum / count;
+  const roundedAverage = Math.ceil(average);
+
+  return { average: roundedAverage, count };
+};
