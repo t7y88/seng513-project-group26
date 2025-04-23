@@ -4,11 +4,11 @@ import { doSignInWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../../firebase/firebase.js"; 
-import { GoogleLogin } from "@react-oauth/google"; 
-import { signInWithCredential, GoogleAuthProvider } from "firebase/auth"; 
-import { db } from "../../firebase/firebase"; 
-import { getDoc, doc } from "firebase/firestore"; 
+import { auth } from "../../firebase/firebase.js";
+import { GoogleLogin } from "@react-oauth/google";
+import { signInWithCredential, GoogleAuthProvider } from "firebase/auth";
+import { db } from "../../firebase/firebase";
+import { getDoc, doc } from "firebase/firestore";
 import "../../index.css";
 
 function Login() {
@@ -31,7 +31,10 @@ function Login() {
         await doSignInWithEmailAndPassword(email, password);
       } catch (err) {
         let errorMessage = "Failed to sign in. Please try again.";
-        if (err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
+        if (
+          err.code === "auth/user-not-found" ||
+          err.code === "auth/wrong-password"
+        ) {
           errorMessage = "Invalid email or password";
         } else if (err.code === "auth/invalid-email") {
           errorMessage = "Invalid email address";
@@ -48,8 +51,8 @@ function Login() {
   const handleForgotPassword = async () => {
     try {
       await sendPasswordResetEmail(auth, email);
-      setResetEmailSent(true);  // Show confirmation message
-      setError("");  // Clear any previous errors
+      setResetEmailSent(true); // Show confirmation message
+      setError(""); // Clear any previous errors
     } catch (err) {
       setError("Error resetting password. Please try again.");
     }
@@ -58,7 +61,9 @@ function Login() {
   // Google login handler
   const handleGoogleLogin = async (response) => {
     try {
-      const googleCredential = GoogleAuthProvider.credential(response.credential);
+      const googleCredential = GoogleAuthProvider.credential(
+        response.credential
+      );
       const userCredential = await signInWithCredential(auth, googleCredential);
 
       if (userCredential.user) {
@@ -89,7 +94,7 @@ function Login() {
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="flex flex-col justify-center bg-white p-8 rounded-xl shadow-lg w-96">
           <h1 className="text-4xl font-bold text-center mb-6">Welcome Back!</h1>
-          
+
           {/* Google Login Button */}
           <GoogleLogin
             onSuccess={handleGoogleLogin}
@@ -150,7 +155,9 @@ function Login() {
 
           <div className="text-center mt-4 mb-4">
             {resetEmailSent ? (
-              <p className="text-green-500">Password reset email sent. Please check your inbox.</p>
+              <p className="text-green-500">
+                Password reset email sent. Please check your inbox.
+              </p>
             ) : (
               <a
                 href="#"
