@@ -51,6 +51,73 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="signup" element={<Signup />} />
 
+          {/* Protected routes grouped under UserDataProvider */}
+          <Route element={<ProtectedLayout />}>
+            <Route
+              path="home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+  
+            <Route path="/hike/:hikeId" element={
+              <ProtectedRoute>
+                <HikeInfo />
+              </ProtectedRoute>
+            }/>
+            <Route
+              path="profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile/:userId"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="profile/edit"
+              element={
+                <ProtectedRoute>
+                  <EditProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="friends"
+              element={
+                <ProtectedRoute>
+                  <Friends />
+                </ProtectedRoute>
+              }
+            />
+            {/* Admin-only routes */}
+            <Route
+              path="admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="admin/friendship"
+              element={
+                <AdminRoute>
+                  <FriendshipTester />
+                </AdminRoute>
+              }
+            />
+
+          </Route>
             {/* Protected routes grouped under UserDataProvider */}
             <Route element={<ProtectedLayout />}>
               <Route

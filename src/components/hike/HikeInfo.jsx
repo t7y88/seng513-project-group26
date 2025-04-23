@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { getHikeByHikeId } from '../../firebase/services/hikeService';
 import BookmarkButton from './Bookmark';
 import PlusButton from './AddHike';
 import mapboxgl from 'mapbox-gl';
 import { useAuth } from '../../contexts/authContext';
 import { useUserData } from '../../contexts/userDataContext/useUserData';
-
+import { useParams } from 'react-router-dom';
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
