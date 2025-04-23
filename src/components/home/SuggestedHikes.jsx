@@ -189,7 +189,6 @@ export default function SuggestedHikes() {
     // I want to eventually change the item width to be more responsive. currently this is
     // just an arbitrary value
     const itemWidth = 352;
-
     const loopToEnd = true;
 
     if (currentScroll <= 0 && loopToEnd) {

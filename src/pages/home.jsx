@@ -4,7 +4,6 @@ import FriendLog from "../components/home/FriendLog";
 function Home() {
   return (
     // The default home page for logged in users.
-
     <div className="w-full h-fit relative rounded-2xl shadow-inner min-h-screen flex flex-col overflow-y-auto">
       <SuggestedHikes />
       <FriendLog />
