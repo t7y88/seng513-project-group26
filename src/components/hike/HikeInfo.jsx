@@ -178,7 +178,7 @@ const HikeInfo = () => {
                 userId={currentUser.uid}
                 username={userData?.username}
               />
-              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+              <PlusButton onClick={handlePlusButtonClick} />
             </div>
           )}
         </div>
@@ -197,7 +197,7 @@ const HikeInfo = () => {
                 userId={currentUser.uid}
                 username={userData?.username}
               />
-              <PlusButton onClick={() => { console.log('Adding hike to completed'); }} />
+              <PlusButton onClick={handlePlusButtonClick} />
             </div>
           )}
           <img
@@ -245,6 +245,7 @@ const HikeInfo = () => {
         <HikeCompletionModal 
           hikeId={hikeData.hikeId} 
           userId={currentUser?.uid} 
+          username={userData?.username}
           onClose={handleCloseModal} 
         />
       )}
